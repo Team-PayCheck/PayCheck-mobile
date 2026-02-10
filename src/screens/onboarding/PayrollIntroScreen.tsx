@@ -28,7 +28,7 @@ const PayrollIntroScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#ffffff",
+		backgroundColor: "#FDFDFD",
 	},
 	header: {
 		paddingHorizontal: 40,

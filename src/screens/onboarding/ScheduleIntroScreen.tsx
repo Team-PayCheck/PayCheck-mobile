@@ -29,7 +29,7 @@ const ScheduleIntroScreen: React.FC<ScheduleIntroScreenProps> = ({ onStartPress 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#ffffff",
+		backgroundColor: "#FDFDFD",
 	},
 	content: {
 		flex: 1,
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		paddingHorizontal: 90,
-		paddingBottom: 32,
+		paddingBottom: 10,
 	},
 	title: {
 		fontSize: 40,

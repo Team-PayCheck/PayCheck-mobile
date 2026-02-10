@@ -21,7 +21,7 @@ const NoticeIntroScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#ffffff",
+		backgroundColor: "#FDFDFD",
 	},
 	content: {
 		flex: 1,

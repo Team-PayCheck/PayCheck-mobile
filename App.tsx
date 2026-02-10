@@ -2,9 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import OnboardingStack from "./src/navigation/OnboardingStack";
+import RootNavigator from "./src/navigation/RootNavigator";
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -28,7 +27,7 @@ export default function App() {
 
 	return (
 		<>
-			<OnboardingStack onComplete={() => console.log("Onboarding completed")} />
+			<RootNavigator />
 			<StatusBar style="dark" />
 		</>
 	);
