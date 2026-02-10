@@ -77,20 +77,23 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	indicatorContainer: {
+		position: "absolute",
+		bottom: 100,
+		left: 0,
+		right: 0,
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
-		paddingBottom: 32,
 		gap: 8,
 	},
 	indicatorDot: {
 		width: 8,
 		height: 8,
 		borderRadius: 4,
-		backgroundColor: "#d1d5db",
+		backgroundColor: "#D9D9D9",
 	},
 	indicatorActive: {
-		backgroundColor: "#111827",
+		backgroundColor: "#353535",
 	},
 });
 

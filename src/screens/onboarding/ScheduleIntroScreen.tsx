@@ -18,6 +18,8 @@ const ScheduleIntroScreen: React.FC<ScheduleIntroScreenProps> = ({ onStartPress 
 					style={styles.image}
 					resizeMode="contain"
 				/>
+			</View>
+			<View style={styles.buttonContainer}>
 				<PrimaryButton text="시작하기" onPress={onStartPress} />
 			</View>
 		</SafeAreaView>
@@ -34,7 +36,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 40,
 		alignItems: "center",
 		justifyContent: "center",
-		paddingTop: 24,
+		paddingTop: 30,
+	},
+	buttonContainer: {
+		paddingHorizontal: 90,
+		paddingBottom: 32,
 	},
 	title: {
 		fontSize: 40,
