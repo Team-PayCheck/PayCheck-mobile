@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import NoticeIntroScreen from "./src/screens/onboarding/NoticeIntroScreen";
+import ScheduleIntroScreen from "./src/screens/onboarding/ScheduleIntroScreen";
 
 export default function App() {
   return (
     <>
-      <NoticeIntroScreen />
+      <ScheduleIntroScreen />
       <StatusBar style="dark" />
     </>
   );
