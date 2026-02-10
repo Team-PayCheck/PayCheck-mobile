@@ -5,7 +5,9 @@ const env = Constants.expoConfig?.extra || {};
 // 카카오 OAuth 설정
 export const KAKAO_CONFIG = {
   REST_API_KEY: (env.kakaoRestApiKey as string) || '',
-  REDIRECT_URI: (env.kakaoRedirectUri as string) || 'exp://localhost:8081/--/kakao-redirect',
+  REDIRECT_URI:
+    (env.kakaoRedirectUri as string) ||
+    'https://auth.expo.io/@TeamPayCheck/PayCheck-mobile',
 };
 
 // HTTP Status Codes
