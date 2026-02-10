@@ -1,6 +1,7 @@
 import React from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import PrimaryButton from "../../components/common/PrimaryButton";
 
 interface ScheduleIntroScreenProps {
 	onStartPress?: () => void;
@@ -11,19 +12,13 @@ const ScheduleIntroScreen: React.FC<ScheduleIntroScreenProps> = ({ onStartPress 
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
 				<Text style={styles.title}>일정 조정</Text>
-				<Text style={styles.subtitle}>근무기록 정정, 수정 요청을 통한 유동적인 일정 조정 </Text>
+				<Text style={styles.subtitle}>근무기록 정정, 수정 요청을 통한{"\n"}유동적인 일정 조정 </Text>
 				<Image
 					source={require("../../assets/images/onboarding/scheduleIntro_image.png")}
 					style={styles.image}
 					resizeMode="contain"
 				/>
-				<TouchableOpacity
-					style={styles.startButton}
-					onPress={onStartPress}
-					activeOpacity={0.8}
-				>
-					<Text style={styles.startButtonText}>시작하기</Text>
-				</TouchableOpacity>
+				<PrimaryButton text="시작하기" onPress={onStartPress} />
 			</View>
 		</SafeAreaView>
 	);
@@ -36,41 +31,28 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		flex: 1,
-		paddingHorizontal: 24,
+		paddingHorizontal: 40,
 		alignItems: "center",
 		justifyContent: "center",
-		paddingBottom: 24,
+		paddingTop: 24,
 	},
 	title: {
-		fontSize: 28,
-		color: "#111827",
-		fontWeight: "700",
+		fontSize: 40,
+		color: "#000000",
+		fontFamily: "Pretendard-ExtraBold",
 		textAlign: "center",
 	},
 	subtitle: {
 		marginTop: 8,
-		fontSize: 14,
-		color: "#6b7280",
-		fontWeight: "500",
+		fontSize: 16,
+		color: "#848484",
+		fontFamily: "Pretendard-SemiBold",
 		textAlign: "center",
 	},
 	image: {
 		marginTop: 24,
 		width: "100%",
 		height: 360,
-	},
-	startButton: {
-		marginTop: 24,
-		backgroundColor: "#3b82f6",
-		paddingVertical: 14,
-		paddingHorizontal: 48,
-		borderRadius: 8,
-	},
-	startButtonText: {
-		fontSize: 16,
-		color: "#ffffff",
-		fontWeight: "600",
-		textAlign: "center",
 	},
 });
 
