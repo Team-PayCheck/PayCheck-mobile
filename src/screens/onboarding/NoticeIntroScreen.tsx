@@ -13,11 +13,6 @@ const NoticeIntroScreen = () => {
 					style={styles.image}
 					resizeMode="contain"
 				/>
-				<View style={styles.indicatorRow}>
-					<View style={styles.indicatorDot} />
-					<View style={[styles.indicatorDot, styles.indicatorActive]} />
-					<View style={styles.indicatorDot} />
-				</View>
 			</View>
 		</SafeAreaView>
 	);
@@ -52,22 +47,6 @@ const styles = StyleSheet.create({
 		marginTop: 24,
 		width: "100%",
 		height: 360,
-	},
-	indicatorRow: {
-		marginTop: 24,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		gap: 8,
-	},
-	indicatorDot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		backgroundColor: "#d1d5db",
-	},
-	indicatorActive: {
-		backgroundColor: "#111827",
 	},
 });
 

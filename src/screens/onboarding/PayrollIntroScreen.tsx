@@ -20,11 +20,6 @@ const PayrollIntroScreen = () => {
 					style={styles.image}
 					resizeMode="contain"
 				/>
-				<View style={styles.indicatorRow}>
-					<View style={[styles.indicatorDot, styles.indicatorActive]} />
-					<View style={styles.indicatorDot} />
-					<View style={styles.indicatorDot} />
-				</View>
 			</View>
 		</SafeAreaView>
 	);
@@ -36,56 +31,41 @@ const styles = StyleSheet.create({
 		backgroundColor: "#ffffff",
 	},
 	header: {
-		paddingHorizontal: 24,
-		paddingTop: 16,
-		paddingBottom: 8,
-		alignItems: "center",
+		paddingHorizontal: 40,
+		paddingTop: 100,
+		paddingBottom: 0,
+		alignItems: "flex-start",
 	},
 	logo: {
-		width: 200,
-		height: 40,
+		width: 220,
+		height: 50,
 	},
 	content: {
 		flex: 1,
-		paddingHorizontal: 24,
-		alignItems: "center",
-		justifyContent: "center",
-		paddingBottom: 24,
+		paddingHorizontal: 40,
+		alignItems: "flex-start",
+		justifyContent: "flex-start",
+		paddingTop: 50,  
 	},
 	subtitle: {
-		fontSize: 14,
-		color: "#6b7280",
-		fontWeight: "500",
-		textAlign: "center",
+		fontSize: 15, 
+		color: "#848484",
+		fontFamily: "Pretendard-SemiBold",
+		textAlign: "left",
 	},
 	title: {
-		marginTop: 8,
-		fontSize: 28,
-		color: "#111827",
-		fontWeight: "700",
-		textAlign: "center",
+		fontSize: 35, 
+		color: "#000000",
+		fontFamily: "Pretendard-ExtraBold",
+		textAlign: "left",
+		lineHeight: 48,
+		letterSpacing: -0.6,
 	},
 	image: {
-		marginTop: 24,
-		width: "100%",
-		height: 360,
-	},
-	indicatorRow: {
-		marginTop: 24,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		gap: 8,
-	},
-	indicatorDot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		backgroundColor: "#d1d5db",
-	},
-	indicatorActive: {
-		backgroundColor: "#111827",
+		width: "115%", 
+		flex: 1,
 	},
 });
+
 
 export default PayrollIntroScreen;

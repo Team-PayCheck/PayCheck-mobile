@@ -41,6 +41,26 @@ const OnboardingStack: React.FC<OnboardingStackProps> = ({ onComplete }) => {
 					<ScheduleIntroScreen onStartPress={handleStartPress} />
 				</View>
 			</PagerView>
+			<View style={styles.indicatorContainer}>
+				<View
+					style={[
+						styles.indicatorDot,
+						currentPage === 0 && styles.indicatorActive,
+					]}
+				/>
+				<View
+					style={[
+						styles.indicatorDot,
+						currentPage === 1 && styles.indicatorActive,
+					]}
+				/>
+				<View
+					style={[
+						styles.indicatorDot,
+						currentPage === 2 && styles.indicatorActive,
+					]}
+				/>
+			</View>
 		</View>
 	);
 };
@@ -55,6 +75,22 @@ const styles = StyleSheet.create({
 	},
 	page: {
 		flex: 1,
+	},
+	indicatorContainer: {
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		paddingBottom: 32,
+		gap: 8,
+	},
+	indicatorDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+		backgroundColor: "#d1d5db",
+	},
+	indicatorActive: {
+		backgroundColor: "#111827",
 	},
 });
 
