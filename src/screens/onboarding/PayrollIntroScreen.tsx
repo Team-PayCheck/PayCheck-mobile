@@ -48,13 +48,13 @@ const styles = StyleSheet.create({
 		paddingTop: 50,  
 	},
 	subtitle: {
-		fontSize: 15, 
+		fontSize: 16, 
 		color: "#848484",
 		fontFamily: "Pretendard-SemiBold",
 		textAlign: "left",
 	},
 	title: {
-		fontSize: 35, 
+		fontSize: 40, 
 		color: "#000000",
 		fontFamily: "Pretendard-ExtraBold",
 		textAlign: "left",
