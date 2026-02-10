@@ -66,7 +66,16 @@ const RootNavigator = () => {
 						/>
 					)}
 				</Stack.Screen>
-				<Stack.Screen name="Welcome" component={WelcomeScreen} />
+				<Stack.Screen name="Welcome">
+					{(props) => (
+						<WelcomeScreen
+							onKakaoLogin={() => {
+								console.log("Kakao Login Success! User authenticated.");
+								console.log("Redirecting to home screen (TODO: Create home screen)");
+							}}
+						/>
+					)}
+				</Stack.Screen>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
