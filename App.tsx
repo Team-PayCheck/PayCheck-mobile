@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import PayrollIntroScreen from "./src/screens/onboarding/PayrollIntroScreen";
+import NoticeIntroScreen from "./src/screens/onboarding/NoticeIntroScreen";
 
 export default function App() {
   return (
     <>
-      <PayrollIntroScreen />
+      <NoticeIntroScreen />
       <StatusBar style="dark" />
     </>
   );
