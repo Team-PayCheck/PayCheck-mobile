@@ -36,7 +36,7 @@ export const kakaoLoginWithToken = async (
     const response = await axios.post<any>(
       `${API_BASE_URL}/api/auth/kakao/login`,
       {
-        accessToken: kakaoAccessToken,
+        kakaoAccessToken: kakaoAccessToken,
       },
       {
         headers: {
@@ -46,8 +46,13 @@ export const kakaoLoginWithToken = async (
     );
 
     return {
-      success: true,
-      data: response.data.data, // 백엔드 응답 구조에 맞게 연동 후 조정
+      success: response.data.success,
+      data: {
+        accessToken: response.data.data.accessToken,
+        userType: response.data.data.userType as 'EMPLOYER' | 'WORKER',
+        userId: response.data.data.userId,
+        userName: response.data.data.name,
+      },
     } as KakaoLoginResponse;
   } catch (error) {
     const axiosError = error as any;
