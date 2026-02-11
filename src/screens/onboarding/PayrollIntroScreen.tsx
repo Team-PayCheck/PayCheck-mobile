@@ -16,7 +16,7 @@ const PayrollIntroScreen = () => {
 				<Text style={styles.subtitle}>토스 딥링크를 이용해 더욱 편리한</Text>
 				<Text style={styles.title}>임금송금 및 수령</Text>
 				<Image
-					source={require("../../assets/images/onboarding/payrollIntro_image.png")}
+					source={require("../../assets/images/onboarding/payrollIntro_Image.png")}
 					style={styles.image}
 					resizeMode="contain"
 				/>
