@@ -31,8 +31,6 @@ const config: ExpoConfig = {
     eas: {
       projectId: '29f43f5b-d91e-4f24-9d57-7307abc841c3',
     },
-    kakaoRestApiKey: process.env.EXPO_PUBLIC_KAKAO_REST_API_KEY || '',
-    kakaoRedirectUri: process.env.EXPO_PUBLIC_KAKAO_REDIRECT_URI || 'exp://localhost:8081/--/kakao-redirect',
     backendApiUrl: process.env.EXPO_PUBLIC_BACKEND_API_URL || 'http://localhost:3000',
     appEnv: process.env.EXPO_PUBLIC_APP_ENV || 'development',
   },
@@ -42,7 +40,10 @@ const config: ExpoConfig = {
   updates: {
     url: 'https://u.expo.dev/29f43f5b-d91e-4f24-9d57-7307abc841c3',
   },
-  plugins: ['expo-font'],
+  plugins: [
+    'expo-font',
+    "expo-build-properties"
+  ],
 };
 
 export default config;
