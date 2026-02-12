@@ -9,9 +9,7 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { HTTP_STATUS } from "../../constants/kakao";
-import { kakaoLoginWithToken, saveAccessToken } from "../../api/authApi";
+import KakaoLogin from "@react-native-seoul/kakao-login";
 
 interface WelcomeScreenProps {
 	onKakaoLogin?: () => void;
@@ -20,12 +18,18 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onKakaoLogin }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
-	// TODO: @react-native-seoul/kakao-login 라이브러리를 사용하여 구현
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
 		try {
-			// 네이티브 SDK 로그인 구현 예정
-			Alert.alert("준비 중", "카카오 네이티브 SDK 로그인 준비 중입니다.");
+			const token = await KakaoLogin.login();
+			const accessToken = token?.accessToken;
+
+			if (!accessToken) {
+				Alert.alert("로그인 실패", "카카오 액세스 토큰을 가져오지 못했습니다.");
+				return;
+			}
+
+			Alert.alert("로그인 성공", "카카오 로그인에 성공했습니다.");
 		} catch (error) {
 			console.error("로그인 에러:", error);
 			Alert.alert("로그인 실패", "로그인에 실패했습니다. 다시 시도해주세요.");
