@@ -14,9 +14,12 @@ const config: ExpoConfig = {
     backgroundColor: '#ffffff',
   },
   ios: {
+    bundleIdentifier: 'com.teampaycheck.paycheck',
     supportsTablet: true,
+    appleTeamId: '', // Apple Developer Team ID 승인 후 입력
   },
   android: {
+    package: 'com.teampaycheck.paycheck',
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
@@ -33,6 +36,7 @@ const config: ExpoConfig = {
     },
     backendApiUrl: process.env.EXPO_PUBLIC_BACKEND_API_URL || 'http://localhost:3000',
     appEnv: process.env.EXPO_PUBLIC_APP_ENV || 'development',
+    kakaoAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY || '',
   },
   runtimeVersion: {
     policy: 'appVersion',
@@ -41,8 +45,27 @@ const config: ExpoConfig = {
     url: 'https://u.expo.dev/29f43f5b-d91e-4f24-9d57-7307abc841c3',
   },
   plugins: [
+    [
+      "@react-native-seoul/kakao-login",
+      {
+        kakaoAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY,
+        kotlinVersion: "1.9.0", 
+      },
+    ],
+    "expo-dev-client",
     'expo-font',
-    "expo-build-properties"
+    [
+      "expo-build-properties",
+      {
+        ios: {
+          
+        },
+        android: {
+          kotlinVersion: "1.9.0",
+          enableProguardInReleaseBuilds: true,
+        },
+      },
+    ],
   ],
 };
 
