@@ -15,6 +15,7 @@ const config: ExpoConfig = {
   },
   ios: {
     supportsTablet: true,
+    bundleIdentifier: 'com.teampaycheck.paycheck',
   },
   android: {
     adaptiveIcon: {
