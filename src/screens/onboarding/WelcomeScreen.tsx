@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import KakaoLogin from "@react-native-seoul/kakao-login";
+import { kakaoLoginWithToken, saveAccessToken } from "../../api/authApi";
 
 interface WelcomeScreenProps {
 	onKakaoLogin?: () => void;
@@ -29,10 +30,24 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onKakaoLogin }) => {
 				return;
 			}
 
-			Alert.alert("로그인 성공", "카카오 로그인에 성공했습니다.");
+			const loginResult = await kakaoLoginWithToken(accessToken);
+
+			if (!loginResult.success || !loginResult.data?.accessToken) {
+				Alert.alert(
+					"로그인 실패",
+					loginResult.error?.message || "서버 로그인에 실패했습니다."
+				);
+				return;
+			}
+
+			await saveAccessToken(loginResult.data.accessToken);
+			onKakaoLogin?.();
 		} catch (error) {
 			console.error("로그인 에러:", error);
-			Alert.alert("로그인 실패", "로그인에 실패했습니다. 다시 시도해주세요.");
+			const message =
+				(error as { message?: string })?.message ||
+				"로그인에 실패했습니다. 다시 시도해주세요.";
+			Alert.alert("로그인 실패", message);
 		} finally {
 			setIsLoading(false);
 		}
