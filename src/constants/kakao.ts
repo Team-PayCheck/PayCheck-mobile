@@ -2,12 +2,9 @@ import Constants from 'expo-constants';
 
 const env = Constants.expoConfig?.extra || {};
 
-// 카카오 OAuth 설정
+// 카카오 네이티브 SDK 설정
 export const KAKAO_CONFIG = {
-  REST_API_KEY: (env.kakaoRestApiKey as string) || '',
-  REDIRECT_URI:
-    (env.kakaoRedirectUri as string) ||
-    'https://auth.expo.io/@TeamPayCheck/PayCheck-mobile',
+  APP_KEY: (env.kakaoAppKey as string) || '',
 };
 
 // HTTP Status Codes

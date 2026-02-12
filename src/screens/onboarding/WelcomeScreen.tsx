@@ -10,24 +10,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as AuthSession from "expo-auth-session";
-import { ResponseType } from "expo-auth-session";
-import axios from "axios";
-import { KAKAO_CONFIG, HTTP_STATUS } from "../../constants/kakao";
+import { HTTP_STATUS } from "../../constants/kakao";
 import { kakaoLoginWithToken, saveAccessToken } from "../../api/authApi";
-
-const KAKAO_AUTHORIZE_URL = "https://kauth.kakao.com/oauth/authorize";
-const KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
-
-const getRedirectUri = () => {
-	const configured = (KAKAO_CONFIG.REDIRECT_URI || "").trim();
-
-	if (!configured) {
-		throw new Error("카카오 Redirect URI가 설정되지 않았습니다.");
-	}
-
-	return configured;
-};
 
 interface WelcomeScreenProps {
 	onKakaoLogin?: () => void;
@@ -36,103 +20,12 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onKakaoLogin }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
+	// TODO: @react-native-seoul/kakao-login 라이브러리를 사용하여 구현
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
 		try {
-			if (!KAKAO_CONFIG.REST_API_KEY) {
-				Alert.alert("설정 오류", "카카오 REST API 키가 설정되지 않았습니다.");
-				return;
-			}
-
-			const redirectUri = getRedirectUri();
-			const discovery = { authorizationEndpoint: KAKAO_AUTHORIZE_URL };
-			const request = await AuthSession.loadAsync(
-				{
-					clientId: KAKAO_CONFIG.REST_API_KEY,
-					redirectUri,
-					responseType: ResponseType.Code,
-					usePKCE: false,
-				},
-				discovery
-			);
-
-			const authResult = await request.promptAsync(discovery);
-
-			if (authResult.type !== "success") {
-				Alert.alert("로그인 취소", "카카오 로그인 진행이 취소되었습니다.");
-				return;
-			}
-
-			const code = authResult.params?.code;
-			const authError = authResult.params?.error;
-
-			if (authError) {
-				Alert.alert("로그인 실패", "카카오 인증에 실패했습니다.");
-				return;
-			}
-
-			if (!code) {
-				Alert.alert("로그인 실패", "인가 코드가 없습니다.");
-				return;
-			}
-
-			const tokenParams =
-				`grant_type=authorization_code` +
-				`&client_id=${encodeURIComponent(KAKAO_CONFIG.REST_API_KEY)}` +
-				`&redirect_uri=${encodeURIComponent(redirectUri)}` +
-				`&code=${encodeURIComponent(code)}`;
-
-			const tokenResponse = await axios.post<{ access_token?: string }>(
-				KAKAO_TOKEN_URL,
-				tokenParams,
-				{
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-					},
-				}
-			);
-
-			const kakaoAccessToken = tokenResponse.data?.access_token;
-			if (!kakaoAccessToken) {
-				Alert.alert("로그인 실패", "카카오 액세스 토큰을 받지 못했습니다.");
-				return;
-			}
-
-			try {
-				const loginResponse = await kakaoLoginWithToken(kakaoAccessToken);
-
-				if (loginResponse.success && loginResponse.data?.accessToken) {
-					await saveAccessToken(loginResponse.data.accessToken);
-					await AsyncStorage.setItem("@user_logged_in", "true");
-					await AsyncStorage.setItem("@user_type", loginResponse.data.userType);
-					await AsyncStorage.setItem("@user_id", String(loginResponse.data.userId));
-					await AsyncStorage.setItem("@user_name", loginResponse.data.userName);
-
-					if (onKakaoLogin) {
-						onKakaoLogin();
-					}
-				} else {
-					throw new Error("로그인에 실패했습니다.");
-				}
-			} catch (error: any) {
-				const statusCode = Number(error?.status) || 0;
-				const isUserNotFound =
-					statusCode === HTTP_STATUS.NOT_FOUND ||
-					statusCode === HTTP_STATUS.UNAUTHORIZED;
-
-				if (isUserNotFound) {
-					Alert.alert(
-						"회원가입 필요",
-						"등록되지 않은 계정입니다. 회원가입 화면으로 이동이 필요합니다."
-					);
-					return;
-				}
-
-				Alert.alert(
-					"로그인 실패",
-					error?.message || "서버 로그인에 실패했습니다."
-				);
-			}
+			// 네이티브 SDK 로그인 구현 예정
+			Alert.alert("준비 중", "카카오 네이티브 SDK 로그인 준비 중입니다.");
 		} catch (error) {
 			console.error("로그인 에러:", error);
 			Alert.alert("로그인 실패", "로그인에 실패했습니다. 다시 시도해주세요.");
