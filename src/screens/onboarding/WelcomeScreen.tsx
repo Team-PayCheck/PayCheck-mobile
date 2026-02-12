@@ -33,13 +33,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 
 			const loginResult = await kakaoLoginWithToken(accessToken);
 
-			// 3-2. 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
+			// 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
 			if (!loginResult.success && (loginResult.error?.code === 'NOT_FOUND' || loginResult.error?.code === 'UNAUTHORIZED')) {
 				onSignUpNeeded?.(accessToken);
 				return;
 			}
 
-			// 3-1. 기존 회원인 경우 (success: true)
+			// 기존 회원인 경우 (success: true)
 			if (loginResult.success && loginResult.data?.accessToken) {
 				// 토큰 저장
 				await saveAccessToken(loginResult.data.accessToken);
