@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAccessToken } from "../../api/authApi";
 
 export const useOnboardingStatus = () => {
-	const [initialRoute, setInitialRoute] = useState<"Onboarding" | "Welcome">("Onboarding");
+	const [initialRoute, setInitialRoute] = useState<
+		"Onboarding" | "Welcome" | "Home"
+	>("Onboarding");
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const checkOnboardingStatus = async () => {
 			try {
-				const onboardingCompleted = await AsyncStorage.getItem(
-					"@onboarding_completed"
-				);
+				const [onboardingCompleted, storedAccessToken] = await Promise.all([
+					AsyncStorage.getItem("@onboarding_completed"),
+					getAccessToken(),
+				]);
+
+				if (storedAccessToken) {
+					setInitialRoute("Home");
+					return;
+				}
+
 				if (onboardingCompleted === "true") {
 					setInitialRoute("Welcome");
 				}
