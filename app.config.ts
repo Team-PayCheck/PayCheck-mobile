@@ -16,11 +16,7 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'com.teampaycheck.paycheck',
     supportsTablet: true,
-<<<<<<< HEAD
     appleTeamId: '', // Apple Developer Team ID 승인 후 입력
-=======
-    bundleIdentifier: 'com.teampaycheck.paycheck',
->>>>>>> 065fb0254e042188ae2d7fe02dee8c6339e388c2
   },
   android: {
     package: 'com.teampaycheck.paycheck',

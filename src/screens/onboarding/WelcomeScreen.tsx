@@ -10,13 +10,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import KakaoLogin from "@react-native-seoul/kakao-login";
-import { kakaoLoginWithToken, saveAccessToken } from "../../api/authApi";
+import { kakaoLoginWithToken, saveAccessToken, saveUserInfo } from "../../api/authApi";
 
 interface WelcomeScreenProps {
-	onKakaoLogin?: () => void;
+	onLoginSuccess?: (userType: 'EMPLOYER' | 'WORKER') => void;
+	onSignUpNeeded?: (kakaoAccessToken: string) => void;
 }
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onKakaoLogin }) => {
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpNeeded }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleKakaoLogin = async () => {
@@ -32,16 +33,31 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onKakaoLogin }) => {
 
 			const loginResult = await kakaoLoginWithToken(accessToken);
 
-			if (!loginResult.success || !loginResult.data?.accessToken) {
-				Alert.alert(
-					"로그인 실패",
-					loginResult.error?.message || "서버 로그인에 실패했습니다."
-				);
+			// 3-2. 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
+			if (!loginResult.success && (loginResult.error?.code === 'NOT_FOUND' || loginResult.error?.code === 'UNAUTHORIZED')) {
+				onSignUpNeeded?.(accessToken);
 				return;
 			}
 
-			await saveAccessToken(loginResult.data.accessToken);
-			onKakaoLogin?.();
+			// 3-1. 기존 회원인 경우 (success: true)
+			if (loginResult.success && loginResult.data?.accessToken) {
+				// 토큰 저장
+				await saveAccessToken(loginResult.data.accessToken);
+				
+				// 사용자 정보 저장
+				await saveUserInfo(
+					loginResult.data.userType,
+					loginResult.data.userId,
+					loginResult.data.userName
+				);
+
+				// userType에 따라 콜백 호출
+				onLoginSuccess?.(loginResult.data.userType);
+				return;
+			}
+
+			// 그 외 에러
+			throw new Error(loginResult.error?.message || "로그인에 실패했습니다.");
 		} catch (error) {
 			console.error("로그인 에러:", error);
 			const message =
