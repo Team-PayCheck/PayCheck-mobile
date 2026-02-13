@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import RootNavigator from "./src/navigation/RootNavigator";
 
 SplashScreen.preventAutoHideAsync();
@@ -26,9 +27,9 @@ export default function App() {
 	}
 
 	return (
-		<>
+		<SafeAreaProvider>
 			<RootNavigator />
 			<StatusBar style="dark" />
-		</>
+		</SafeAreaProvider>
 	);
 }
