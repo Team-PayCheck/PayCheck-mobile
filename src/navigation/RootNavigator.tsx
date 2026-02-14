@@ -39,34 +39,34 @@ const RootNavigator = () => {
 							onComplete={() => handleOnboardingComplete(props.navigation)}
 						/>
 					)}
+					</Stack.Screen>
+				<Stack.Screen name="Welcome">
+					{(props) => (
+						<WelcomeScreen
+							onLoginSuccess={(userType) => {
+								// userType에 따라 다른 화면으로 이동
+								const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerHome';
+								props.navigation.replace(targetRoute);
+							}}
+							onSignUpNeeded={(kakaoAccessToken) => {
+								// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
+								props.navigation.navigate("SignUp", { kakaoAccessToken });
+							}}
+						/>
+					)}
 				</Stack.Screen>
-			<Stack.Screen name="Welcome">
-				{(props) => (
-					<WelcomeScreen
-						onLoginSuccess={(userType) => {
-							// userType에 따라 다른 화면으로 이동
-							const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerHome';
-							props.navigation.replace(targetRoute);
-						}}
-						onSignUpNeeded={(kakaoAccessToken) => {
-							// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
-							props.navigation.navigate("SignUp", { kakaoAccessToken });
-						}}
-					/>
-				)}
-			</Stack.Screen>
-			<Stack.Screen name="SignUp" component={SignUpScreen} options={{ title: "회원가입" }} />
-			<Stack.Screen name="Home" component={HomeScreen} />
-			<Stack.Screen
-				name="EmployerHome"
-				component={HomeScreen}
-				options={{ title: "고용주 홈" }}
-			/>
-			<Stack.Screen
-				name="WorkerHome"
-				component={HomeScreen}
-				options={{ title: "근로자 홈" }}
-			/>
+				<Stack.Screen name="SignUp" component={SignUpScreen} options={{ title: "회원가입" }} />
+				<Stack.Screen name="Home" component={HomeScreen} />
+				<Stack.Screen
+					name="EmployerHome"
+					component={HomeScreen}
+					options={{ title: "고용주 홈" }}
+				/>
+				<Stack.Screen
+					name="WorkerHome"
+					component={HomeScreen}
+					options={{ title: "근로자 홈" }}
+				/>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);

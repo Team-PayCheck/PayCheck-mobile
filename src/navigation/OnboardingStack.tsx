@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import PagerView from "react-native-pager-view";
+import PagerView, { PagerViewOnPageSelectedEvent } from "react-native-pager-view";
 import PayrollIntroScreen from "../screens/onboarding/PayrollIntroScreen";
 import NoticeIntroScreen from "../screens/onboarding/NoticeIntroScreen";
 import ScheduleIntroScreen from "../screens/onboarding/ScheduleIntroScreen";
@@ -13,7 +13,7 @@ const OnboardingStack: React.FC<OnboardingStackProps> = ({ onComplete }) => {
 	const pagerRef = useRef<PagerView>(null);
 	const [currentPage, setCurrentPage] = useState(0);
 
-	const handlePageSelected = (e: any) => {
+	const handlePageSelected = (e: PagerViewOnPageSelectedEvent) => {
 		setCurrentPage(e.nativeEvent.position);
 	};
 
