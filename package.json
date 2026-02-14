@@ -34,7 +34,6 @@
     "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
-    "@types/axios": "^0.9.36",
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
   },

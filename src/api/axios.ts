@@ -1,19 +1,21 @@
 import axios, {
+	AxiosResponse,
 	AxiosError,
 	InternalAxiosRequestConfig,
-	AxiosResponse,
 } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CookieManager from "@react-native-cookies/cookies";
 import Constants from "expo-constants";
+import type {
+	ApiResponse,
+	AuthSuccessData,
+	CustomAxiosRequestConfig,
+	RefreshSubscriber,
+} from "../types/api.types";
 
 const env = Constants.expoConfig?.extra || {};
-const API_BASE_URL = (env.backendApiUrl as string) || "http://localhost:3000";
-
-// 커스텀 타입 (_retry 속성 추가)
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-	_retry?: boolean;
-}
+const API_BASE_URL =
+	(env.backendApiUrl as string) || "http://localhost:8000";
 
 // Axios 인스턴스 생성
 export const api = axios.create({
@@ -41,24 +43,20 @@ const handleAuthFailure = async () => {
 
 // 요청 인터셉터: Access Token 자동 첨부
 api.interceptors.request.use(
-	async (config) => {
+	async (config: InternalAxiosRequestConfig) => {
 		const token = await AsyncStorage.getItem("@access_token");
-		if (token) {
+		if (token && config.headers) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 		return config;
 	},
-	(error) => Promise.reject(error)
+	(error: AxiosError) => Promise.reject(error)
 );
 
 // Refresh 중복 요청 방지
 let isRefreshing = false;
 
 // 대기 중인 요청들 관리
-interface RefreshSubscriber {
-	resolve: (token: string) => void;
-	reject: (error: unknown) => void;
-}
 let refreshSubscribers: RefreshSubscriber[] = [];
 
 // 대기 중인 요청들에 새 토큰 전달
@@ -82,7 +80,9 @@ const addRefreshSubscriber = (subscriber: RefreshSubscriber) => {
 api.interceptors.response.use(
 	(response: AxiosResponse) => response,
 	async (error: AxiosError) => {
-		const originalRequest = error.config as CustomAxiosRequestConfig;
+		const originalRequest = error.config as
+			| CustomAxiosRequestConfig
+			| undefined;
 
 		if (!originalRequest) {
 			return Promise.reject(error);
@@ -95,8 +95,10 @@ api.interceptors.response.use(
 				return new Promise((resolve, reject) => {
 					addRefreshSubscriber({
 						resolve: (token: string) => {
-							originalRequest.headers.Authorization = `Bearer ${token}`;
-							resolve(api(originalRequest));
+							if (originalRequest.headers) {
+								originalRequest.headers.Authorization = `Bearer ${token}`;
+							}
+							resolve(api.request(originalRequest));
 						},
 						reject: (err: unknown) => reject(err),
 					});
@@ -109,7 +111,7 @@ api.interceptors.response.use(
 
 			try {
 				// Refresh Token(쿠키)으로 새 Access Token 요청
-				const response = await axios.post(
+				const response = await axios.post<ApiResponse<AuthSuccessData>>(
 					`${API_BASE_URL}/api/auth/refresh`,
 					{},
 					{ withCredentials: true }
@@ -132,8 +134,10 @@ api.interceptors.response.use(
 				onRefreshed(newAccessToken);
 
 				// 원래 요청 재시도
-				originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-				return api(originalRequest);
+				if (originalRequest.headers) {
+					originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+				}
+				return api.request(originalRequest);
 			} catch (refreshError) {
 				// 갱신 실패 → 대기 요청 모두 reject 후 로그아웃
 				onRefreshFailed(refreshError);
