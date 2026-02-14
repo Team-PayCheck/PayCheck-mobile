@@ -15,18 +15,18 @@ export interface ApiResponse<T = unknown> {
 	};
 }
 
-// 인증 성공 데이터
+// 인증 성공 데이터 (백엔드 API 응답 형태)
 export interface AuthSuccessData {
 	accessToken: string;
 	userType: "EMPLOYER" | "WORKER";
 	userId: number;
-	userName: string;
+	name: string;
 }
 
 // 사용자 정보
 export interface UserInfo {
 	userId: number;
-	userName: string;
+	name: string;
 	userType: "EMPLOYER" | "WORKER";
 }
 

@@ -57,7 +57,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				authLogin(loginResult.data.accessToken, {
 					userType: loginResult.data.userType,
 					userId: loginResult.data.userId,
-					userName: loginResult.data.userName,
+					name: loginResult.data.name,
 				});
 
 				// userType에 따라 콜백 호출
