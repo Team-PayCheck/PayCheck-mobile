@@ -9,7 +9,7 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import KakaoLogin from "@react-native-seoul/kakao-login";
+import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken, saveAccessToken, saveUserInfo } from "../../api/authApi";
 
 interface WelcomeScreenProps {
@@ -23,7 +23,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
 		try {
-			const token = await KakaoLogin.login();
+			const token = await login();
 			const accessToken = token?.accessToken;
 
 			if (!accessToken) {
