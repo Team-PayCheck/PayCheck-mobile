@@ -3,7 +3,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { useOnboardingStore } from "../../stores/onboardingStore";
 import api from "../../api/axios";
 
-type InitialRoute = "Onboarding" | "Welcome" | "Home";
+type InitialRoute = "Onboarding" | "Welcome" | "EmployerHome" | "WorkerHome";
 
 export const useOnboardingStatus = () => {
 	const [initialRoute, setInitialRoute] = useState<InitialRoute>("Onboarding");
@@ -12,6 +12,7 @@ export const useOnboardingStatus = () => {
 	// Zustand 스토어에서 hydration 상태 및 데이터 가져오기
 	const authHydrated = useAuthStore((state) => state.isHydrated);
 	const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+	const userInfo = useAuthStore((state) => state.userInfo);
 	const authLogout = useAuthStore((state) => state.logout);
 
 	const onboardingHydrated = useOnboardingStore((state) => state.isHydrated);
@@ -46,11 +47,12 @@ export const useOnboardingStatus = () => {
 				return;
 			}
 
-			// 우선순위 1: 로그인된 상태면 토큰 검증 후 Home
+			// 우선순위 1: 로그인된 상태면 토큰 검증 후 userType에 맞는 홈으로
 			if (isLoggedIn) {
 				const isValid = await validateToken();
 				if (isValid) {
-					setInitialRoute("Home");
+					const targetRoute = userInfo?.userType === "EMPLOYER" ? "EmployerHome" : "WorkerHome";
+					setInitialRoute(targetRoute);
 				} else {
 					// 토큰 만료 + 갱신 실패 → Welcome으로
 					setInitialRoute("Welcome");
@@ -66,7 +68,7 @@ export const useOnboardingStatus = () => {
 		};
 
 		determineInitialRoute();
-	}, [authHydrated, onboardingHydrated, isLoggedIn, isOnboardingCompleted, validateToken]);
+	}, [authHydrated, onboardingHydrated, isLoggedIn, isOnboardingCompleted, userInfo, validateToken]);
 
 	const handleOnboardingComplete = (navigation: { navigate: (route: string) => void }) => {
 		completeOnboarding();

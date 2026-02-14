@@ -5,13 +5,13 @@ import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
 import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpScreen from "../screens/auth/SignUpScreen";
-import HomeScreen from "../screens/HomeScreen";
+import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
+import WorkerHomeScreen from "../screens/worker/WorkerHomeScreen";
 
 export type RootStackParamList = {
 	Onboarding: undefined;
 	Welcome: undefined;
 	SignUp: { kakaoAccessToken: string };
-	Home: undefined;
 	EmployerHome: undefined;
 	WorkerHome: undefined;
 };
@@ -39,7 +39,7 @@ const RootNavigator = () => {
 							onComplete={() => handleOnboardingComplete(props.navigation)}
 						/>
 					)}
-					</Stack.Screen>
+				</Stack.Screen>
 				<Stack.Screen name="Welcome">
 					{(props) => (
 						<WelcomeScreen
@@ -55,18 +55,9 @@ const RootNavigator = () => {
 						/>
 					)}
 				</Stack.Screen>
-				<Stack.Screen name="SignUp" component={SignUpScreen} options={{ title: "회원가입" }} />
-				<Stack.Screen name="Home" component={HomeScreen} />
-				<Stack.Screen
-					name="EmployerHome"
-					component={HomeScreen}
-					options={{ title: "고용주 홈" }}
-				/>
-				<Stack.Screen
-					name="WorkerHome"
-					component={HomeScreen}
-					options={{ title: "근로자 홈" }}
-				/>
+				<Stack.Screen name="SignUp" component={SignUpScreen} />
+				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
+				<Stack.Screen name="WorkerHome" component={WorkerHomeScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
