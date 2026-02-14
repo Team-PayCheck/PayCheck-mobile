@@ -1,7 +1,8 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/common/PrimaryButton";
+import { Text } from "../../components/common/Text";
 
 interface ScheduleIntroScreenProps {
 	onStartPress?: () => void;
@@ -11,8 +12,8 @@ const ScheduleIntroScreen: React.FC<ScheduleIntroScreenProps> = ({ onStartPress 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<Text style={styles.title}>일정 조정</Text>
-				<Text style={styles.subtitle}>근무기록 정정, 수정 요청을 통한{"\n"}유동적인 일정 조정 </Text>
+				<Text weight="ExtraBold" style={styles.title}>일정 조정</Text>
+				<Text weight="SemiBold" style={styles.subtitle}>근무기록 정정, 수정 요청을 통한{"\n"}유동적인 일정 조정 </Text>
 				<Image
 					source={require("../../assets/images/onboarding/scheduleIntro_image.png")}
 					style={styles.image}
@@ -45,14 +46,12 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 40,
 		color: "#000000",
-		fontFamily: "Pretendard-ExtraBold",
 		textAlign: "center",
 	},
 	subtitle: {
 		marginTop: 8,
 		fontSize: 16,
 		color: "#848484",
-		fontFamily: "Pretendard-SemiBold",
 		textAlign: "center",
 	},
 	image: {

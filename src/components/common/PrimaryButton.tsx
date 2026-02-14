@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { Text } from "./Text";
 
 interface PrimaryButtonProps {
 	text: string;
@@ -13,7 +14,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({ text, onPress }) => {
 			onPress={onPress}
 			activeOpacity={0.8}
 		>
-			<Text style={styles.buttonText}>{text}</Text>
+			<Text weight="Bold" style={styles.buttonText}>{text}</Text>
 		</TouchableOpacity>
 	);
 };
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
 	buttonText: {
 		fontSize: 14,
 		color: "#ffffff",
-		fontFamily: "Pretendard-Bold",
 		textAlign: "center",
 	},
 });

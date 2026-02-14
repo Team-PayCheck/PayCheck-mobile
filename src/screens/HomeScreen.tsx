@@ -1,13 +1,14 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "../components/common/Text";
 
 const HomeScreen: React.FC = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<Text style={styles.title}>PayCheck</Text>
-				<Text style={styles.subtitle}>임시화면_로그인 완료</Text>
+				<Text weight="Bold" style={styles.title}>PayCheck</Text>
+				<Text weight="Medium" style={styles.subtitle}>임시화면_로그인 완료</Text>
 			</View>
 		</SafeAreaView>
 	);
@@ -27,12 +28,10 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 28,
 		color: "#111111",
-		fontFamily: "Pretendard-Bold",
 	},
 	subtitle: {
 		fontSize: 14,
 		color: "#777777",
-		fontFamily: "Pretendard-Medium",
 	},
 });
 

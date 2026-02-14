@@ -1,6 +1,7 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "../../components/common/Text";
 
 const PayrollIntroScreen = () => {
 	return (
@@ -13,8 +14,8 @@ const PayrollIntroScreen = () => {
 				/>
 			</View>
 			<View style={styles.content}>
-				<Text style={styles.subtitle}>토스 딥링크를 이용해 더욱 편리한</Text>
-				<Text style={styles.title}>임금송금 및 수령</Text>
+				<Text weight="SemiBold" style={styles.subtitle}>토스 딥링크를 이용해 더욱 편리한</Text>
+				<Text weight="ExtraBold" style={styles.title}>임금송금 및 수령</Text>
 				<Image
 					source={require("../../assets/images/onboarding/payrollIntro_Image.png")}
 					style={styles.image}
@@ -48,15 +49,13 @@ const styles = StyleSheet.create({
 		paddingTop: 50,  
 	},
 	subtitle: {
-		fontSize: 16, 
+		fontSize: 16,
 		color: "#848484",
-		fontFamily: "Pretendard-SemiBold",
 		textAlign: "left",
 	},
 	title: {
-		fontSize: 40, 
+		fontSize: 40,
 		color: "#000000",
-		fontFamily: "Pretendard-ExtraBold",
 		textAlign: "left",
 		lineHeight: 48,
 		letterSpacing: -0.6,

@@ -1,6 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "../../components/common/Text";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../../navigation/RootNavigator";
@@ -18,14 +19,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<Text style={styles.title}>회원가입</Text>
-				<Text style={styles.subtitle}>
+				<Text weight="Bold" style={styles.title}>회원가입</Text>
+				<Text weight="Medium" style={styles.subtitle}>
 					사용자 정보를 입력해주세요
 				</Text>
 				{kakaoAccessToken && (
 					<Text style={styles.debug}>Token: {kakaoAccessToken.slice(0, 20)}...</Text>
 				)}
-				<Text style={styles.placeholder}>
+				<Text weight="Medium" style={styles.placeholder}>
 					회원가입 임시화면
 				</Text>
 			</View>
@@ -48,22 +49,18 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 28,
 		color: "#111111",
-		fontFamily: "Pretendard-Bold",
 	},
 	subtitle: {
 		fontSize: 14,
 		color: "#777777",
-		fontFamily: "Pretendard-Medium",
 	},
 	debug: {
 		fontSize: 12,
 		color: "#999999",
-		fontFamily: "Pretendard-Regular",
 	},
 	placeholder: {
 		fontSize: 13,
 		color: "#CCCCCC",
-		fontFamily: "Pretendard-Medium",
 		textAlign: "center",
 		lineHeight: 20,
 	},

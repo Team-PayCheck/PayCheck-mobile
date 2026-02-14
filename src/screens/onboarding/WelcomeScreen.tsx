@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import {
 	Image,
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	View,
 	Alert,
 	ActivityIndicator,
 } from "react-native";
+import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken, saveAccessToken, saveUserInfo } from "../../api/authApi";
@@ -77,8 +77,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 						source={require("../../assets/images/logo.png")}
 						style={styles.logo}
 					/>
-					<Text style={styles.title}>PayCheck</Text>
-					<Text style={styles.subtitle}>
+					<Text weight="Bold" style={styles.title}>PayCheck</Text>
+					<Text weight="SemiBold" style={styles.subtitle}>
 						근로자와 고용주의 거래와 소통을 원활하게
 					</Text>
 				</View>
@@ -87,7 +87,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 				{isLoading ? (
 					<View style={styles.loadingContainer}>
 						<ActivityIndicator size="large" color="#3b82f6" />
-						<Text style={styles.loadingText}>로그인 중...</Text>
+						<Text weight="Medium" style={styles.loadingText}>로그인 중...</Text>
 					</View>
 				) : (
 					<TouchableOpacity
@@ -129,13 +129,11 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 40,
 		color: "#000000",
-		fontFamily: "Pretendard-Bold",
 		textAlign: "center",
 	},
 	subtitle: {
 		fontSize: 13,
 		color: "#848484",
-		fontFamily: "Pretendard-SemiBold",
 		textAlign: "center",
 	},
 	buttonContainer: {
@@ -151,7 +149,6 @@ const styles = StyleSheet.create({
 	loadingText: {
 		fontSize: 14,
 		color: "#3b82f6",
-		fontFamily: "Pretendard-Medium",
 	},
 	kakaoButton: {
 		width: "100%",
