@@ -10,15 +10,20 @@ import {
 import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
-import { kakaoLoginWithToken, saveAccessToken, saveUserInfo } from "../../api/authApi";
+import { kakaoLoginWithToken } from "../../api/authApi";
+import { useAuthStore } from "../../stores/authStore";
 
 interface WelcomeScreenProps {
-	onLoginSuccess?: (userType: 'EMPLOYER' | 'WORKER') => void;
+	onLoginSuccess?: (userType: "EMPLOYER" | "WORKER") => void;
 	onSignUpNeeded?: (kakaoAccessToken: string) => void;
 }
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpNeeded }) => {
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
+	onLoginSuccess,
+	onSignUpNeeded,
+}) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const authLogin = useAuthStore((state) => state.login);
 
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
@@ -27,29 +32,33 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 			const accessToken = token?.accessToken;
 
 			if (!accessToken) {
-				Alert.alert("로그인 실패", "카카오 액세스 토큰을 가져오지 못했습니다.");
+				Alert.alert(
+					"로그인 실패",
+					"카카오 액세스 토큰을 가져오지 못했습니다."
+				);
 				return;
 			}
 
 			const loginResult = await kakaoLoginWithToken(accessToken);
 
 			// 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
-			if (!loginResult.success && (loginResult.error?.code === 'NOT_FOUND' || loginResult.error?.code === 'UNAUTHORIZED')) {
+			if (
+				!loginResult.success &&
+				(loginResult.error?.code === "NOT_FOUND" ||
+					loginResult.error?.code === "UNAUTHORIZED")
+			) {
 				onSignUpNeeded?.(accessToken);
 				return;
 			}
 
 			// 기존 회원인 경우 (success: true)
 			if (loginResult.success && loginResult.data?.accessToken) {
-				// 토큰 저장
-				await saveAccessToken(loginResult.data.accessToken);
-				
-				// 사용자 정보 저장
-				await saveUserInfo(
-					loginResult.data.userType,
-					loginResult.data.userId,
-					loginResult.data.userName
-				);
+				// Zustand에 토큰 + 사용자 정보 저장 (자동으로 AsyncStorage에도 persist)
+				authLogin(loginResult.data.accessToken, {
+					userType: loginResult.data.userType,
+					userId: loginResult.data.userId,
+					userName: loginResult.data.userName,
+				});
 
 				// userType에 따라 콜백 호출
 				onLoginSuccess?.(loginResult.data.userType);
@@ -77,7 +86,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 						source={require("../../assets/images/logo.png")}
 						style={styles.logo}
 					/>
-					<Text weight="Bold" style={styles.title}>PayCheck</Text>
+					<Text weight="Bold" style={styles.title}>
+						PayCheck
+					</Text>
 					<Text weight="SemiBold" style={styles.subtitle}>
 						근로자와 고용주의 거래와 소통을 원활하게
 					</Text>
@@ -87,7 +98,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoginSuccess, onSignUpN
 				{isLoading ? (
 					<View style={styles.loadingContainer}>
 						<ActivityIndicator size="large" color="#3b82f6" />
-						<Text weight="Medium" style={styles.loadingText}>로그인 중...</Text>
+						<Text weight="Medium" style={styles.loadingText}>
+							로그인 중...
+						</Text>
 					</View>
 				) : (
 					<TouchableOpacity

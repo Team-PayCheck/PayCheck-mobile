@@ -3,9 +3,9 @@ import axios, {
 	AxiosError,
 	InternalAxiosRequestConfig,
 } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import CookieManager from "@react-native-cookies/cookies";
 import Constants from "expo-constants";
+import { getAuthState } from "../stores/authStore";
 import type {
 	ApiResponse,
 	AuthSuccessData,
@@ -34,19 +34,19 @@ export const setLogoutCallback = (callback: () => void) => {
 	logoutCallback = callback;
 };
 
-// 인증 실패 시 처리 (토큰 + 쿠키 삭제)
+// 인증 실패 시 처리 (Zustand + 쿠키 삭제)
 const handleAuthFailure = async () => {
-	await AsyncStorage.multiRemove(["@access_token", "@user_info"]);
+	getAuthState().logout();
 	await CookieManager.clearAll();
 	logoutCallback?.();
 };
 
-// 요청 인터셉터: Access Token 자동 첨부
+// 요청 인터셉터: Access Token 자동 첨부 (Zustand에서 동기적으로 가져옴)
 api.interceptors.request.use(
-	async (config: InternalAxiosRequestConfig) => {
-		const token = await AsyncStorage.getItem("@access_token");
-		if (token && config.headers) {
-			config.headers.Authorization = `Bearer ${token}`;
+	(config: InternalAxiosRequestConfig) => {
+		const { accessToken } = getAuthState();
+		if (accessToken && config.headers) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
 		}
 		return config;
 	},
@@ -127,8 +127,8 @@ api.interceptors.response.use(
 					return Promise.reject(noTokenError);
 				}
 
-				// 새 토큰 저장
-				await AsyncStorage.setItem("@access_token", newAccessToken);
+				// 새 토큰 저장 (Zustand → 자동으로 AsyncStorage에도 persist)
+				getAuthState().setAccessToken(newAccessToken);
 
 				// 대기 중인 요청들에 새 토큰 전달
 				onRefreshed(newAccessToken);

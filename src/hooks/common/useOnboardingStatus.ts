@@ -1,46 +1,47 @@
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAccessToken } from "../../api/authApi";
+import { useAuthStore } from "../../stores/authStore";
+import { useOnboardingStore } from "../../stores/onboardingStore";
+
+type InitialRoute = "Onboarding" | "Welcome" | "Home";
 
 export const useOnboardingStatus = () => {
-	const [initialRoute, setInitialRoute] = useState<
-		"Onboarding" | "Welcome" | "Home"
-	>("Onboarding");
+	const [initialRoute, setInitialRoute] = useState<InitialRoute>("Onboarding");
 	const [isLoading, setIsLoading] = useState(true);
 
+	// Zustand 스토어에서 hydration 상태 및 데이터 가져오기
+	const authHydrated = useAuthStore((state) => state.isHydrated);
+	const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+	const onboardingHydrated = useOnboardingStore((state) => state.isHydrated);
+	const isOnboardingCompleted = useOnboardingStore(
+		(state) => state.isOnboardingCompleted
+	);
+	const completeOnboarding = useOnboardingStore(
+		(state) => state.completeOnboarding
+	);
+
 	useEffect(() => {
-		const checkOnboardingStatus = async () => {
-			try {
-				const [onboardingCompleted, storedAccessToken] = await Promise.all([
-					AsyncStorage.getItem("@onboarding_completed"),
-					getAccessToken(),
-				]);
-
-				if (storedAccessToken) {
-					setInitialRoute("Home");
-					return;
-				}
-
-				if (onboardingCompleted === "true") {
-					setInitialRoute("Welcome");
-				}
-			} catch (error) {
-				console.error("Failed to check onboarding status:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		checkOnboardingStatus();
-	}, []);
-
-	const handleOnboardingComplete = async (navigation: any) => {
-		try {
-			await AsyncStorage.setItem("@onboarding_completed", "true");
-			navigation.navigate("Welcome");
-		} catch (error) {
-			console.error("Failed to save onboarding status:", error);
+		// 두 스토어 모두 hydration 완료될 때까지 대기
+		if (!authHydrated || !onboardingHydrated) {
+			return;
 		}
+
+		// 우선순위 1: 로그인된 상태면 Home
+		if (isLoggedIn) {
+			setInitialRoute("Home");
+		}
+		// 우선순위 2: 온보딩 완료했으면 Welcome
+		else if (isOnboardingCompleted) {
+			setInitialRoute("Welcome");
+		}
+		// 그 외: Onboarding (기본값)
+
+		setIsLoading(false);
+	}, [authHydrated, onboardingHydrated, isLoggedIn, isOnboardingCompleted]);
+
+	const handleOnboardingComplete = (navigation: { navigate: (route: string) => void }) => {
+		completeOnboarding();
+		navigation.navigate("Welcome");
 	};
 
 	return { initialRoute, isLoading, handleOnboardingComplete };
