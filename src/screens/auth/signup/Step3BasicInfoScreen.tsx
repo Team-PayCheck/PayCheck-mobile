@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RouteProp } from "@react-navigation/native";
 import {
 	ProgressBar,
 	StepHeader,
@@ -21,21 +20,28 @@ import {
 } from "../../../components/signup";
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { colors } from "../../../constants/colors";
+import { useSignUpStore } from "../../../stores";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 import type { BankName } from "../../../constants/bank";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step3BasicInfo">;
-type RoutePropType = RouteProp<SignUpStackParamList, "Step3BasicInfo">;
 
 const Step3BasicInfoScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const route = useRoute<RoutePropType>();
-	const { userType, profileImageUri } = route.params;
 
-	const [name, setName] = useState("");
-	const [phone, setPhone] = useState("--");
-	const [bankName, setBankName] = useState("");
-	const [accountNumber, setAccountNumber] = useState("");
+	// Store에서 값 가져오기
+	const userType = useSignUpStore((state) => state.userType);
+	const name = useSignUpStore((state) => state.name);
+	const phone = useSignUpStore((state) => state.phone);
+	const bankName = useSignUpStore((state) => state.bankName);
+	const accountNumber = useSignUpStore((state) => state.accountNumber);
+
+	// Store 액션
+	const setName = useSignUpStore((state) => state.setName);
+	const setPhone = useSignUpStore((state) => state.setPhone);
+	const setBankName = useSignUpStore((state) => state.setBankName);
+	const setAccountNumber = useSignUpStore((state) => state.setAccountNumber);
+
 	const [isBankModalVisible, setIsBankModalVisible] = useState(false);
 
 	const isWorker = userType === "WORKER";
@@ -51,14 +57,7 @@ const Step3BasicInfoScreen: React.FC = () => {
 	};
 
 	const handleNext = () => {
-		navigation.navigate("Step4Alarm", {
-			userType,
-			profileImageUri,
-			name,
-			phone,
-			bankName: isWorker ? bankName : "",
-			accountNumber: isWorker ? accountNumber : "",
-		});
+		navigation.navigate("Step4Alarm");
 	};
 
 	return (

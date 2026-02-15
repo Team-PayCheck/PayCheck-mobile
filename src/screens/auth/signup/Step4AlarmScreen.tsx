@@ -2,48 +2,30 @@ import React from "react";
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RouteProp } from "@react-navigation/native";
 import { ProgressBar, StepHeader, TextButton } from "../../../components/signup";
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
+import { useSignUpStore } from "../../../stores";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step4Alarm">;
-type RoutePropType = RouteProp<SignUpStackParamList, "Step4Alarm">;
 
 const Step4AlarmScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const route = useRoute<RoutePropType>();
-	const { userType, profileImageUri, name, phone, bankName, accountNumber } =
-		route.params;
+	const setIsAlarmEnabled = useSignUpStore((state) => state.setIsAlarmEnabled);
 
 	const handleAllowAlarm = () => {
 		// TODO: 푸시 알림 권한 요청 (expo-notifications)
-		console.log("알람 허용");
-		navigation.navigate("Step5Complete", {
-			userType,
-			profileImageUri,
-			name,
-			phone,
-			bankName,
-			accountNumber,
-			isAlarmEnabled: true,
-		});
+		setIsAlarmEnabled(true);
+		navigation.navigate("Step5Complete");
 	};
 
 	const handleSkip = () => {
-		navigation.navigate("Step5Complete", {
-			userType,
-			profileImageUri,
-			name,
-			phone,
-			bankName,
-			accountNumber,
-			isAlarmEnabled: false,
-		});
+		setIsAlarmEnabled(false);
+		navigation.navigate("Step5Complete");
 	};
 
 	return (

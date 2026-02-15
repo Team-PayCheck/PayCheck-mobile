@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProgressBar, StepHeader, UserTypeCard } from "../../../components/signup";
 import { colors } from "../../../constants/colors";
+import { useSignUpStore } from "../../../stores";
 import type { UserType } from "../../../types/signup.types";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 
@@ -13,13 +14,14 @@ type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step1User
 
 const Step1UserTypeScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const [selectedType, setSelectedType] = useState<UserType | null>(null);
+	const userType = useSignUpStore((state) => state.userType);
+	const setUserType = useSignUpStore((state) => state.setUserType);
 
 	const handleSelect = (type: UserType) => {
-		setSelectedType(type);
+		setUserType(type);
 		// 선택 후 잠시 대기 후 다음 화면으로 이동
 		setTimeout(() => {
-			navigation.navigate("Step2Profile", { userType: type });
+			navigation.navigate("Step2Profile");
 		}, 300);
 	};
 
@@ -45,12 +47,12 @@ const Step1UserTypeScreen: React.FC = () => {
 				<View style={styles.cardContainer}>
 					<UserTypeCard
 						type="WORKER"
-						selected={selectedType === "WORKER"}
+						selected={userType === "WORKER"}
 						onPress={() => handleSelect("WORKER")}
 					/>
 					<UserTypeCard
 						type="EMPLOYER"
-						selected={selectedType === "EMPLOYER"}
+						selected={userType === "EMPLOYER"}
 						onPress={() => handleSelect("EMPLOYER")}
 					/>
 				</View>
