@@ -1,11 +1,8 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ProgressBar, StepHeader, UserTypeCard } from "../../../components/signup";
-import { colors } from "../../../constants/colors";
+import { SignUpScreenLayout, UserTypeCard } from "../../../components/signup";
 import { useSignUpStore } from "../../../stores";
 import type { UserType } from "../../../types/signup.types";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
@@ -26,63 +23,29 @@ const Step1UserTypeScreen: React.FC = () => {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			{/* 헤더 */}
-			<View style={styles.header}>
-				<TouchableOpacity
-					style={styles.backButton}
-					onPress={() => navigation.goBack()}
-				>
-					<Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-				</TouchableOpacity>
-				<View style={styles.progressBarContainer}>
-					<ProgressBar currentStep={1} totalSteps={5} />
-				</View>
+		<SignUpScreenLayout
+			currentStep={1}
+			stepTitle="회원유형"
+			contentStyle={styles.content}
+		>
+			<View style={styles.cardContainer}>
+				<UserTypeCard
+					type="WORKER"
+					selected={userType === "WORKER"}
+					onPress={() => handleSelect("WORKER")}
+				/>
+				<UserTypeCard
+					type="EMPLOYER"
+					selected={userType === "EMPLOYER"}
+					onPress={() => handleSelect("EMPLOYER")}
+				/>
 			</View>
-
-			{/* 콘텐츠 */}
-			<View style={styles.content}>
-				<StepHeader step={1} totalSteps={5} title="회원유형" />
-
-				<View style={styles.cardContainer}>
-					<UserTypeCard
-						type="WORKER"
-						selected={userType === "WORKER"}
-						onPress={() => handleSelect("WORKER")}
-					/>
-					<UserTypeCard
-						type="EMPLOYER"
-						selected={userType === "EMPLOYER"}
-						onPress={() => handleSelect("EMPLOYER")}
-					/>
-				</View>
-			</View>
-		</SafeAreaView>
+		</SignUpScreenLayout>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: colors.background,
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-	},
-	backButton: {
-		padding: 4,
-	},
-	progressBarContainer: {
-		flex: 1,
-		marginLeft: 8,
-	},
 	content: {
-		flex: 1,
-		paddingHorizontal: 24,
-		paddingTop: 40,
 		gap: 60,
 	},
 	cardContainer: {

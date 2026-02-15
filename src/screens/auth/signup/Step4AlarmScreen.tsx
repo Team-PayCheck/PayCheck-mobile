@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import {
-	View,
-	StyleSheet,
-	TouchableOpacity,
-	Image,
-	ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { View, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ProgressBar, StepHeader, TextButton } from "../../../components/signup";
+import { SignUpScreenLayout, TextButton } from "../../../components/signup";
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
@@ -117,80 +109,44 @@ const Step4AlarmScreen: React.FC = () => {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			{/* 헤더 */}
-			<View style={styles.header}>
-				<TouchableOpacity
-					style={styles.backButton}
-					onPress={() => navigation.goBack()}
-					disabled={isLoading}
-				>
-					<Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-				</TouchableOpacity>
-				<View style={styles.progressBarContainer}>
-					<ProgressBar currentStep={4} totalSteps={5} />
-				</View>
-			</View>
-
-			{/* 콘텐츠 */}
-			<View style={styles.content}>
-				<StepHeader step={4} totalSteps={5} title="알람 설정" />
-
-				<View style={styles.imageContainer}>
-					<Image
-						source={require("../../../assets/images/signup/megaphone.png")}
-						style={styles.image}
-						resizeMode="contain"
-					/>
-				</View>
-
-				<View style={styles.textContainer}>
-					<Text weight="Bold" style={styles.title}>
-						푸시알림을 받아보세요
-					</Text>
-					<Text weight="Medium" style={styles.description}>
-						일정 전달사항과 공지, 기타 안내사항을{"\n"}빠르고 간결하게 읽어봐요!
-					</Text>
-				</View>
-			</View>
-
-			{/* 하단 버튼 */}
-			<View style={styles.footer}>
-				{isLoading ? (
+		<SignUpScreenLayout
+			currentStep={4}
+			stepTitle="알람 설정"
+			backButtonDisabled={isLoading}
+			contentStyle={styles.content}
+			footer={
+				isLoading ? (
 					<ActivityIndicator size="large" color={colors.primary} />
 				) : (
 					<>
 						<PrimaryButton text="알람 허용" onPress={handleAllowAlarm} />
 						<TextButton text="나중에 설정하기" onPress={handleSkip} />
 					</>
-				)}
+				)
+			}
+		>
+			<View style={styles.imageContainer}>
+				<Image
+					source={require("../../../assets/images/signup/megaphone.png")}
+					style={styles.image}
+					resizeMode="contain"
+				/>
 			</View>
-		</SafeAreaView>
+
+			<View style={styles.textContainer}>
+				<Text weight="Bold" style={styles.title}>
+					푸시알림을 받아보세요
+				</Text>
+				<Text weight="Medium" style={styles.description}>
+					일정 전달사항과 공지, 기타 안내사항을{"\n"}빠르고 간결하게 읽어봐요!
+				</Text>
+			</View>
+		</SignUpScreenLayout>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: colors.background,
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-	},
-	backButton: {
-		padding: 4,
-	},
-	progressBarContainer: {
-		flex: 1,
-		marginLeft: 8,
-	},
 	content: {
-		flex: 1,
-		paddingHorizontal: 24,
-		paddingTop: 40,
 		gap: 32,
 	},
 	imageContainer: {
@@ -215,12 +171,6 @@ const styles = StyleSheet.create({
 		color: colors.textSecondary,
 		textAlign: "center",
 		lineHeight: 22,
-	},
-	footer: {
-		paddingHorizontal: 40,
-		paddingBottom: 20,
-		gap: 8,
-		alignItems: "center",
 	},
 });
 

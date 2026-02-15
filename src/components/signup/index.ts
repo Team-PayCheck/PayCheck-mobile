@@ -6,3 +6,4 @@ export { default as FormInput } from "./FormInput";
 export { default as PhoneInput } from "./PhoneInput";
 export { default as TextButton } from "./TextButton";
 export { default as BankSelectModal } from "./BankSelectModal";
+export { default as SignUpScreenLayout } from "./SignUpScreenLayout";
