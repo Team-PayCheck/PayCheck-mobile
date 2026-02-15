@@ -68,7 +68,11 @@ const Step2ProfileScreen: React.FC = () => {
 
 			{/* 하단 버튼 */}
 			<View style={styles.footer}>
-				<PrimaryButton text="다음" onPress={handleNext} />
+				<PrimaryButton
+					text="다음"
+					onPress={handleNext}
+					disabled={!profileImageUri}
+				/>
 				<TextButton text="나중에 설정하기" onPress={handleSkip} />
 			</View>
 		</SafeAreaView>
