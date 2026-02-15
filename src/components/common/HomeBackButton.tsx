@@ -11,8 +11,8 @@ const HomeBackButton: React.FC<HomeBackButtonProps> = ({ onPress }) => {
 	return (
 		<TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
 			<View style={styles.row}>
-				<Ionicons name="chevron-back" size={24} color="#000000" />
-				<Text weight="Bold" style={styles.text}>홈</Text>
+				<Ionicons name="chevron-back" size={20} color="#222222" />
+				<Text weight="Medium" style={styles.text}>홈</Text>
 			</View>
 		</TouchableOpacity>
 	);
@@ -25,11 +25,11 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 2,
+		gap: 1,
 	},
 	text: {
-		fontSize: 16,
-		color: "#000000",
+		fontSize: 17,
+		color: "#222222",
 	},
 });
 

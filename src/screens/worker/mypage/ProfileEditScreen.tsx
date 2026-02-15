@@ -43,7 +43,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 				<View style={styles.headerArea}>
 					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
 					<View style={styles.titleRow}>
-						<Text weight="Bold" style={styles.title}>내 프로필 수정</Text>
+						<Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
 						<Image
 							source={require("../../../assets/images/mypage/user.png")}
 							style={styles.titleImage}
@@ -52,24 +52,20 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 					</View>
 				</View>
 
-				<View style={styles.profileSection}>
-					<View style={styles.profilePhotoWrapper}>
-						<View style={styles.profilePhoto}>
-							<Image
-								source={require("../../../assets/images/mypage/user.png")}
-								style={styles.profileImage}
-								resizeMode="contain"
-							/>
-						</View>
-						<TouchableOpacity style={styles.settingButton} activeOpacity={0.8}>
-							<Ionicons name="settings-outline" size={16} color="#8A8A8A" />
-						</TouchableOpacity>
-					</View>
-				</View>
-
 				<View style={styles.formArea}>
-					<View style={styles.fieldRow}>
-						<Text weight="Medium" style={styles.fieldLabel}>이름</Text>
+					<View style={styles.nameRow}>
+						<View style={styles.profilePhotoWrapper}>
+							<View style={styles.profilePhoto}>
+								<Image
+									source={require("../../../assets/images/mypage/user.png")}
+									style={styles.profileImage}
+									resizeMode="contain"
+								/>
+							</View>
+							<TouchableOpacity style={styles.settingButton} activeOpacity={0.8}>
+								<Ionicons name="settings-outline" size={15} color="#8A8A8A" />
+							</TouchableOpacity>
+						</View>
 						<TextInput
 							value={name}
 							onChangeText={setName}
@@ -84,6 +80,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 
 					<View style={styles.fieldRow}>
 						<Text weight="Medium" style={styles.fieldLabel}>전화 번호</Text>
+						<View style={styles.bankSelectorSpacer} />
 						<TextInput
 							value={phone}
 							onChangeText={setPhone}
@@ -99,6 +96,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 
 					<View style={styles.fieldRow}>
 						<Text weight="Medium" style={styles.fieldLabel}>이메일</Text>
+						<View style={styles.bankSelectorSpacer} />
 						<TextInput
 							value={email}
 							onChangeText={setEmail}
@@ -113,7 +111,14 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 					</View>
 
 					<View style={styles.fieldRow}>
-						<Text weight="Medium" style={styles.fieldLabel}>근무자코드</Text>
+						<Text
+							weight="Medium"
+							style={styles.fieldLabel}
+							numberOfLines={1}
+						>
+							근무자코드
+						</Text>
+						<View style={styles.bankSelectorSpacer} />
 						<TextInput
 							value={workerCode}
 							editable={false}
@@ -135,7 +140,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 						<TextInput
 							value={accountNumber}
 							onChangeText={setAccountNumber}
-							style={styles.accountInput}
+							style={styles.input}
 							placeholder="계좌번호"
 							placeholderTextColor="#A4A4A4"
 						/>
@@ -170,90 +175,83 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 24,
 	},
 	scrollContent: {
-		paddingBottom: 36,
+		paddingBottom: 34,
 	},
 	headerArea: {
-		paddingTop: 10,
-		gap: 16,
+		paddingTop: 8,
+		gap: 12,
 	},
 	titleRow: {
 		flexDirection: "row",
-		alignItems: "center",
+		alignItems: "flex-start",
 		justifyContent: "space-between",
 	},
 	title: {
-		fontSize: 42,
-		color: "#2F3135",
+		fontSize: 24,
+		color: "#353535",
+		lineHeight: 52,
 	},
 	titleImage: {
-		width: 96,
-		height: 96,
+		width: 100,
+		height: 100,
+		marginTop: -2,
 	},
-	profileSection: {
-		marginTop: 6,
+	formArea: {
+		marginTop: 8,
+		gap: 14,
+	},
+	nameRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
+		marginBottom: 8,
 	},
 	profilePhotoWrapper: {
 		position: "relative",
-		width: 96,
-		height: 96,
+		width: 86,
+		height: 86,
 	},
 	profilePhoto: {
-		width: 96,
-		height: 96,
-		borderRadius: 48,
-		backgroundColor: "#DDE5EF",
+		width: 86,
+		height: 86,
+		borderRadius: 43,
+		backgroundColor: "#D9E5F2",
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	profileImage: {
-		width: 54,
-		height: 54,
+		width: 48,
+		height: 48,
 	},
 	settingButton: {
 		position: "absolute",
-		right: -4,
-		bottom: -2,
-		width: 28,
-		height: 28,
-		borderRadius: 14,
+		right: -2,
+		bottom: -1,
+		width: 25,
+		height: 25,
+		borderRadius: 12.5,
 		backgroundColor: "#FFFFFF",
 		borderWidth: 1,
 		borderColor: "#DCDCDC",
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	formArea: {
-		marginTop: 24,
-		gap: 16,
-	},
 	fieldRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 8,
+		gap: 7,
 	},
 	fieldLabel: {
-		width: 54,
-		fontSize: 16,
+		width: 68,
+		fontSize: 15,
 		color: "#8A8A8A",
-	},
-	input: {
-		flex: 1,
-		height: 40,
-		backgroundColor: "#F2F2F2",
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: "#E3E3E3",
-		paddingHorizontal: 14,
-		fontSize: 16,
-		color: "#4B4B4B",
-		fontFamily: "Pretendard-Medium",
 	},
 	readOnlyInput: {
 		color: "#5E5E5E",
 	},
 	editButton: {
-		width: 44,
-		height: 34,
+		width: 42,
+		height: 33,
 		borderRadius: 8,
 		borderWidth: 1,
 		borderColor: "#DDDDDD",
@@ -262,34 +260,38 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	editButtonText: {
-		fontSize: 14,
+		fontSize: 13,
 		color: "#4D4D4D",
 	},
 	bankSelector: {
-		width: 78,
+		width: 82,
 		height: 40,
 		borderRadius: 10,
-		backgroundColor: "#F2F2F2",
+		backgroundColor: "#F3F3F3",
 		borderWidth: 1,
-		borderColor: "#E3E3E3",
+		borderColor: "#E6E6E6",
 		paddingHorizontal: 10,
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
 	},
+	bankSelectorSpacer: {
+		width: 82,
+		height: 40,
+	},
 	bankText: {
-		fontSize: 14,
+		fontSize: 13,
 		color: "#4B4B4B",
 	},
-	accountInput: {
+	input: {
 		flex: 1,
 		height: 40,
-		backgroundColor: "#F2F2F2",
+		backgroundColor: "#F3F3F3",
 		borderRadius: 10,
 		borderWidth: 1,
-		borderColor: "#E3E3E3",
+		borderColor: "#E6E6E6",
 		paddingHorizontal: 12,
-		fontSize: 16,
+		fontSize: 15,
 		color: "#4B4B4B",
 		fontFamily: "Pretendard-Medium",
 	},
