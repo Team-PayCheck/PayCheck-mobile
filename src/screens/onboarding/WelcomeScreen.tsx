@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken } from "../../api/authApi";
 import { useAuthStore } from "../../stores/authStore";
+import type { LoginError } from "../../types/api.types";
 import { colors } from "../../constants/colors";
 
 interface WelcomeScreenProps {
@@ -28,11 +29,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
+		let kakaoAccessToken: string | undefined;
+
 		try {
 			const token = await login();
-			const accessToken = token?.accessToken;
+			kakaoAccessToken = token?.accessToken;
 
-			if (!accessToken) {
+			if (!kakaoAccessToken) {
 				Alert.alert(
 					"로그인 실패",
 					"카카오 액세스 토큰을 가져오지 못했습니다."
@@ -40,17 +43,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				return;
 			}
 
-			const loginResult = await kakaoLoginWithToken(accessToken);
-
-			// 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
-			if (
-				!loginResult.success &&
-				(loginResult.error?.code === "NOT_FOUND" ||
-					loginResult.error?.code === "UNAUTHORIZED")
-			) {
-				onSignUpNeeded?.(accessToken);
-				return;
-			}
+			const loginResult = await kakaoLoginWithToken(kakaoAccessToken);
 
 			// 기존 회원인 경우 (success: true)
 			if (loginResult.success && loginResult.data?.accessToken) {
@@ -66,12 +59,25 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				return;
 			}
 
-			// 그 외 에러
+			// 그 외 에러 (success: false인 경우)
 			throw new Error(loginResult.error?.message || "로그인에 실패했습니다.");
 		} catch (error) {
+			const loginError = error as LoginError;
+
+			// 404 (USER_NOT_FOUND) → 회원가입으로 이동
+			if (
+				loginError.status === 404 ||
+				loginError.code === "USER_NOT_FOUND"
+			) {
+				if (kakaoAccessToken) {
+					onSignUpNeeded?.(kakaoAccessToken);
+					return;
+				}
+			}
+
+			// 그 외 에러
 			const message =
-				(error as { message?: string })?.message ||
-				"로그인에 실패했습니다. 다시 시도해주세요.";
+				loginError.message || "로그인에 실패했습니다. 다시 시도해주세요.";
 			Alert.alert("로그인 실패", message);
 		} finally {
 			setIsLoading(false);
