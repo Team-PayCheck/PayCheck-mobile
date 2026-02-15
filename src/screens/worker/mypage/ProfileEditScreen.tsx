@@ -171,7 +171,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F4F4F4",
+		backgroundColor: "#FDFDFD",
 		paddingHorizontal: 24,
 	},
 	scrollContent: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	title: {
-        marginTop: 4,
+		marginTop: 4,
 		fontSize: 24,
 		color: "#353535",
 		lineHeight: 52,

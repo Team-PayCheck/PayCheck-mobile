@@ -88,7 +88,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: "#F4F4F4",
 		paddingHorizontal: 24,
 	},
 	headerRow: {
@@ -115,19 +115,19 @@ const styles = StyleSheet.create({
 		lineHeight: 52,
 	},
 	cardList: {
-		gap: 13,
 		marginTop: 8,
 	},
 	card: {
-		backgroundColor: "#FFFFFF",
+		backgroundColor: "#FFF",
 		borderRadius: 18,
-		padding: 20,
+		paddingHorizontal: 18,
+		paddingVertical: 14,
 		shadowColor: "#000",
 		shadowOpacity: 0.07,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 8,
 		elevation: 3,
-		marginBottom: 2,
+		marginBottom: 16,
 	},
 	cardLabel: {
 		fontSize: 16,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
 		marginBottom: 6,
 	},
 	cardValue: {
-		color: "#000000",
+		color: "#000",
 	},
 });
 
