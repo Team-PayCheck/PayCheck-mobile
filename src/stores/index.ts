@@ -1,2 +1,3 @@
 export { useAuthStore, getAuthState } from "./authStore";
-export { useOnboardingStore, getOnboardingState } from "./onboardingStore";
+export { useOnboardingStore } from "./onboardingStore";
+export { useSignUpStore } from "./signUpStore";

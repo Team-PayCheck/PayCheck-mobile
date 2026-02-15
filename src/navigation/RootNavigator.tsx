@@ -4,9 +4,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
 import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
-import SignUpScreen from "../screens/auth/SignUpScreen";
+import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerStack from "../navigation/WorkerStack";
+import WorkerHomeScreen from "../screens/worker/WorkerHomeScreen";
+import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
 
 export type RootStackParamList = {
 	Onboarding: undefined;
@@ -14,6 +16,7 @@ export type RootStackParamList = {
 	SignUp: { kakaoAccessToken: string };
 	EmployerHome: undefined;
 	WorkerHome: undefined;
+	WorkplaceManage: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,7 +49,7 @@ const RootNavigator = () => {
 							onLoginSuccess={(userType) => {
 								// userType에 따라 다른 화면으로 이동
 								const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerHome';
-								props.navigation.replace("WorkerHome");
+								props.navigation.replace(targetRoute);
 							}}
 							onSignUpNeeded={(kakaoAccessToken) => {
 								// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
@@ -55,9 +58,16 @@ const RootNavigator = () => {
 						/>
 					)}
 				</Stack.Screen>
-				<Stack.Screen name="SignUp" component={SignUpScreen} />
+				<Stack.Screen name="SignUp">
+					{(props) => (
+						<SignUpNavigator
+							kakaoAccessToken={props.route.params?.kakaoAccessToken || ""}
+						/>
+					)}
+				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
 				<Stack.Screen name="WorkerHome" component={WorkerStack} />
+				<Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);

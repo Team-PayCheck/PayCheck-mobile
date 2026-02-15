@@ -1,9 +1,4 @@
-import type {
-	AxiosRequestConfig,
-	AxiosResponse,
-	AxiosError,
-	InternalAxiosRequestConfig,
-} from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
 
 // API 응답 공통 타입
 export interface ApiResponse<T = unknown> {
@@ -33,6 +28,7 @@ export interface UserInfo {
 // 카카오 회원가입 파라미터
 export interface KakaoRegisterParams {
 	kakaoAccessToken: string;
+	name: string;
 	userType: "EMPLOYER" | "WORKER";
 	phone: string;
 	bankName: string;
@@ -57,11 +53,3 @@ export interface RefreshSubscriber {
 	resolve: (token: string) => void;
 	reject: (error: unknown) => void;
 }
-
-// Axios 타입 재export
-export type {
-	AxiosRequestConfig,
-	AxiosResponse,
-	AxiosError,
-	InternalAxiosRequestConfig,
-};
