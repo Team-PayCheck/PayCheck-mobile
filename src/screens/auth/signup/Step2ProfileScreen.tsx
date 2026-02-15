@@ -13,6 +13,7 @@ import {
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { colors } from "../../../constants/colors";
 import { useSignUpStore } from "../../../stores";
+import { pickProfileImage } from "../../../utils/image";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step2Profile">;
@@ -20,11 +21,13 @@ type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step2Prof
 const Step2ProfileScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const profileImageUri = useSignUpStore((state) => state.profileImageUri);
-	const setProfileImageUri = useSignUpStore((state) => state.setProfileImageUri);
+	const setProfileImage = useSignUpStore((state) => state.setProfileImage);
 
-	const handleImagePress = () => {
-		// TODO: 이미지 선택 기능 (expo-image-picker)
-		console.log("이미지 선택");
+	const handleImagePress = async () => {
+		const result = await pickProfileImage();
+		if (result) {
+			setProfileImage(result.uri, result.base64);
+		}
 	};
 
 	const handleNext = () => {
@@ -32,7 +35,7 @@ const Step2ProfileScreen: React.FC = () => {
 	};
 
 	const handleSkip = () => {
-		setProfileImageUri(null);
+		setProfileImage(null, null);
 		navigation.navigate("Step3BasicInfo");
 	};
 

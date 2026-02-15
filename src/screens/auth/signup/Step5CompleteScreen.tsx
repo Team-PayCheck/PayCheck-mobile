@@ -22,7 +22,7 @@ const Step5CompleteScreen: React.FC = () => {
 	// SignUp Store에서 데이터 가져오기
 	const kakaoAccessToken = useSignUpStore((state) => state.kakaoAccessToken);
 	const userType = useSignUpStore((state) => state.userType);
-	const profileImageUri = useSignUpStore((state) => state.profileImageUri);
+	const profileImageBase64 = useSignUpStore((state) => state.profileImageBase64);
 	const name = useSignUpStore((state) => state.name);
 	const phone = useSignUpStore((state) => state.phone);
 	const bankName = useSignUpStore((state) => state.bankName);
@@ -51,7 +51,7 @@ const Step5CompleteScreen: React.FC = () => {
 				phone,
 				bankName: isWorker ? bankName : "",
 				accountNumber: isWorker ? accountNumber : "",
-				profileImageUrl: profileImageUri || "",
+				profileImageUrl: profileImageBase64 || "",
 			});
 
 			if (response.success && response.data) {

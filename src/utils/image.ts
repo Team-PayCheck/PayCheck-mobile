@@ -1,5 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import * as ImageManipulator from "expo-image-manipulator";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import * as Linking from "expo-linking";
 import { Alert } from "react-native";
 
@@ -55,15 +55,15 @@ export const pickProfileImage = async (): Promise<ProcessedImage | null> => {
 	}
 
 	// 3. 압축 + base64 변환
-	const context = ImageManipulator.manipulate(result.assets[0].uri);
-	context.resize({ width: 400, height: 400 });
-
-	const rendered = await context.renderAsync();
-	const processed = await rendered.saveAsync({
-		format: ImageManipulator.SaveFormat.JPEG,
-		compress: 0.7,
-		base64: true,
-	});
+	const processed = await manipulateAsync(
+		result.assets[0].uri,
+		[{ resize: { width: 400, height: 400 } }],
+		{
+			compress: 0.7,
+			format: SaveFormat.JPEG,
+			base64: true,
+		}
+	);
 
 	return {
 		uri: processed.uri,
