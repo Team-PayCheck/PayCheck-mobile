@@ -6,7 +6,7 @@ import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpScreen from "../screens/auth/SignUpScreen";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
-import WorkerHomeScreen from "../screens/worker/WorkerHomeScreen";
+import WorkerStack from "../navigation/WorkerStack";
 
 export type RootStackParamList = {
 	Onboarding: undefined;
@@ -57,7 +57,7 @@ const RootNavigator = () => {
 				</Stack.Screen>
 				<Stack.Screen name="SignUp" component={SignUpScreen} />
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
-				<Stack.Screen name="WorkerHome" component={WorkerHomeScreen} />
+				<Stack.Screen name="WorkerHome" component={WorkerStack} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
