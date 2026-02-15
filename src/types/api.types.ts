@@ -1,9 +1,4 @@
-import type {
-	AxiosRequestConfig,
-	AxiosResponse,
-	AxiosError,
-	InternalAxiosRequestConfig,
-} from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
 
 // API 응답 공통 타입
 export interface ApiResponse<T = unknown> {
@@ -58,11 +53,3 @@ export interface RefreshSubscriber {
 	resolve: (token: string) => void;
 	reject: (error: unknown) => void;
 }
-
-// Axios 타입 재export
-export type {
-	AxiosRequestConfig,
-	AxiosResponse,
-	AxiosError,
-	InternalAxiosRequestConfig,
-};

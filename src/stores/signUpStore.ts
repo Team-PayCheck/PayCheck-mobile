@@ -52,6 +52,3 @@ export const useSignUpStore = create<SignUpState>((set) => ({
 
 	reset: () => set(initialState),
 }));
-
-// 스토어 외부에서 상태 접근용
-export const getSignUpState = () => useSignUpStore.getState();

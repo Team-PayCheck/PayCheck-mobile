@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken } from "../../api/authApi";
 import { useAuthStore } from "../../stores/authStore";
+import { colors } from "../../constants/colors";
 
 interface WelcomeScreenProps {
 	onLoginSuccess?: (userType: "EMPLOYER" | "WORKER") => void;
@@ -96,7 +97,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 			<View style={styles.buttonContainer}>
 				{isLoading ? (
 					<View style={styles.loadingContainer}>
-						<ActivityIndicator size="large" color="#3b82f6" />
+						<ActivityIndicator size="large" color={colors.primary} />
 						<Text weight="Medium" style={styles.loadingText}>
 							로그인 중...
 						</Text>
@@ -135,7 +136,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	content: {
 		flex: 1,
@@ -153,12 +154,12 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 40,
-		color: "#000000",
+		color: colors.black,
 		textAlign: "center",
 	},
 	subtitle: {
 		fontSize: 13,
-		color: "#848484",
+		color: colors.textSecondary,
 		textAlign: "center",
 	},
 	buttonContainer: {
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 14,
-		color: "#3b82f6",
+		color: colors.primary,
 	},
 	kakaoButton: {
 		width: "100%",
@@ -187,15 +188,15 @@ const styles = StyleSheet.create({
 		marginTop: 16,
 		paddingVertical: 12,
 		paddingHorizontal: 24,
-		backgroundColor: "#f0f0f0",
+		backgroundColor: colors.backgroundGrey,
 		borderRadius: 8,
 		borderWidth: 1,
-		borderColor: "#ccc",
+		borderColor: colors.grey,
 		borderStyle: "dashed",
 	},
 	devButtonText: {
 		fontSize: 14,
-		color: "#666",
+		color: colors.textSecondary,
 		textAlign: "center",
 	},
 });

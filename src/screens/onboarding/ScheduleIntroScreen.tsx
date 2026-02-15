@@ -3,6 +3,7 @@ import { Image, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 
 interface ScheduleIntroScreenProps {
 	onStartPress?: () => void;
@@ -30,7 +31,7 @@ const ScheduleIntroScreen: React.FC<ScheduleIntroScreenProps> = ({ onStartPress 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	content: {
 		flex: 1,
@@ -45,13 +46,13 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 40,
-		color: "#000000",
+		color: colors.black,
 		textAlign: "center",
 	},
 	subtitle: {
 		marginTop: 8,
 		fontSize: 16,
-		color: "#848484",
+		color: colors.textSecondary,
 		textAlign: "center",
 	},
 	image: {

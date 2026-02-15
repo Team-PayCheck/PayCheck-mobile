@@ -2,6 +2,7 @@ import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 
 const PayrollIntroScreen = () => {
 	return (
@@ -29,7 +30,7 @@ const PayrollIntroScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	header: {
 		paddingHorizontal: 40,
@@ -46,22 +47,22 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 40,
 		alignItems: "flex-start",
 		justifyContent: "flex-start",
-		paddingTop: 50,  
+		paddingTop: 50,
 	},
 	subtitle: {
 		fontSize: 16,
-		color: "#848484",
+		color: colors.textSecondary,
 		textAlign: "left",
 	},
 	title: {
 		fontSize: 40,
-		color: "#000000",
+		color: colors.black,
 		textAlign: "left",
 		lineHeight: 48,
 		letterSpacing: -0.6,
 	},
 	image: {
-		width: "115%", 
+		width: "115%",
 		flex: 1,
 	},
 });

@@ -4,10 +4,6 @@
  */
 
 export const colors = {
-	// 메인 색상
-	main: "#769FCD",
-	mainDark: "#5A7FA8",
-
 	// 버튼/강조 색상
 	primary: "#0158CC",
 	primaryLight: "#E8F1FC",
