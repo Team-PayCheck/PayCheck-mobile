@@ -46,6 +46,27 @@ const Step3BasicInfoScreen: React.FC = () => {
 
 	const isWorker = userType === "WORKER";
 
+	// 전화번호 유효성 검사 (010-1234-5678 형식, 11자리 숫자)
+	const isPhoneValid = () => {
+		const digits = phone.replace(/-/g, "");
+		return digits.length === 11;
+	};
+
+	// 다음 버튼 활성화 조건
+	const isNextEnabled = () => {
+		const hasName = name.trim().length > 0;
+		const hasPhone = isPhoneValid();
+
+		if (isWorker) {
+			// 근로자: 이름 + 전화번호 + 은행명 + 계좌번호
+			const hasBank = bankName.length > 0;
+			const hasAccount = accountNumber.trim().length > 0;
+			return hasName && hasPhone && hasBank && hasAccount;
+		}
+		// 고용주: 이름 + 전화번호
+		return hasName && hasPhone;
+	};
+
 	const handleBankSelect = (selected: BankName) => {
 		setBankName(selected);
 	};
@@ -122,7 +143,11 @@ const Step3BasicInfoScreen: React.FC = () => {
 
 				{/* 하단 버튼 */}
 				<View style={styles.footer}>
-					<PrimaryButton text="다음" onPress={handleNext} />
+					<PrimaryButton
+						text="다음"
+						onPress={handleNext}
+						disabled={!isNextEnabled()}
+					/>
 				</View>
 			</KeyboardAvoidingView>
 
