@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Image, ActivityIndicator } from "react-native";
+import React from "react";
+import { View, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,78 +7,40 @@ import { ProgressBar, StepHeader } from "../../../components/signup";
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
-import { useSignUpStore, useAuthStore } from "../../../stores";
-import { kakaoRegisterWithToken } from "../../../api/authApi";
-import { showError } from "../../../utils/alert";
+import { useSignUpStore } from "../../../stores";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
-import type { LoginError } from "../../../types/api.types";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step5Complete">;
 
 const Step5CompleteScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const [isLoading, setIsLoading] = useState(false);
 
-	// SignUp Store에서 데이터 가져오기
-	const kakaoAccessToken = useSignUpStore((state) => state.kakaoAccessToken);
 	const userType = useSignUpStore((state) => state.userType);
-	const profileImageBase64 = useSignUpStore((state) => state.profileImageBase64);
-	const name = useSignUpStore((state) => state.name);
-	const phone = useSignUpStore((state) => state.phone);
-	const bankName = useSignUpStore((state) => state.bankName);
-	const accountNumber = useSignUpStore((state) => state.accountNumber);
 	const resetSignUp = useSignUpStore((state) => state.reset);
-
-	// Auth Store
-	const authLogin = useAuthStore((state) => state.login);
 
 	const isWorker = userType === "WORKER";
 	const buttonText = isWorker ? "시작하기" : "매장 관리하러 가기";
 
-	const handleStart = async () => {
-		if (!kakaoAccessToken || !userType) {
-			showError("오류", "회원가입 정보가 올바르지 않습니다.");
-			return;
-		}
+	const handleStart = () => {
+		// SignUp Store 초기화
+		resetSignUp();
 
-		setIsLoading(true);
-
-		try {
-			const response = await kakaoRegisterWithToken({
-				kakaoAccessToken,
-				name,
-				userType,
-				phone,
-				bankName: isWorker ? bankName : "",
-				accountNumber: isWorker ? accountNumber : "",
-				profileImageUrl: profileImageBase64 || "",
-			});
-
-			if (response.success && response.data) {
-				// Zustand에 저장 (자동으로 AsyncStorage에 persist)
-				authLogin(response.data.accessToken, {
-					userId: response.data.userId,
-					name: response.data.name,
-					userType: response.data.userType as "EMPLOYER" | "WORKER",
-				});
-
-				// SignUp Store 초기화
-				resetSignUp();
-
-				// 홈 화면으로 이동 (스택 초기화)
-				const targetRoute = isWorker ? "WorkerHome" : "EmployerHome";
-				navigation.dispatch(
-					CommonActions.reset({
-						index: 0,
-						routes: [{ name: targetRoute }],
-					})
-				);
-			}
-		} catch (error) {
-			const loginError = error as LoginError;
-			showError("회원가입 실패", loginError.message);
-		} finally {
-			setIsLoading(false);
+		if (isWorker) {
+			// 근로자: WorkerHome으로 이동
+			navigation.dispatch(
+				CommonActions.reset({
+					index: 0,
+					routes: [{ name: "WorkerHome" }],
+				})
+			);
+		} else {
+			// 고용주: WorkplaceManage로 이동
+			navigation.dispatch(
+				CommonActions.reset({
+					index: 0,
+					routes: [{ name: "WorkplaceManage" }],
+				})
+			);
 		}
 	};
 
@@ -115,11 +77,7 @@ const Step5CompleteScreen: React.FC = () => {
 
 			{/* 하단 버튼 */}
 			<View style={styles.footer}>
-				{isLoading ? (
-					<ActivityIndicator size="large" color={colors.primary} />
-				) : (
-					<PrimaryButton text={buttonText} onPress={handleStart} />
-				)}
+				<PrimaryButton text={buttonText} onPress={handleStart} />
 			</View>
 		</SafeAreaView>
 	);

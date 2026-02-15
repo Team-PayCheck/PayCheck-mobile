@@ -7,6 +7,7 @@ import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerHomeScreen from "../screens/worker/WorkerHomeScreen";
+import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
 
 export type RootStackParamList = {
 	Onboarding: undefined;
@@ -14,6 +15,7 @@ export type RootStackParamList = {
 	SignUp: { kakaoAccessToken: string };
 	EmployerHome: undefined;
 	WorkerHome: undefined;
+	WorkplaceManage: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -64,6 +66,7 @@ const RootNavigator = () => {
 				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
 				<Stack.Screen name="WorkerHome" component={WorkerHomeScreen} />
+				<Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);

@@ -18,6 +18,8 @@ export type SignUpStackParamList = {
 	// RootNavigator의 화면들 (완료 후 이동용)
 	EmployerHome: undefined;
 	WorkerHome: undefined;
+	WorkplaceManage: undefined;
+	Welcome: undefined;
 };
 
 const Stack = createNativeStackNavigator<SignUpStackParamList>();
