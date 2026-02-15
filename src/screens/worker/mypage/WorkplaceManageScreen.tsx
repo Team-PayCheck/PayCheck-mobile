@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import HomeBackButton from "../../../components/common/HomeBackButton";
@@ -9,6 +9,20 @@ import MyPageDrawer from "../../../components/worker/mypage/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
+
+// Mock 데이터 - 실제 데이터 연결 시 삭제 예정
+const dummyWorkplaces = [
+	{
+		name: "맥도날드",
+		joinedAt: "2025년 4월 23일",
+		wage: "10,030원",
+	},
+	{
+		name: "버거킹",
+		joinedAt: "2025년 5월 15일",
+		wage: "10,030원",
+	},
+];
 
 const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -23,9 +37,34 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
-			<View style={styles.headerArea}>
-				<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-				<Text weight="Bold" style={styles.title}>내 근무지</Text>
+			<View style={styles.headerRow}>
+				<View style={{ flex: 1 }}>
+					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+					<Text weight="ExtraBold" style={styles.title}>내 근무지</Text>
+				</View>
+				<View style={styles.illustWrapper}>
+					<Image
+						source={require("../../../assets/images/mypage/location.png")}
+						style={styles.illust}
+						resizeMode="contain"
+					/>
+				</View>
+			</View>
+
+			<View style={styles.cardList}>
+				{dummyWorkplaces.map((w, idx) => (
+					<View key={w.name + idx} style={styles.card}>
+						<Text weight="Bold" style={styles.cardLabel}>
+							근무지: <Text weight="Bold" style={styles.cardValue}>{w.name}</Text>
+						</Text>
+						<Text weight="Bold" style={styles.cardLabel}>
+							입사 날짜: <Text weight="Bold" style={styles.cardValue}>{w.joinedAt}</Text>
+						</Text>
+						<Text weight="Bold" style={styles.cardLabel}>
+							시급: <Text weight="Bold" style={styles.cardValue}>{w.wage}</Text>
+						</Text>
+					</View>
+				))}
 			</View>
 
 			<MyPageDrawer
@@ -45,19 +84,58 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	);
 };
 
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F4F4F4",
+		backgroundColor: "#FDFDFD",
 		paddingHorizontal: 24,
 	},
-	headerArea: {
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "flex-start",
+		justifyContent: "space-between",
 		paddingTop: 10,
-		gap: 16,
+		marginBottom: 12,
+	},
+	illustWrapper: {
+		width: 100,
+		height: 100,
+		marginTop: -8,
+		marginRight: -8,
+	},
+	illust: {
+		width: "100%",
+		height: "100%",
 	},
 	title: {
-		fontSize: 40,
-		color: "#2F3135",
+		marginTop: 4,
+		fontSize: 24,
+		color: "#353535",
+		lineHeight: 52,
+	},
+	cardList: {
+		gap: 13,
+		marginTop: 8,
+	},
+	card: {
+		backgroundColor: "#FFFFFF",
+		borderRadius: 18,
+		padding: 20,
+		shadowColor: "#000",
+		shadowOpacity: 0.07,
+		shadowOffset: { width: 0, height: 3 },
+		shadowRadius: 8,
+		elevation: 3,
+		marginBottom: 2,
+	},
+	cardLabel: {
+		fontSize: 16,
+		color: "#848484",
+		marginBottom: 6,
+	},
+	cardValue: {
+		color: "#000000",
 	},
 });
 

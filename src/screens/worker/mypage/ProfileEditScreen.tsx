@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	title: {
+        marginTop: 4,
 		fontSize: 24,
 		color: "#353535",
 		lineHeight: 52,
