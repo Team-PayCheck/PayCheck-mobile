@@ -23,6 +23,7 @@ src/
 │   ├── employer/     # 고용주 전용
 │   ├── layout/       # 레이아웃
 │   ├── mypage/       # 마이페이지
+│   ├── signup/       # 회원가입 (ProgressBar, FormInput 등)
 │   ├── skeleton/     # 로딩 스켈레톤
 │   └── worker/       # 근로자 전용
 ├── hooks/            # 커스텀 훅
@@ -36,7 +37,7 @@ src/
 │   ├── onboarding/   # 온보딩, 로그인
 │   ├── mypage/       # 마이페이지
 │   └── worker/       # 근로자 화면 (WorkerHomeScreen 등)
-├── stores/           # Zustand 전역 상태 (authStore, onboardingStore)
+├── stores/           # Zustand 전역 상태 (authStore, onboardingStore, signUpStore)
 ├── types/            # TypeScript 타입 (api.types.ts 등)
 └── utils/            # 유틸리티 함수
 ```
@@ -55,12 +56,26 @@ Onboarding (3페이지 스와이프)
     ↓
 Welcome (카카오 로그인)
     ├─ 기존 회원 → EmployerHome / WorkerHome
-    └─ 신규 회원 → SignUp → EmployerHome / WorkerHome
+    └─ 신규 회원 → SignUp (5단계) → EmployerHome / WorkerHome
+```
+
+### 회원가입 플로우 (5단계)
+```
+Step1: 회원유형 선택 (근로자/사장님)
+    ↓
+Step2: 프로필 사진 (선택, 갤러리에서 선택 → 압축 → base64)
+    ↓
+Step3: 기본정보 (이름, 전화번호, 은행/계좌 - 근로자만)
+    ↓
+Step4: 알람 설정 (푸시 알림 권한)
+    ↓
+Step5: 완료 → API 호출 → 홈 화면
 ```
 
 ### 상태 관리
 - **authStore**: accessToken, userInfo, isLoggedIn (AsyncStorage 자동 persist)
 - **onboardingStore**: isOnboardingCompleted (AsyncStorage 자동 persist)
+- **signUpStore**: 회원가입 임시 데이터 (persist 없음, 앱 종료 시 자동 초기화)
 
 ## 명령어
 
