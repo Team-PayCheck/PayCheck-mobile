@@ -13,6 +13,7 @@ import { ImageSourcePropType } from "react-native";
 export interface BankInfo {
 	name: string;
 	logo: ImageSourcePropType;
+	logoSize?: { width: number; height: number }; // 커스텀 로고 크기 (기본: 32x32)
 }
 
 /**
@@ -93,7 +94,7 @@ export const BANK_INFO: Record<string, BankInfo> = {
 	KB증권: { name: "KB증권", logo: BANK_LOGOS.kb },
 	미래에셋증권: { name: "미래에셋증권", logo: BANK_LOGOS.miraeAsset },
 	삼성증권: { name: "삼성증권", logo: BANK_LOGOS.samsung },
-	한국투자증권: { name: "한국투자증권", logo: BANK_LOGOS.koreaInvestment },
+	한국투자증권: { name: "한국투자증권", logo: BANK_LOGOS.koreaInvestment, logoSize: { width: 70, height: 32 } },
 	NH투자증권: { name: "NH투자증권", logo: BANK_LOGOS.nh },
 	교보증권: { name: "교보증권", logo: BANK_LOGOS.kyobo },
 	하이투자증권: { name: "하이투자증권", logo: BANK_LOGOS.im },

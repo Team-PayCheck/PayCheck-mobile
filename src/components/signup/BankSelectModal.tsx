@@ -45,7 +45,13 @@ const BankSelectModal: React.FC<BankSelectModalProps> = ({
 					{bankInfo.logo ? (
 						<Image
 							source={bankInfo.logo}
-							style={styles.logo}
+							style={[
+								styles.logo,
+								bankInfo.logoSize && {
+									width: bankInfo.logoSize.width,
+									height: bankInfo.logoSize.height,
+								},
+							]}
 							resizeMode="contain"
 						/>
 					) : (
