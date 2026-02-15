@@ -13,7 +13,6 @@ interface SignUpState {
 	phone: string;
 	bankName: string;
 	accountNumber: string;
-	isAlarmEnabled: boolean;
 
 	// 액션
 	setKakaoAccessToken: (token: string) => void;
@@ -23,7 +22,6 @@ interface SignUpState {
 	setPhone: (phone: string) => void;
 	setBankName: (bankName: string) => void;
 	setAccountNumber: (accountNumber: string) => void;
-	setIsAlarmEnabled: (enabled: boolean) => void;
 
 	// 전체 초기화 (회원가입 완료/취소 시)
 	reset: () => void;
@@ -38,7 +36,6 @@ const initialState = {
 	phone: "--",
 	bankName: "",
 	accountNumber: "",
-	isAlarmEnabled: false,
 };
 
 export const useSignUpStore = create<SignUpState>((set) => ({
@@ -52,7 +49,6 @@ export const useSignUpStore = create<SignUpState>((set) => ({
 	setPhone: (phone) => set({ phone }),
 	setBankName: (bankName) => set({ bankName }),
 	setAccountNumber: (accountNumber) => set({ accountNumber }),
-	setIsAlarmEnabled: (enabled) => set({ isAlarmEnabled: enabled }),
 
 	reset: () => set(initialState),
 }));
