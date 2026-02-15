@@ -88,7 +88,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F4F4F4",
+		backgroundColor: "#FDFDFD",
 		paddingHorizontal: 24,
 	},
 	headerRow: {
