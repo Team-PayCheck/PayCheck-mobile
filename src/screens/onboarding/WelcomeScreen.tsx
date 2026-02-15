@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken } from "../../api/authApi";
 import { useAuthStore } from "../../stores/authStore";
+import type { LoginError } from "../../types/api.types";
+import { colors } from "../../constants/colors";
 
 interface WelcomeScreenProps {
 	onLoginSuccess?: (userType: "EMPLOYER" | "WORKER") => void;
@@ -27,11 +29,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 	const handleKakaoLogin = async () => {
 		setIsLoading(true);
+		let kakaoAccessToken: string | undefined;
+
 		try {
 			const token = await login();
-			const accessToken = token?.accessToken;
+			kakaoAccessToken = token?.accessToken;
 
-			if (!accessToken) {
+			if (!kakaoAccessToken) {
 				Alert.alert(
 					"로그인 실패",
 					"카카오 액세스 토큰을 가져오지 못했습니다."
@@ -39,17 +43,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				return;
 			}
 
-			const loginResult = await kakaoLoginWithToken(accessToken);
-
-			// 회원가입 필요 (NOT_FOUND 또는 UNAUTHORIZED)
-			if (
-				!loginResult.success &&
-				(loginResult.error?.code === "NOT_FOUND" ||
-					loginResult.error?.code === "UNAUTHORIZED")
-			) {
-				onSignUpNeeded?.(accessToken);
-				return;
-			}
+			const loginResult = await kakaoLoginWithToken(kakaoAccessToken);
 
 			// 기존 회원인 경우 (success: true)
 			if (loginResult.success && loginResult.data?.accessToken) {
@@ -65,12 +59,25 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				return;
 			}
 
-			// 그 외 에러
+			// 그 외 에러 (success: false인 경우)
 			throw new Error(loginResult.error?.message || "로그인에 실패했습니다.");
 		} catch (error) {
+			const loginError = error as LoginError;
+
+			// 404 (USER_NOT_FOUND) → 회원가입으로 이동
+			if (
+				loginError.status === 404 ||
+				loginError.code === "USER_NOT_FOUND"
+			) {
+				if (kakaoAccessToken) {
+					onSignUpNeeded?.(kakaoAccessToken);
+					return;
+				}
+			}
+
+			// 그 외 에러
 			const message =
-				(error as { message?: string })?.message ||
-				"로그인에 실패했습니다. 다시 시도해주세요.";
+				loginError.message || "로그인에 실패했습니다. 다시 시도해주세요.";
 			Alert.alert("로그인 실패", message);
 		} finally {
 			setIsLoading(false);
@@ -96,23 +103,36 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 			<View style={styles.buttonContainer}>
 				{isLoading ? (
 					<View style={styles.loadingContainer}>
-						<ActivityIndicator size="large" color="#3b82f6" />
+						<ActivityIndicator size="large" color={colors.primary} />
 						<Text weight="Medium" style={styles.loadingText}>
 							로그인 중...
 						</Text>
 					</View>
 				) : (
-					<TouchableOpacity
-						style={styles.kakaoButton}
-						onPress={handleKakaoLogin}
-						activeOpacity={0.8}
-					>
-						<Image
-							source={require("../../assets/images/kakao_login_medium_wide.png")}
-							style={styles.kakaoButtonImage}
-							resizeMode="contain"
-						/>
-					</TouchableOpacity>
+					<>
+						<TouchableOpacity
+							style={styles.kakaoButton}
+							onPress={handleKakaoLogin}
+							activeOpacity={0.8}
+						>
+							<Image
+								source={require("../../assets/images/kakao_login_medium_wide.png")}
+								style={styles.kakaoButtonImage}
+								resizeMode="contain"
+							/>
+						</TouchableOpacity>
+						{__DEV__ && (
+							<TouchableOpacity
+								style={styles.devButton}
+								onPress={() => onSignUpNeeded?.("dev_test_token")}
+								activeOpacity={0.7}
+							>
+								<Text weight="Medium" style={styles.devButtonText}>
+									[DEV] 회원가입 테스트
+								</Text>
+							</TouchableOpacity>
+						)}
+					</>
 				)}
 			</View>
 		</SafeAreaView>
@@ -122,7 +142,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	content: {
 		flex: 1,
@@ -140,12 +160,12 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 40,
-		color: "#000000",
+		color: colors.black,
 		textAlign: "center",
 	},
 	subtitle: {
 		fontSize: 13,
-		color: "#848484",
+		color: colors.textSecondary,
 		textAlign: "center",
 	},
 	buttonContainer: {
@@ -160,7 +180,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 14,
-		color: "#3b82f6",
+		color: colors.primary,
 	},
 	kakaoButton: {
 		width: "100%",
@@ -169,6 +189,21 @@ const styles = StyleSheet.create({
 	kakaoButtonImage: {
 		width: "100%",
 		height: "100%",
+	},
+	devButton: {
+		marginTop: 16,
+		paddingVertical: 12,
+		paddingHorizontal: 24,
+		backgroundColor: colors.backgroundGrey,
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: colors.grey,
+		borderStyle: "dashed",
+	},
+	devButtonText: {
+		fontSize: 14,
+		color: colors.textSecondary,
+		textAlign: "center",
 	},
 });
 

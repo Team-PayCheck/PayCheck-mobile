@@ -47,3 +47,4 @@ yarn-error.*
 # claude
 .claude
 CLAUDE.md
+PLAN.md

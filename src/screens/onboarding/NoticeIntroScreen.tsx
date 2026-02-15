@@ -2,6 +2,7 @@ import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 
 const NoticeIntroScreen = () => {
 	return (
@@ -22,7 +23,7 @@ const NoticeIntroScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	content: {
 		flex: 1,
@@ -33,13 +34,13 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 40,
-		color: "#000000",
+		color: colors.black,
 		textAlign: "center",
 	},
 	subtitle: {
 		marginTop: 8,
 		fontSize: 16,
-		color: "#848484",
+		color: colors.textSecondary,
 		textAlign: "center",
 	},
 	image: {

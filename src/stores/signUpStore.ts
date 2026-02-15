@@ -1,0 +1,54 @@
+import { create } from "zustand";
+import type { UserType } from "../types/signup.types";
+
+interface SignUpState {
+	// 카카오 액세스 토큰 (persist 안 함)
+	kakaoAccessToken: string | null;
+
+	// 회원가입 폼 데이터
+	userType: UserType | null;
+	profileImageUri: string | null;
+	profileImageBase64: string | null;
+	name: string;
+	phone: string;
+	bankName: string;
+	accountNumber: string;
+
+	// 액션
+	setKakaoAccessToken: (token: string) => void;
+	setUserType: (type: UserType) => void;
+	setProfileImage: (uri: string | null, base64: string | null) => void;
+	setName: (name: string) => void;
+	setPhone: (phone: string) => void;
+	setBankName: (bankName: string) => void;
+	setAccountNumber: (accountNumber: string) => void;
+
+	// 전체 초기화 (회원가입 완료/취소 시)
+	reset: () => void;
+}
+
+const initialState = {
+	kakaoAccessToken: null,
+	userType: null,
+	profileImageUri: null,
+	profileImageBase64: null,
+	name: "",
+	phone: "--",
+	bankName: "",
+	accountNumber: "",
+};
+
+export const useSignUpStore = create<SignUpState>((set) => ({
+	...initialState,
+
+	setKakaoAccessToken: (token) => set({ kakaoAccessToken: token }),
+	setUserType: (type) => set({ userType: type }),
+	setProfileImage: (uri, base64) =>
+		set({ profileImageUri: uri, profileImageBase64: base64 }),
+	setName: (name) => set({ name }),
+	setPhone: (phone) => set({ phone }),
+	setBankName: (bankName) => set({ bankName }),
+	setAccountNumber: (accountNumber) => set({ accountNumber }),
+
+	reset: () => set(initialState),
+}));
