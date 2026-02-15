@@ -98,7 +98,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 						inputStyle={{ color: "#5E5E5E" }}
 					/>
 
-            <View style={{ gap: 8 }}>
+            <View style={{ gap: 14 }}>
               <View style={styles.fieldRow}>
                 <Text style={styles.fieldLabel} weight="Medium">은행</Text>
                 <TouchableOpacity
