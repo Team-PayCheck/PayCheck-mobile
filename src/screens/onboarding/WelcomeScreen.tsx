@@ -102,17 +102,30 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 						</Text>
 					</View>
 				) : (
-					<TouchableOpacity
-						style={styles.kakaoButton}
-						onPress={handleKakaoLogin}
-						activeOpacity={0.8}
-					>
-						<Image
-							source={require("../../assets/images/kakao_login_medium_wide.png")}
-							style={styles.kakaoButtonImage}
-							resizeMode="contain"
-						/>
-					</TouchableOpacity>
+					<>
+						<TouchableOpacity
+							style={styles.kakaoButton}
+							onPress={handleKakaoLogin}
+							activeOpacity={0.8}
+						>
+							<Image
+								source={require("../../assets/images/kakao_login_medium_wide.png")}
+								style={styles.kakaoButtonImage}
+								resizeMode="contain"
+							/>
+						</TouchableOpacity>
+						{__DEV__ && (
+							<TouchableOpacity
+								style={styles.devButton}
+								onPress={() => onSignUpNeeded?.("dev_test_token")}
+								activeOpacity={0.7}
+							>
+								<Text weight="Medium" style={styles.devButtonText}>
+									[DEV] 회원가입 테스트
+								</Text>
+							</TouchableOpacity>
+						)}
+					</>
 				)}
 			</View>
 		</SafeAreaView>
@@ -169,6 +182,21 @@ const styles = StyleSheet.create({
 	kakaoButtonImage: {
 		width: "100%",
 		height: "100%",
+	},
+	devButton: {
+		marginTop: 16,
+		paddingVertical: 12,
+		paddingHorizontal: 24,
+		backgroundColor: "#f0f0f0",
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: "#ccc",
+		borderStyle: "dashed",
+	},
+	devButtonText: {
+		fontSize: 14,
+		color: "#666",
+		textAlign: "center",
 	},
 });
 
