@@ -56,7 +56,9 @@ Onboarding (3페이지 스와이프)
     ↓
 Welcome (카카오 로그인)
     ├─ 기존 회원 → EmployerHome / WorkerHome
-    └─ 신규 회원 → SignUp (5단계) → EmployerHome / WorkerHome
+    └─ 신규 회원 → SignUp (5단계)
+                      ├─ WORKER → WorkerHome
+                      └─ EMPLOYER → WorkplaceManage
 ```
 
 ### 회원가입 플로우 (5단계)
@@ -64,12 +66,18 @@ Welcome (카카오 로그인)
 Step1: 회원유형 선택 (근로자/사장님)
     ↓
 Step2: 프로필 사진 (선택, 갤러리에서 선택 → 압축 → base64)
+    - 사진 미선택 시 '다음' 버튼 비활성화
     ↓
 Step3: 기본정보 (이름, 전화번호, 은행/계좌 - 근로자만)
+    - 필수 항목 미입력 시 '다음' 버튼 비활성화
     ↓
-Step4: 알람 설정 (푸시 알림 권한)
+Step4: 알람 설정 (푸시 알림 권한 요청) → 회원가입 API 호출
+    - expo-notifications, expo-device 사용
+    - 성공 시 Step5로 이동, 실패 시 Welcome으로 이동
     ↓
-Step5: 완료 → API 호출 → 홈 화면
+Step5: 가입완료 화면
+    - WORKER: '시작하기' → WorkerHome
+    - EMPLOYER: '매장 관리하러 가기' → WorkplaceManage
 ```
 
 ### 상태 관리
