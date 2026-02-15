@@ -8,23 +8,20 @@ import { ProgressBar, StepHeader, TextButton } from "../../../components/signup"
 import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
-import { useSignUpStore } from "../../../stores";
+import { requestNotificationPermission } from "../../../utils/notification";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step4Alarm">;
 
 const Step4AlarmScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const setIsAlarmEnabled = useSignUpStore((state) => state.setIsAlarmEnabled);
 
-	const handleAllowAlarm = () => {
-		// TODO: 푸시 알림 권한 요청 (expo-notifications)
-		setIsAlarmEnabled(true);
+	const handleAllowAlarm = async () => {
+		await requestNotificationPermission();
 		navigation.navigate("Step5Complete");
 	};
 
 	const handleSkip = () => {
-		setIsAlarmEnabled(false);
 		navigation.navigate("Step5Complete");
 	};
 
