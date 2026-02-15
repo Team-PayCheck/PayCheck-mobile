@@ -49,7 +49,7 @@ const RootNavigator = () => {
 							onLoginSuccess={(userType) => {
 								// userType에 따라 다른 화면으로 이동
 								const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerHome';
-								props.navigation.replace(targetRoute);
+								props.navigation.replace("WorkerHome"); // 추후 userType에 따라 targetRoute로 변경!!!! 잊지말기
 							}}
 							onSignUpNeeded={(kakaoAccessToken) => {
 								// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
