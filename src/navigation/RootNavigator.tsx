@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
 import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
-import SignUpScreen from "../screens/auth/SignUpScreen";
+import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerHomeScreen from "../screens/worker/WorkerHomeScreen";
 
@@ -55,7 +55,13 @@ const RootNavigator = () => {
 						/>
 					)}
 				</Stack.Screen>
-				<Stack.Screen name="SignUp" component={SignUpScreen} />
+				<Stack.Screen name="SignUp">
+					{(props) => (
+						<SignUpNavigator
+							kakaoAccessToken={props.route.params?.kakaoAccessToken || ""}
+						/>
+					)}
+				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
 				<Stack.Screen name="WorkerHome" component={WorkerHomeScreen} />
 			</Stack.Navigator>

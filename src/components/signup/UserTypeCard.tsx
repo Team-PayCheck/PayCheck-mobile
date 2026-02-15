@@ -54,14 +54,14 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 	},
 	iconContainer: {
-		width: 80,
-		height: 80,
+		width: 100,
+		height: 100,
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	icon: {
-		width: 70,
-		height: 70,
+		width: 160,
+		height: 160,
 	},
 	label: {
 		fontSize: 16,
