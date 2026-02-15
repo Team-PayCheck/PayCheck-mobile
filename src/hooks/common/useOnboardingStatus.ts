@@ -52,7 +52,7 @@ export const useOnboardingStatus = () => {
 				const isValid = await validateToken();
 				if (isValid) {
 					const targetRoute = userInfo?.userType === "EMPLOYER" ? "EmployerHome" : "WorkerHome";
-					setInitialRoute(targetRoute);
+					setInitialRoute("WorkerHome");
 				} else {
 					// 토큰 만료 + 갱신 실패 → Welcome으로
 					setInitialRoute("Welcome");
