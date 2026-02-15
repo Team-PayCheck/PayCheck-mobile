@@ -33,6 +33,7 @@ export interface UserInfo {
 // 카카오 회원가입 파라미터
 export interface KakaoRegisterParams {
 	kakaoAccessToken: string;
+	name: string;
 	userType: "EMPLOYER" | "WORKER";
 	phone: string;
 	bankName: string;
