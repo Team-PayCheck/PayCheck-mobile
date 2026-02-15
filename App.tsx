@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 import RootNavigator from "./src/navigation/RootNavigator";
 
 SplashScreen.preventAutoHideAsync();
@@ -28,8 +29,10 @@ export default function App() {
 
 	return (
 		<SafeAreaProvider>
-			<RootNavigator />
-			<StatusBar style="dark" />
+			<AlertNotificationRoot>
+				<RootNavigator />
+				<StatusBar style="dark" />
+			</AlertNotificationRoot>
 		</SafeAreaProvider>
 	);
 }
