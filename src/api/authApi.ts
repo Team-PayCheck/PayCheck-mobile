@@ -70,3 +70,11 @@ export const logout = async (): Promise<void> => {
 		await CookieManager.clearAll();
 	}
 };
+
+/**
+ * 회원 탈퇴
+ */
+export const deleteMyAccount = async () => {
+	const { data } = await api.delete("/api/users/me");
+	return data;
+};
