@@ -54,16 +54,22 @@ const Step3BasicInfoScreen: React.FC = () => {
 		return digits.length === 11;
 	};
 
+	// 계좌번호 유효성 검사 (8~16자리 숫자)
+	const isAccountNumberValid = () => {
+		const digits = accountNumber.replace(/\D/g, "");
+		return digits.length >= 8 && digits.length <= 16;
+	};
+
 	// 다음 버튼 활성화 조건
 	const isNextEnabled = () => {
 		const hasName = name.trim().length > 0;
 		const hasPhone = isPhoneValid();
 
 		if (isWorker) {
-			// 근로자: 이름 + 전화번호 + 은행명 + 계좌번호
+			// 근로자: 이름 + 전화번호 + 은행명 + 계좌번호 (8~16자리)
 			const hasBank = bankName.length > 0;
-			const hasAccount = accountNumber.trim().length > 0;
-			return hasName && hasPhone && hasBank && hasAccount;
+			const hasValidAccount = isAccountNumberValid();
+			return hasName && hasPhone && hasBank && hasValidAccount;
 		}
 		// 고용주: 이름 + 전화번호
 		return hasName && hasPhone;
@@ -77,6 +83,12 @@ const Step3BasicInfoScreen: React.FC = () => {
 	const handleNameChange = (text: string) => {
 		const filtered = text.replace(/[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ\s]/g, "");
 		setName(filtered);
+	};
+
+	// 계좌번호 입력 시 숫자만 허용 (최대 16자리)
+	const handleAccountNumberChange = (text: string) => {
+		const digits = text.replace(/\D/g, "").slice(0, 16);
+		setAccountNumber(digits);
 	};
 
 	const handleNext = () => {
@@ -134,8 +146,8 @@ const Step3BasicInfoScreen: React.FC = () => {
 								<FormInput
 									label="계좌번호"
 									value={accountNumber}
-									onChangeText={setAccountNumber}
-									placeholder="계좌번호를 입력하세요"
+									onChangeText={handleAccountNumberChange}
+									placeholder="계좌번호를 입력하세요 (8~16자리)"
 									keyboardType="number-pad"
 								/>
 							</>
