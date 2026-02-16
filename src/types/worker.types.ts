@@ -28,6 +28,7 @@ export interface WorkItem {
 	nightSalary: number;
 	holidaySalary: number;
 	totalSalary: number;
+	salary?: number; // 시급 (API 미제공, 임시 필드)
 }
 
 export interface WeekDay {

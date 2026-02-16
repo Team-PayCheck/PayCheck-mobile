@@ -61,6 +61,7 @@ export const dummyWorks: WorkItem[] = [
 		nightSalary: 0,
 		holidaySalary: 0,
 		totalSalary: 20600,
+		salary: 10300,
 	},
 	{
 		id: 2,
@@ -80,6 +81,7 @@ export const dummyWorks: WorkItem[] = [
 		nightSalary: 0,
 		holidaySalary: 0,
 		totalSalary: 36050,
+		salary: 10300,
 	},
 	{
 		id: 3,
@@ -99,6 +101,7 @@ export const dummyWorks: WorkItem[] = [
 		nightSalary: 0,
 		holidaySalary: 0,
 		totalSalary: 41200,
+		salary: 10300,
 	},
 ];
 

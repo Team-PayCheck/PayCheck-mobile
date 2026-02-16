@@ -4,12 +4,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
+import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
 import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
 import {
 	dummyWeekDays,
 	dummyWeekTitle,
 	dummyNotices,
+	dummyWorks,
 } from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
@@ -28,12 +30,7 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<NoticeBoard notices={dummyNotices} />
 
-				{/* Phase 4: WorkListSection */}
-				<View style={styles.placeholder}>
-					<Text weight="Medium" style={styles.placeholderText}>
-						이번 주 근무 리스트
-					</Text>
-				</View>
+				<WorkListSection works={dummyWorks} />
 
 				{/* Phase 5: WeeklySummary */}
 				<View style={styles.placeholder}>
