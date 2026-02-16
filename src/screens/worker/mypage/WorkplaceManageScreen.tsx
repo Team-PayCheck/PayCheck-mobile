@@ -7,10 +7,10 @@ import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
+import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
+import { dummyWorkplaces } from "../../../dummyData/workerMyPage";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
-
-import { dummyWorkplaces } from "../../../dummyData/workerMyPage";
 
 const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -41,17 +41,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 
 			<View style={styles.cardList}>
 				{dummyWorkplaces.map((w, idx) => (
-					<View key={w.name + idx} style={styles.card}>
-						<Text weight="Bold" style={styles.cardLabel}>
-							근무지: <Text weight="Bold" style={styles.cardValue}>{w.name}</Text>
-						</Text>
-						<Text weight="Bold" style={styles.cardLabel}>
-							입사 날짜: <Text weight="Bold" style={styles.cardValue}>{w.joinedAt}</Text>
-						</Text>
-						<Text weight="Bold" style={styles.cardLabel}>
-							시급: <Text weight="Bold" style={styles.cardValue}>{w.wage}</Text>
-						</Text>
-					</View>
+					<WorkplaceCard key={w.name + idx} name={w.name} joinedAt={w.joinedAt} wage={w.wage} />
 				))}
 			</View>
 
