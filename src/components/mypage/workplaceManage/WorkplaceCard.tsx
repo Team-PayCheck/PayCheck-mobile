@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
     marginBottom: 16,
+    height: 100,
   },
   cardLabel: {
     fontSize: 16,

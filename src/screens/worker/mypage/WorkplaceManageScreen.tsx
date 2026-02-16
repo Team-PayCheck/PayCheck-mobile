@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Alert, StyleSheet, View, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Alert, StyleSheet, View, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import HomeBackButton from "../../../components/common/HomeBackButton";
@@ -8,12 +8,19 @@ import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
-import { dummyWorkplaces } from "../../../dummyData/workerMyPage";
+import { getContracts } from "../../../api/workerApi";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 
+{/* 현재 API 연동 테스트 불가
+	: 로그인된 계정이 고용주(EMPLOYER)로 등록되어 있어
+	  worker 전용 API 호출 시 서버에서 500 에러 발생-> 근로자 계정 필요 */}
+
 const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [workplaces, setWorkplaces] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
 	const closeDrawer = () => setIsDrawerVisible(false);
 
@@ -22,8 +29,53 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		navigation.navigate(route);
 	};
 
+	// 컴포넌트 마운트 시 근무지(계약) 정보 fetch
+	useEffect(() => {
+		const fetchContracts = async () => {
+			setLoading(true);
+			setError(null);
+			try {
+				// 실제 API 호출
+				const res = await getContracts();
+				if (res.success) {
+					setWorkplaces(res.data);
+				} else {
+					setError(res.error?.message || '근무지 정보를 불러오지 못했습니다.');
+				}
+			} catch (e: any) {
+				setError(e?.message || '근무지 정보를 불러오지 못했습니다.');
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchContracts();
+	}, []);
+
+	// WorkplaceCard에 맞는 데이터 변환 및 렌더링
+	const renderWorkplaceCards = () => {
+		if (!workplaces || workplaces.length === 0) return (
+			<Text style={{textAlign: 'center', marginTop: 24}}>근무지 정보가 없습니다.</Text>
+		);
+		return workplaces.map((w, idx) => (
+			<WorkplaceCard
+				key={w.id || idx}
+				name={w.workplaceName || w.workerName || '-'}
+				joinedAt={w.contractStartDate ? formatDate(w.contractStartDate) : '-'}
+				wage={w.hourlyWage ? `${w.hourlyWage.toLocaleString()}원` : '-'}
+			/>
+		));
+	};
+
+	// 날짜 포맷: YYYY-MM-DD → YYYY년 M월 D일로 변환
+	const formatDate = (dateStr: string) => {
+		const d = new Date(dateStr);
+		if (isNaN(d.getTime())) return dateStr;
+		return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
+			{/* 상단 헤더 및 타이틀 */}
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<View style={styles.headerRow}>
 				<View style={{ flex: 1 }}>
@@ -39,12 +91,18 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				</View>
 			</View>
 
+			{/* 근무지 카드 리스트, 로딩/에러 처리 */}
 			<View style={styles.cardList}>
-				{dummyWorkplaces.map((w, idx) => (
-					<WorkplaceCard key={w.name + idx} name={w.name} joinedAt={w.joinedAt} wage={w.wage} />
-				))}
+				{loading ? (
+					<ActivityIndicator size="large" color="#aaa" style={{marginTop: 32}} />
+				) : error ? (
+					<Text style={{color: 'red', textAlign: 'center', marginTop: 24}}>{error}</Text>
+				) : (
+					renderWorkplaceCards()
+				)}
 			</View>
 
+			{/* 마이페이지 드로어 */}
 			<MyPageDrawer
 				visible={isDrawerVisible}
 				onClose={closeDrawer}
