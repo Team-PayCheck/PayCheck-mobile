@@ -12,42 +12,7 @@ import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 type Props = NativeStackScreenProps<WorkerStackParamList, "SentRequests">;
 
 
-const dummyRequests = [
-	{
-		workplace: "교내근로",
-		date: "1/24",
-		time: "17:00 ~ 19:00",
-		status: "거절",
-		image: require("../../../assets/images/mypage/user.png"),
-		detail: {
-			workplaceName: "인하대 정석학술정보관",
-			workDate: "1/24",
-			startHour: "17",
-			startMin: "00",
-			endHour: "19",
-			endMin: "00",
-			breakMin: "0",
-			wage: "10,300",
-		},
-	},
-	{
-		workplace: "교내근로",
-		date: "1/24",
-		time: "17:00 ~ 19:00",
-		status: "대기",
-		image: require("../../../assets/images/mypage/user.png"),
-		detail: {
-			workplaceName: "인하대 정석학술정보관",
-			workDate: "1/24",
-			startHour: "17",
-			startMin: "00",
-			endHour: "19",
-			endMin: "00",
-			breakMin: "0",
-			wage: "10,300",
-		},
-	},
-];
+import { dummyRequests } from "../../../dummyData/workerMyPage";
 
 const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);

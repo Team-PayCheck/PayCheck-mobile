@@ -10,19 +10,7 @@ import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 
-// Mock 데이터 - 실제 데이터 연결 시 삭제 예정
-const dummyWorkplaces = [
-	{
-		name: "맥도날드",
-		joinedAt: "2025년 4월 23일",
-		wage: "10,030원",
-	},
-	{
-		name: "버거킹",
-		joinedAt: "2025년 5월 15일",
-		wage: "10,030원",
-	},
-];
+import { dummyWorkplaces } from "../../../dummyData/workerMyPage";
 
 const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
