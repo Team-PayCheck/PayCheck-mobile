@@ -7,11 +7,11 @@ import type {
 
 export const dummyWeekDays: WeekDay[] = [
 	{ dayLabel: "Mon", date: 21, isToday: false },
-	{ dayLabel: "Tue", date: 22, isToday: false },
+	{ dayLabel: "Tue", date: 22, isToday: false, workStatus: "COMPLETED" },
 	{ dayLabel: "Wed", date: 23, isToday: false },
 	{ dayLabel: "Thu", date: 24, isToday: true },
-	{ dayLabel: "Fri", date: 25, isToday: false },
-	{ dayLabel: "Sat", date: 26, isToday: false },
+	{ dayLabel: "Fri", date: 25, isToday: false, workStatus: "SCHEDULED" },
+	{ dayLabel: "Sat", date: 26, isToday: false, workStatus: "SCHEDULED" },
 	{ dayLabel: "Sun", date: 27, isToday: false },
 ];
 

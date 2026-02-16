@@ -29,6 +29,7 @@ export interface WeekDay {
 	dayLabel: string; // "Mon", "Tue", ...
 	date: number; // 21, 22, ...
 	isToday: boolean;
+	workStatus?: WorkStatus; // 해당 날짜의 근무 상태 (API 응답 기반)
 }
 
 export interface WeeklySummaryData {

@@ -2,8 +2,10 @@ import React from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
+import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
+import { dummyWeekDays, dummyWeekTitle } from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
 	return (
@@ -14,12 +16,10 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* Phase 2: WeeklyDateBar */}
-				<View style={styles.placeholder}>
-					<Text weight="Medium" style={styles.placeholderText}>
-						주간 날짜바
-					</Text>
-				</View>
+				<WeeklyDateBar
+					weekTitle={dummyWeekTitle}
+					weekDays={dummyWeekDays}
+				/>
 
 				{/* Phase 3: NoticeBoard */}
 				<View style={styles.placeholder}>
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollContent: {
+		paddingTop: 16,
 		paddingHorizontal: 20,
 		paddingBottom: 40,
 		gap: 24,
