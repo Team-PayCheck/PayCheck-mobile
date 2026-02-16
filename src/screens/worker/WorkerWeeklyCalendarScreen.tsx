@@ -5,13 +5,14 @@ import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
-import { Text } from "../../components/common/Text";
+import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
 import { colors } from "../../constants/colors";
 import {
 	dummyWeekDays,
 	dummyWeekTitle,
 	dummyNotices,
 	dummyWorks,
+	dummyWeeklySummary,
 } from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
@@ -32,12 +33,9 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<WorkListSection works={dummyWorks} />
 
-				{/* Phase 5: WeeklySummary */}
-				<View style={styles.placeholder}>
-					<Text weight="Medium" style={styles.placeholderText}>
-						주간 요약
-					</Text>
-				</View>
+				<View style={styles.dashedLine} />
+
+				<WeeklySummary summary={dummyWeeklySummary} />
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -57,16 +55,10 @@ const styles = StyleSheet.create({
 		paddingBottom: 40,
 		gap: 24,
 	},
-	placeholder: {
-		backgroundColor: colors.backgroundGrey,
-		borderRadius: 16,
-		padding: 40,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	placeholderText: {
-		fontSize: 14,
-		color: colors.textMuted,
+	dashedLine: {
+		borderStyle: "dashed",
+		borderWidth: 1,
+		borderColor: colors.border,
 	},
 });
 
