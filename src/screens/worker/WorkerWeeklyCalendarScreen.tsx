@@ -3,9 +3,14 @@ import { StyleSheet, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
+import NoticeBoard from "../../components/common/NoticeBoard";
 import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
-import { dummyWeekDays, dummyWeekTitle } from "../../dummyData/workerWeeklyCalendar";
+import {
+	dummyWeekDays,
+	dummyWeekTitle,
+	dummyNotices,
+} from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
 	return (
@@ -21,12 +26,7 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 					weekDays={dummyWeekDays}
 				/>
 
-				{/* Phase 3: NoticeBoard */}
-				<View style={styles.placeholder}>
-					<Text weight="Medium" style={styles.placeholderText}>
-						공지 게시판
-					</Text>
-				</View>
+				<NoticeBoard notices={dummyNotices} />
 
 				{/* Phase 4: WorkListSection */}
 				<View style={styles.placeholder}>
