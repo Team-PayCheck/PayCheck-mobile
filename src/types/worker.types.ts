@@ -12,17 +12,22 @@ export interface NoticeItem {
 
 export interface WorkItem {
 	id: number;
+	contractId: number;
+	workerName: string;
+	workerCode: string;
 	workplaceName: string;
-	workplaceLogoUrl: string | null;
-	date: string; // "1/24"
-	startTime: string; // "17:00"
-	endTime: string; // "19:00"
+	workDate: string; // "2026-02-16"
+	startTime: string; // "09:00"
+	endTime: string; // "18:00"
+	breakMinutes: number;
+	totalWorkMinutes: number;
 	status: WorkStatus;
-	// 토글 펼침 시 표시되는 상세 정보
-	workLocation: string; // 근무지 상세 ("정석학술정보관")
-	breakMinutes: number; // 휴게 시간 (분)
-	hourlyWage: number; // 시급
-	totalWage: number; // 총 급여
+	isModified: boolean;
+	memo: string;
+	baseSalary: number;
+	nightSalary: number;
+	holidaySalary: number;
+	totalSalary: number;
 }
 
 export interface WeekDay {
