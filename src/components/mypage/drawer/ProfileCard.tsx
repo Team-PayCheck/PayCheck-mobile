@@ -9,20 +9,20 @@ interface ProfileCardProps {
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ name, code, imageUri }) => {
-	return (
-		<View style={styles.container}>
-			<Image
-				source={{
-					uri:
-						imageUri ??
-						"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-				}}
-				style={styles.profileImage}
-			/>
-			<Text weight="SemiBold" style={styles.name}>{name}</Text>
-			<Text weight="SemiBold" style={styles.code}>{code}</Text>
-		</View>
-	);
+       return (
+	       <View style={styles.container}>
+		       <Image
+			       source={
+				       imageUri
+					       ? { uri: imageUri }
+					       : require("../../../assets/images/mypage/user.png")
+			       }
+			       style={styles.profileImage}
+		       />
+		       <Text weight="SemiBold" style={styles.name}>{name}</Text>
+		       <Text weight="SemiBold" style={styles.code}>{code}</Text>
+	       </View>
+       );
 };
 
 const styles = StyleSheet.create({

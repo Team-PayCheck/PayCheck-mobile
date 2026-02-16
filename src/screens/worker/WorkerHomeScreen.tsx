@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text } from "../../components/common/Text";
 import Header from "../../components/layout/Header";
-import MyPageDrawer from "../../components/worker/mypage/MyPageDrawer";
+import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../navigation/WorkerStack";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;

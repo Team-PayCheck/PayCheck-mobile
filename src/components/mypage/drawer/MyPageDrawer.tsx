@@ -25,7 +25,7 @@ interface MyPageDrawerProps {
 }
 
 const { width } = Dimensions.get("window");
-const DRAWER_WIDTH = Math.min(width * 0.75, 320);
+const DRAWER_WIDTH = 288;
 
 const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 	visible,
@@ -63,7 +63,7 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 					<View style={styles.menuGroup}>
 						<MenuButton
 							title="내 프로필 수정"
-							iconSource={require("../../../assets/images/mypage/user.png")}
+							iconSource={require("../../../assets/images/signup/worker-icon.png")}
 							onPress={onPressProfileEdit}
 						/>
 						<MenuButton
