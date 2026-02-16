@@ -23,13 +23,14 @@ export const colors = {
 	borderLight: "#F0F0F0",
 
 	// 상태 색상
-	red: "#F38181",
+	red: "#F17D77",
 	yellow: "#FCE38A",
-	mint: "#95E1D3",
-	green: "#27C840",
+	mint: "#E0F2F1",
+	green: "#28C28D",
 
 	// 기타
-	grey: "#D9D9D9",
+  blue: "#038BFA",
+	grey: "#EEEEEE",
 	white: "#FFFFFF",
 	black: "#000000",
 	disabled: "#EEEEEE",
