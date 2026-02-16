@@ -174,8 +174,8 @@ const styles = StyleSheet.create({
 		gap: 2,
 	},
 	workplaceName: {
-		fontSize: 15,
-		color: colors.textPrimary,
+		fontSize: 13,
+		color: colors.textSecondary,
 	},
 	dateTime: {
 		fontSize: 13,
