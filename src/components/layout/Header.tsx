@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
 
 interface HeaderProps {
   onPressLeft?: () => void;
@@ -11,10 +12,10 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft, onPressRight }) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onPressLeft} activeOpacity={0.8}>
-        <Feather name="align-left" size={28} color="#111111" />
+        <Feather name="align-left" size={28} color={colors.textPrimary} />
       </TouchableOpacity>
       <TouchableOpacity onPress={onPressRight} activeOpacity={0.8}>
-        <Ionicons name="notifications-outline" size={28} color="#111111" />
+        <Ionicons name="notifications-outline" size={28} color={colors.textPrimary} />
       </TouchableOpacity>
     </View>
   );

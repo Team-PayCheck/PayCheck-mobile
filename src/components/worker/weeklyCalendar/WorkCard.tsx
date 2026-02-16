@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
+import { formatCurrency, formatDate } from "../../../utils/format";
 import type { WorkItem } from "../../../types/worker.types";
 
 interface WorkCardProps {
@@ -34,15 +35,6 @@ const StatusBadge: React.FC<{ status: WorkItem["status"] }> = ({ status }) => {
 			</Text>
 		</View>
 	);
-};
-
-const formatDate = (workDate: string) => {
-	const date = new Date(workDate);
-	return `${date.getMonth() + 1}/${date.getDate()}`;
-};
-
-const formatWage = (amount: number) => {
-	return amount.toLocaleString();
 };
 
 const WorkCard: React.FC<WorkCardProps> = ({
@@ -109,7 +101,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>시급</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{formatWage(work.salary ?? 0)} 원
+									{formatCurrency(work.salary ?? 0)} 원
 								</Text>
 							</View>
 						</View>
@@ -117,7 +109,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>총 급여</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{formatWage(work.totalSalary)} 원
+									{formatCurrency(work.totalSalary)} 원
 								</Text>
 							</View>
 						</View>

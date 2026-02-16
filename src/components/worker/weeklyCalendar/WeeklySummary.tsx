@@ -2,15 +2,12 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
+import { formatCurrency } from "../../../utils/format";
 import type { WeeklySummaryData } from "../../../types/worker.types";
 
 interface WeeklySummaryProps {
 	summary: WeeklySummaryData;
 }
-
-const formatPay = (amount: number) => {
-	return amount.toLocaleString();
-};
 
 const WeeklySummary: React.FC<WeeklySummaryProps> = ({ summary }) => {
 	return (
@@ -28,7 +25,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ summary }) => {
 					이번 주 예상 근무비
 				</Text>
 				<Text weight="Bold" style={styles.value}>
-					{formatPay(summary.estimatedPay)}원
+					{formatCurrency(summary.estimatedPay)}원
 				</Text>
 			</View>
 		</View>
