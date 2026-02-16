@@ -31,7 +31,7 @@ const NoticeCard: React.FC<NoticeCardProps> = ({ notice, onPress }) => {
 			<Text weight="SemiBold" style={styles.category}>
 				{notice.category}
 			</Text>
-			<Text weight="Medium" style={styles.title} numberOfLines={2}>
+      <Text weight="ExtraBold" style={styles.title} numberOfLines={2}>
 				{notice.title}
 			</Text>
 			<View style={styles.footer}>
