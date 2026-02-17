@@ -36,18 +36,21 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 	const containerHeight = itemHeight * visibleCount;
 	const paddingVertical = itemHeight * Math.floor(visibleCount / 2);
 
-	// 초기 위치로 스크롤
+	const initialIndex = items.findIndex(
+		(item) => item.value === selectedValue
+	);
+	const safeInitialIndex = Math.max(0, initialIndex);
+
+	// selectedValue 변경 시 스크롤 위치 동기화
 	useEffect(() => {
 		const index = items.findIndex((item) => item.value === selectedValue);
 		if (index >= 0 && flatListRef.current) {
-			setTimeout(() => {
-				(flatListRef.current as any)?.scrollToOffset({
-					offset: index * itemHeight,
-					animated: false,
-				});
-			}, 50);
+			(flatListRef.current as any)?.scrollToOffset({
+				offset: index * itemHeight,
+				animated: false,
+			});
 		}
-	}, []);
+	}, [selectedValue]);
 
 	const handleMomentumScrollEnd = useCallback(
 		(e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -123,6 +126,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 				snapToInterval={itemHeight}
 				decelerationRate="fast"
 				bounces={false}
+				initialScrollIndex={safeInitialIndex}
 				onScroll={Animated.event(
 					[{ nativeEvent: { contentOffset: { y: scrollY } } }],
 					{ useNativeDriver: true }
