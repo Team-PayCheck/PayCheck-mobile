@@ -28,7 +28,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 	selectedValue,
 	onValueChange,
 	itemHeight = 40,
-	visibleCount = 5,
+	visibleCount = 3,
 	width = 80,
 }) => {
 	const scrollY = useRef(new Animated.Value(0)).current;
