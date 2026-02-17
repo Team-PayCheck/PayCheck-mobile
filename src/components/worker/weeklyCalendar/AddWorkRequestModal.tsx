@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
 	View,
 	Modal,
 	StyleSheet,
 	TouchableOpacity,
 	Dimensions,
+	Animated,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
@@ -94,6 +95,48 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 	const [endMinute, setEndMinute] = useState(0);
 	const [breakMinutes, setBreakMinutes] = useState(0);
 	const [activePicker, setActivePicker] = useState<PickerTarget>(null);
+
+	// 슬라이드업 애니메이션
+	const slideAnim = useRef(new Animated.Value(0)).current;
+	const overlayAnim = useRef(new Animated.Value(0)).current;
+
+	useEffect(() => {
+		if (visible) {
+			Animated.parallel([
+				Animated.timing(overlayAnim, {
+					toValue: 1,
+					duration: 250,
+					useNativeDriver: true,
+				}),
+				Animated.spring(slideAnim, {
+					toValue: 1,
+					damping: 20,
+					stiffness: 200,
+					useNativeDriver: true,
+				}),
+			]).start();
+		} else {
+			slideAnim.setValue(0);
+			overlayAnim.setValue(0);
+		}
+	}, [visible]);
+
+	const handleClose = () => {
+		Animated.parallel([
+			Animated.timing(overlayAnim, {
+				toValue: 0,
+				duration: 200,
+				useNativeDriver: true,
+			}),
+			Animated.timing(slideAnim, {
+				toValue: 0,
+				duration: 200,
+				useNativeDriver: true,
+			}),
+		]).start(() => {
+			onClose();
+		});
+	};
 
 	const dateItems = useMemo(() => getDateItems(), []);
 
@@ -267,19 +310,38 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 
 	const pickerConfig = getPickerConfig();
 
+	const screenHeight = Dimensions.get("window").height;
+	const translateY = slideAnim.interpolate({
+		inputRange: [0, 1],
+		outputRange: [screenHeight, 0],
+	});
+
 	return (
 		<Modal
 			visible={visible}
 			transparent
-			animationType="slide"
-			onRequestClose={onClose}
+			animationType="none"
+			onRequestClose={handleClose}
 		>
-			<TouchableOpacity
-				style={styles.overlay}
-				activeOpacity={1}
-				onPress={onClose}
-			>
-				<TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
+			<View style={styles.overlay}>
+				<Animated.View
+					style={[
+						styles.overlayBackground,
+						{ opacity: overlayAnim },
+					]}
+				>
+					<TouchableOpacity
+						style={StyleSheet.absoluteFill}
+						activeOpacity={1}
+						onPress={handleClose}
+					/>
+				</Animated.View>
+				<Animated.View
+					style={[
+						styles.modalContainer,
+						{ transform: [{ translateY }] },
+					]}
+				>
 					<View style={styles.handle} />
 
 					<Text weight="Bold" style={styles.title}>
@@ -383,8 +445,8 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 							</Text>
 						</TouchableOpacity>
 					</View>
-				</TouchableOpacity>
-			</TouchableOpacity>
+				</Animated.View>
+			</View>
 		</Modal>
 	);
 };
@@ -392,8 +454,11 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
 		justifyContent: "flex-end",
+	},
+	overlayBackground: {
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
 	},
 	modalContainer: {
 		backgroundColor: colors.white,
