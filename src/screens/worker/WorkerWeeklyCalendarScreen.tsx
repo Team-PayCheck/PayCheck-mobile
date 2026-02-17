@@ -7,15 +7,19 @@ import NoticeBoard from "../../components/common/NoticeBoard";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
 import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
 import { colors } from "../../constants/colors";
+import { getWeekTitle, getWeekDays, getWeekLabel } from "../../utils/date";
 import {
-	dummyWeekDays,
-	dummyWeekTitle,
 	dummyNotices,
 	dummyWorks,
 	dummyWeeklySummary,
 } from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
+	const today = new Date();
+	const weekTitle = getWeekTitle(today);
+	const weekDays = getWeekDays(today);
+	const weekLabel = getWeekLabel(today);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header />
@@ -25,8 +29,8 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 				showsVerticalScrollIndicator={false}
 			>
 				<WeeklyDateBar
-					weekTitle={dummyWeekTitle}
-					weekDays={dummyWeekDays}
+					weekTitle={weekTitle}
+					weekDays={weekDays}
 				/>
 
 				<NoticeBoard notices={dummyNotices} />
@@ -35,7 +39,7 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<View style={styles.dashedLine} />
 
-				<WeeklySummary summary={dummyWeeklySummary} />
+				<WeeklySummary summary={{ ...dummyWeeklySummary, weekLabel }} />
 			</ScrollView>
 		</SafeAreaView>
 	);

@@ -1,19 +1,8 @@
 import type {
 	NoticeItem,
 	WorkItem,
-	WeekDay,
 	WeeklySummaryData,
 } from "../types/worker.types";
-
-export const dummyWeekDays: WeekDay[] = [
-	{ dayLabel: "Mon", date: 21, isToday: false },
-	{ dayLabel: "Tue", date: 22, isToday: false },
-	{ dayLabel: "Wed", date: 23, isToday: false },
-	{ dayLabel: "Thu", date: 24, isToday: true, workStatus: "SCHEDULED" },
-	{ dayLabel: "Fri", date: 25, isToday: false, workStatus: "SCHEDULED" },
-	{ dayLabel: "Sat", date: 26, isToday: false },
-	{ dayLabel: "Sun", date: 27, isToday: false },
-];
 
 export const dummyNotices: NoticeItem[] = [
 	{
@@ -106,9 +95,7 @@ export const dummyWorks: WorkItem[] = [
 ];
 
 export const dummyWeeklySummary: WeeklySummaryData = {
-	weekLabel: "이번주(5주차)",
+	weekLabel: "",
 	totalHours: 24,
 	estimatedPay: 320000,
 };
-
-export const dummyWeekTitle = "1월 5주차 근무";
