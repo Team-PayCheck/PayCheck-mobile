@@ -66,7 +66,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 			// 404 (USER_NOT_FOUND) → 회원가입으로 이동
 			if (
-				loginError.status === 404 ||
+				loginError.status === 404 &&
 				loginError.code === "USER_NOT_FOUND"
 			) {
 				if (kakaoAccessToken) {
