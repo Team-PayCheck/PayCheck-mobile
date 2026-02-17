@@ -1,11 +1,13 @@
-import React from "react";
-import { StyleSheet, ScrollView, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, ScrollView, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
 import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
+import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
+import { createCorrectionRequest } from "../../api/workerApi";
 import { colors } from "../../constants/colors";
 import { getWeekTitle, getWeekDays, getWeekLabel } from "../../utils/date";
 import {
@@ -14,11 +16,42 @@ import {
 	dummyWeeklySummary,
 } from "../../dummyData/workerWeeklyCalendar";
 
+// TODO: API 연동 시 근로자의 근무지 목록을 가져오는 로직으로 교체
+const dummyWorkplaces = [
+	{ id: 10, name: "교내근로", salary: 10300 },
+	{ id: 11, name: "스타벅스 건대점", salary: 10300 },
+	{ id: 12, name: "CU 화양점", salary: 10300 },
+];
+
 const WorkerWeeklyCalendarScreen: React.FC = () => {
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
 	const weekDays = getWeekDays(today);
 	const weekLabel = getWeekLabel(today);
+	const [addModalVisible, setAddModalVisible] = useState(false);
+
+	const handleAddWorkSubmit = async (data: {
+		contractId: number;
+		requestedWorkDate: string;
+		requestedStartTime: string;
+		requestedEndTime: string;
+		requestedBreakMinutes: number;
+	}) => {
+		try {
+			await createCorrectionRequest({
+				type: "CREATE",
+				...data,
+			});
+			setAddModalVisible(false);
+			Alert.alert("요청 완료", "근무 추가 요청이 전송되었습니다.");
+		} catch (error) {
+			const message =
+				error instanceof Error
+					? error.message
+					: "요청에 실패했습니다. 다시 시도해주세요.";
+			Alert.alert("요청 실패", message);
+		}
+	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -35,12 +68,22 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<NoticeBoard notices={dummyNotices} />
 
-				<WorkListSection works={dummyWorks} />
+				<WorkListSection
+					works={dummyWorks}
+					onPressAdd={() => setAddModalVisible(true)}
+				/>
 
 				<View style={styles.dashedLine} />
 
 				<WeeklySummary summary={{ ...dummyWeeklySummary, weekLabel }} />
 			</ScrollView>
+
+			<AddWorkRequestModal
+				visible={addModalVisible}
+				onClose={() => setAddModalVisible(false)}
+				workplaces={dummyWorkplaces}
+				onSubmit={handleAddWorkSubmit}
+			/>
 		</SafeAreaView>
 	);
 };
