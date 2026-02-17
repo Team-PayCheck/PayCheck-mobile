@@ -45,10 +45,12 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 	useEffect(() => {
 		const index = items.findIndex((item) => item.value === selectedValue);
 		if (index >= 0 && flatListRef.current) {
-			(flatListRef.current as any)?.scrollToOffset({
-				offset: index * itemHeight,
-				animated: false,
-			});
+			setTimeout(() => {
+				(flatListRef.current as any)?.scrollToIndex({
+					index,
+					animated: false,
+				});
+			}, 0);
 		}
 	}, [selectedValue]);
 
@@ -125,7 +127,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 				showsVerticalScrollIndicator={false}
 				snapToInterval={itemHeight}
 				decelerationRate="fast"
-				bounces={false}
+				bounces={true}
 				initialScrollIndex={safeInitialIndex}
 				onScroll={Animated.event(
 					[{ nativeEvent: { contentOffset: { y: scrollY } } }],
