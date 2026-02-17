@@ -25,11 +25,11 @@ const Step5CompleteScreen: React.FC = () => {
 		resetSignUp();
 
 		if (isWorker) {
-			// 근로자: WorkerHome으로 이동
+			// 근로자: WorkerWeeklyCalendar으로 이동
 			navigation.dispatch(
 				CommonActions.reset({
 					index: 0,
-					routes: [{ name: "WorkerHome" }],
+					routes: [{ name: "WorkerWeeklyCalendar" }],
 				})
 			);
 		} else {
