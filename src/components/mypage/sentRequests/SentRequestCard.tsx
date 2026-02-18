@@ -2,6 +2,7 @@ import React from "react";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 export interface SentRequestCardProps {
   request: any;
@@ -34,7 +35,7 @@ const SentRequestCard: React.FC<SentRequestCardProps> = ({ request, expanded, on
             <Feather
               name={expanded ? "chevron-up" : "chevron-down"}
               size={22}
-              color="#353535"
+              color={colors.textSecondary}
               style={{ marginLeft: 6 }}
               onPress={onToggle}
             />
@@ -101,11 +102,11 @@ const SentRequestCard: React.FC<SentRequestCardProps> = ({ request, expanded, on
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.white,
     borderRadius: 18,
     paddingHorizontal: 18,
     paddingVertical: 14,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 8,
@@ -133,19 +134,19 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: colors.grey,
   },
   infoCol: {
     justifyContent: "center",
   },
   profileName: {
     fontSize: 15,
-    color: "#848484",
+    color: colors.textSecondary,
     marginBottom: 2,
   },
   timeText: {
     fontSize: 18,
-    color: "#000",
+    color: colors.textPrimary,
   },
   cardRight: {
     flexDirection: "row",
@@ -162,17 +163,17 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   statusPending: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.blue,
   },
   statusApproved: {
-    backgroundColor: "#ededed",
+    backgroundColor: colors.grey,
   },
   statusPendingText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 15,
   },
   statusApprovedText: {
-    color: "#b0b0b0",
+    color: colors.textSecondary,
     fontSize: 15,
   },
 
@@ -180,19 +181,19 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   detailLabel: {
-    color: "#848484",
+    color: colors.textSecondary,
     fontSize: 15,
     marginBottom: 2,
   },
   detailValueBox: {
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 8,
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ededed",
+    borderColor: colors.borderLight,
   },
   detailValueText: {
-    color: "#353535",
+    color: colors.textPrimary,
     fontSize: 16,
   },
   detailTimeRow: {
@@ -201,11 +202,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   detailDateBox: {
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: "#ededed",
+    borderColor: colors.borderLight,
     minWidth: 56,
     alignItems: "center",
   },
@@ -215,11 +216,11 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   detailHourBox: {
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: "#ededed",
+    borderColor: colors.borderLight,
     minWidth: 36,
     alignItems: "center",
   },
@@ -232,16 +233,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   detailWageBox: {
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 8,
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ededed",
+    borderColor: colors.borderLight,
     flexDirection: "row",
     alignItems: "center",
   },
   detailUnit: {
-    color: "#848484",
+    color: colors.textSecondary,
     fontSize: 15,
     marginLeft: 2,
   },
@@ -252,11 +253,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   detailEdit: {
-    color: "#b0b0b0",
+    color: colors.blue,
     fontSize: 15,
   },
   detailDelete: {
-    color: "#ff4d4f",
+    color: colors.deleteRed,
     fontSize: 15,
   },
 });

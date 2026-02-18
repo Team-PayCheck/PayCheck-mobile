@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 interface ProfileCardProps {
 	name: string;
@@ -33,16 +34,16 @@ const styles = StyleSheet.create({
 		width: 45,
 		height: 45,
 		borderRadius: 22.5,
-		backgroundColor: "#D9D9D9",
+		backgroundColor: colors.backgroundGrey,
 	},
 	name: {
 		fontSize: 24,
-		color: "#000000",
+		color: colors.textPrimary,
         paddingTop: 5,
 	},
 	code: {
 		fontSize: 14,
-		color: "#848484",
+		color: colors.textSecondary,
 	},
 });
 

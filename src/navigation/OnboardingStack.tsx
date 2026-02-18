@@ -4,6 +4,7 @@ import PagerView, { PagerViewOnPageSelectedEvent } from "react-native-pager-view
 import PayrollIntroScreen from "../screens/onboarding/PayrollIntroScreen";
 import NoticeIntroScreen from "../screens/onboarding/NoticeIntroScreen";
 import ScheduleIntroScreen from "../screens/onboarding/ScheduleIntroScreen";
+import { colors } from "../constants/colors";
 
 interface OnboardingStackProps {
 	onComplete?: () => void;
@@ -68,7 +69,7 @@ const OnboardingStack: React.FC<OnboardingStackProps> = ({ onComplete }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#ffffff",
+		backgroundColor: colors.white,
 	},
 	pagerView: {
 		flex: 1,
@@ -90,10 +91,10 @@ const styles = StyleSheet.create({
 		width: 8,
 		height: 8,
 		borderRadius: 4,
-		backgroundColor: "#D9D9D9",
+		backgroundColor: colors.backgroundGrey,
 	},
 	indicatorActive: {
-		backgroundColor: "#353535",
+		backgroundColor: colors.textPrimary,
 	},
 });
 

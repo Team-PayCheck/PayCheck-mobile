@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../../../constants/colors";
 
 interface ProfilePhotoProps {
   imageSource: any;
@@ -14,7 +15,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({ imageSource, onPressSetting
         <Image source={imageSource} style={styles.profileImage} resizeMode="contain" />
       </View>
       <TouchableOpacity style={styles.settingButton} activeOpacity={0.8} onPress={onPressSetting}>
-        <Ionicons name="settings-outline" size={15} color="#8A8A8A" />
+        <Ionicons name="settings-outline" size={15} color={colors.textSecondary} />
       </TouchableOpacity>
     </View>
   );
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     width: 86,
     height: 86,
     borderRadius: 43,
-    backgroundColor: "#D9E5F2",
+    backgroundColor: colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -45,9 +46,9 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 12.5,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: "#DCDCDC",
+    borderColor: colors.borderLight,
     alignItems: "center",
     justifyContent: "center",
   },

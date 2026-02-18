@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 interface SmallActionButtonProps {
 	text: string;
@@ -19,13 +20,13 @@ const styles = StyleSheet.create({
 	button: {
 		width: 114,
 		height: 71,
-		backgroundColor: "#FFFFFF",
+		backgroundColor: colors.white,
 		borderRadius: 18,
 		justifyContent: "center",
 		alignItems: "center",
 		borderWidth: 1,
-		borderColor: "#F0F0F0",
-		shadowColor: "#000000",
+		borderColor: colors.borderLight,
+		shadowColor: colors.black,
 		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 6,
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		fontSize: 18,
-		color: "#353535",
+		color: colors.textPrimary,
 		textAlign: "center",
 	},
 });

@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 interface MenuButtonProps {
 	title: string;
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
 	container: {
 		width: 239,
 		height: 71,
-		backgroundColor: "#FFFFFF",
+		backgroundColor: colors.white,
 		borderRadius: 18,
 		paddingHorizontal: 18,
 		paddingVertical: 14,
@@ -35,8 +36,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		gap: 20,
 		borderWidth: 1,
-		borderColor: "#F0F0F0",
-		shadowColor: "#000000",
+		borderColor: colors.borderLight,
+		shadowColor: colors.black,
 		shadowOpacity: 0.06,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 6,
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
 		width: 56,
 		height: 56,
 		borderRadius: 28,
-		backgroundColor: "#769fcd",
+		backgroundColor: colors.primaryLight,
 		alignItems: "center",
 		justifyContent: "center",
 	},
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 16,
-		color: "#2F3135",
+		color: colors.textPrimary,
 	},
 });
 

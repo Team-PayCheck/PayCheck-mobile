@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ProfileCard from "./ProfileCard";
 import MenuButton from "./MenuButton";
 import SmallActionButton from "./SmallActionButton";
+import { colors } from "../../../constants/colors";
 
 interface MyPageDrawerProps {
 	visible: boolean;
@@ -54,7 +55,7 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 				<Animated.View style={[styles.drawerContainer, { transform: [{ translateX }] }]}>
 					<View style={styles.drawerTop}>
 						<TouchableOpacity onPress={onClose} activeOpacity={0.8}>
-							<Ionicons name="close" size={30} color="#111111" />
+							<Ionicons name="close" size={30} color={colors.textPrimary} />
 						</TouchableOpacity>
 					</View>
 
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
 		top: 0,
 		bottom: 0,
 		width: DRAWER_WIDTH,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 		borderTopRightRadius: 42,
 		borderBottomRightRadius: 42,
 		paddingTop: 54,

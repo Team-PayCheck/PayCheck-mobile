@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 export interface WorkplaceCardProps {
   name: string;
@@ -27,11 +28,11 @@ const WorkplaceCard: React.FC<WorkplaceCardProps> = ({ name, joinedAt, wage, sty
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: colors.white,
     borderRadius: 18,
     paddingHorizontal: 18,
     paddingVertical: 14,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 8,
@@ -41,11 +42,11 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 16,
-    color: "#848484",
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   cardValue: {
-    color: "#000",
+    color: colors.textPrimary,
   },
 });
 
