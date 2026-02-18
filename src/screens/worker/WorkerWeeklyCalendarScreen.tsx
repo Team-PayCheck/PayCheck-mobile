@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { StyleSheet, ScrollView, View, Alert } from "react-native";
+import React from "react";
+import { StyleSheet, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
@@ -8,10 +8,9 @@ import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSect
 import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
 import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
-import { createCorrectionRequest } from "../../api/workerApi";
+import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import { colors } from "../../constants/colors";
 import { getWeekTitle, getWeekDays, getWeekLabel } from "../../utils/date";
-import type { WorkItem } from "../../types/worker.types";
 import {
 	dummyNotices,
 	dummyWorks,
@@ -23,60 +22,18 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 	const weekTitle = getWeekTitle(today);
 	const weekDays = getWeekDays(today);
 	const weekLabel = getWeekLabel(today);
-	const [addModalVisible, setAddModalVisible] = useState(false);
-	const [correctionModalVisible, setCorrectionModalVisible] = useState(false);
-	const [selectedWork, setSelectedWork] = useState<WorkItem | null>(null);
 
-	const handlePressCorrectionRequest = (work: WorkItem) => {
-		setSelectedWork(work);
-		setCorrectionModalVisible(true);
-	};
-
-	const handleCorrectionSubmit = async (data: {
-		workRecordId: number;
-		requestedWorkDate: string;
-		requestedStartTime: string;
-		requestedEndTime: string;
-		requestedBreakMinutes: number;
-	}) => {
-		try {
-			await createCorrectionRequest({
-				type: "UPDATE",
-				...data,
-			});
-			setCorrectionModalVisible(false);
-			Alert.alert("요청 완료", "근무 기록 정정 요청이 전송되었습니다.");
-		} catch (error) {
-			const message =
-				error instanceof Error
-					? error.message
-					: "요청에 실패했습니다. 다시 시도해주세요.";
-			Alert.alert("요청 실패", message);
-		}
-	};
-
-	const handleAddWorkSubmit = async (data: {
-		contractId: number;
-		requestedWorkDate: string;
-		requestedStartTime: string;
-		requestedEndTime: string;
-		requestedBreakMinutes: number;
-	}) => {
-		try {
-			await createCorrectionRequest({
-				type: "CREATE",
-				...data,
-			});
-			setAddModalVisible(false);
-			Alert.alert("요청 완료", "근무 추가 요청이 전송되었습니다.");
-		} catch (error) {
-			const message =
-				error instanceof Error
-					? error.message
-					: "요청에 실패했습니다. 다시 시도해주세요.";
-			Alert.alert("요청 실패", message);
-		}
-	};
+	const {
+		correctionModalVisible,
+		selectedWork,
+		openCorrectionModal,
+		closeCorrectionModal,
+		handleCorrectionSubmit,
+		addModalVisible,
+		openAddModal,
+		closeAddModal,
+		handleAddWorkSubmit,
+	} = useCorrectionRequest();
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -95,8 +52,8 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<WorkListSection
 					works={dummyWorks}
-					onPressAdd={() => setAddModalVisible(true)}
-					onPressCorrectionRequest={handlePressCorrectionRequest}
+					onPressAdd={openAddModal}
+					onPressCorrectionRequest={openCorrectionModal}
 				/>
 
 				<View style={styles.dashedLine} />
@@ -106,13 +63,13 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 			<AddWorkRequestModal
 				visible={addModalVisible}
-				onClose={() => setAddModalVisible(false)}
+				onClose={closeAddModal}
 				onSubmit={handleAddWorkSubmit}
 			/>
 
 			<WorkerCorrectionRequestModal
 				visible={correctionModalVisible}
-				onClose={() => setCorrectionModalVisible(false)}
+				onClose={closeCorrectionModal}
 				work={selectedWork}
 				onSubmit={handleCorrectionSubmit}
 			/>
