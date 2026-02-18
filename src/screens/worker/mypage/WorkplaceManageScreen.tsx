@@ -32,7 +32,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	};
 
 	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
-	const handleLogout = useLogoutHandler(closeDrawer);
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 컴포넌트 마운트 시 근무지(계약) 정보 fetch
 	useEffect(() => {

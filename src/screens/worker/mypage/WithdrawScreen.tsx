@@ -22,7 +22,7 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 		navigation.navigate(route);
 	};
 	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
-	const handleLogout = useLogoutHandler(closeDrawer);
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 탈퇴 버튼 클릭 시 확인 모달
 	const handleWithdraw = () => {

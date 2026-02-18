@@ -28,7 +28,7 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 		navigation.navigate(route);
 	};
 	const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
-	const handleLogout = useLogoutHandler(closeDrawer);
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />

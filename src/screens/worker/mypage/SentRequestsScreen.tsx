@@ -24,7 +24,7 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
 	};
 	// 공통 로그아웃 핸들러
 	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
-	const handleLogout = useLogoutHandler(closeDrawer);
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	return (
 		<SafeAreaView style={styles.container}>
