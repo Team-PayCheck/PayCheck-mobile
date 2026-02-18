@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
@@ -47,10 +47,10 @@ const BREAK_ITEMS: WheelPickerItem[] = Array.from({ length: 7 }, (_, i) => ({
 	value: i * 10,
 }));
 
-const getDateItems = (): WheelPickerItem[] => {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = now.getMonth();
+const getDateItems = (workDate: string): WheelPickerItem[] => {
+	const date = new Date(workDate);
+	const year = date.getFullYear();
+	const month = date.getMonth();
 	const daysInMonth = new Date(year, month + 1, 0).getDate();
 
 	return Array.from({ length: daysInMonth }, (_, i) => {
@@ -92,7 +92,10 @@ const WorkerCorrectionRequestModal: React.FC<
 	const [correctedBreakMinutes, setCorrectedBreakMinutes] = useState(0);
 	const [activePicker, setActivePicker] = useState<PickerTarget>(null);
 
-	const dateItems = useMemo(() => getDateItems(), []);
+	const dateItems = useMemo(
+		() => (work ? getDateItems(work.workDate) : []),
+		[work]
+	);
 
 	const original = useMemo(
 		() => (work ? parseWorkItem(work) : null),
@@ -137,11 +140,11 @@ const WorkerCorrectionRequestModal: React.FC<
 	]);
 
 	const handleSubmit = () => {
-		if (!work || !hasChanges) return;
+		if (!work || !hasChanges || !original) return;
 
-		const now = new Date();
-		const year = now.getFullYear();
-		const month = now.getMonth() + 1;
+		const workDate = new Date(work.workDate);
+		const year = workDate.getFullYear();
+		const month = workDate.getMonth() + 1;
 		const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(correctedStartDate).padStart(2, "0")}`;
 
 		onSubmit({
@@ -229,7 +232,6 @@ const WorkerCorrectionRequestModal: React.FC<
 	if (!work || !original) return null;
 
 	const pickerConfig = getPickerConfig();
-	const currentMonth = new Date().getMonth() + 1;
 
 	const renderReadonlyField = (value: string) => (
 		<View style={styles.readonlyField}>
@@ -258,7 +260,7 @@ const WorkerCorrectionRequestModal: React.FC<
 
 	return (
 		<BottomSheetModal visible={visible} onClose={onClose}>
-			<ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+			<View>
 				<Text weight="Bold" style={styles.title}>
 					근무 기록 정정 요청
 				</Text>
@@ -330,7 +332,7 @@ const WorkerCorrectionRequestModal: React.FC<
 						<View style={styles.timeRow}>
 							{renderSelectField(
 								"startDate",
-								`${currentMonth}/${correctedStartDate}`
+								`${original.month}/${correctedStartDate}`
 							)}
 							{renderSelectField(
 								"startHour",
@@ -348,7 +350,7 @@ const WorkerCorrectionRequestModal: React.FC<
 						<View style={styles.timeRow}>
 							{renderSelectField(
 								"endDate",
-								`${currentMonth}/${correctedEndDate}`
+								`${original.month}/${correctedEndDate}`
 							)}
 							{renderSelectField(
 								"endHour",
@@ -407,7 +409,7 @@ const WorkerCorrectionRequestModal: React.FC<
 						size="compact"
 					/>
 				</View>
-			</ScrollView>
+			</View>
 		</BottomSheetModal>
 	);
 };
