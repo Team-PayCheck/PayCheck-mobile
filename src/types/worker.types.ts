@@ -19,16 +19,16 @@ export interface WorkItem {
 	workDate: string; // "2026-02-16"
 	startTime: string; // "09:00"
 	endTime: string; // "18:00"
-	breakMinutes: number;
+	breakMinutes: number | null;
 	totalWorkMinutes: number;
 	status: WorkStatus;
 	isModified: boolean;
-	memo: string;
-	baseSalary: number;
-	nightSalary: number;
-	holidaySalary: number;
-	totalSalary: number;
-	salary?: number; // 시급 (API 미제공, 임시 필드)
+	memo: string | null;
+	baseSalary: number | null;
+	nightSalary: number | null;
+	holidaySalary: number | null;
+	totalSalary: number | null;
+	salary?: number | null;
 }
 
 export interface WeekDay {
