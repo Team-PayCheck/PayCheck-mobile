@@ -17,6 +17,31 @@ export const getWeekLabel = (date: Date): string => {
 	return `이번주(${week}주차)`;
 };
 
+const formatDateStr = (date: Date): string => {
+	const y = date.getFullYear();
+	const m = String(date.getMonth() + 1).padStart(2, "0");
+	const d = String(date.getDate()).padStart(2, "0");
+	return `${y}-${m}-${d}`;
+};
+
+export const getWeekRange = (
+	baseDate: Date
+): { startDate: string; endDate: string } => {
+	const dayOfWeek = baseDate.getDay();
+	const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+	const monday = new Date(baseDate);
+	monday.setDate(baseDate.getDate() + mondayOffset);
+
+	const sunday = new Date(monday);
+	sunday.setDate(monday.getDate() + 6);
+
+	return {
+		startDate: formatDateStr(monday),
+		endDate: formatDateStr(sunday),
+	};
+};
+
 export const getWeekDays = (baseDate: Date): WeekDay[] => {
 	const dayOfWeek = baseDate.getDay(); // 0(일) ~ 6(토)
 	const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;

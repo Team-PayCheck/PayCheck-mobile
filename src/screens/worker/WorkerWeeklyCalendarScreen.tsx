@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, ScrollView, View } from "react-native";
+import React, { useMemo } from "react";
+import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
@@ -9,19 +9,24 @@ import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary"
 import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
 import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
+import useWorkRecords from "../../hooks/worker/useWorkRecords";
 import { colors } from "../../constants/colors";
-import { getWeekTitle, getWeekDays, getWeekLabel } from "../../utils/date";
 import {
-	dummyNotices,
-	dummyWorks,
-	dummyWeeklySummary,
-} from "../../dummyData/workerWeeklyCalendar";
+	getWeekTitle,
+	getWeekDays,
+	getWeekLabel,
+	getWeekRange,
+} from "../../utils/date";
+import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 
 const WorkerWeeklyCalendarScreen: React.FC = () => {
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
 	const weekDays = getWeekDays(today);
 	const weekLabel = getWeekLabel(today);
+	const { startDate, endDate } = useMemo(() => getWeekRange(today), []);
+
+	const { works, isLoading } = useWorkRecords(startDate, endDate);
 
 	const {
 		correctionModalVisible,
@@ -34,6 +39,17 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 		closeAddModal,
 		handleAddWorkSubmit,
 	} = useCorrectionRequest();
+
+	// 주간 요약 계산
+	const totalMinutes = works.reduce(
+		(sum, w) => sum + w.totalWorkMinutes,
+		0
+	);
+	const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
+	const estimatedPay = works.reduce(
+		(sum, w) => sum + (w.totalSalary ?? 0),
+		0
+	);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -50,15 +66,25 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 				<NoticeBoard notices={dummyNotices} />
 
-				<WorkListSection
-					works={dummyWorks}
-					onPressAdd={openAddModal}
-					onPressCorrectionRequest={openCorrectionModal}
-				/>
+				{isLoading ? (
+					<ActivityIndicator
+						size="large"
+						color={colors.primary}
+						style={styles.loader}
+					/>
+				) : (
+					<WorkListSection
+						works={works}
+						onPressAdd={openAddModal}
+						onPressCorrectionRequest={openCorrectionModal}
+					/>
+				)}
 
 				<View style={styles.dashedLine} />
 
-				<WeeklySummary summary={{ ...dummyWeeklySummary, weekLabel }} />
+				<WeeklySummary
+					summary={{ weekLabel, totalHours, estimatedPay }}
+				/>
 			</ScrollView>
 
 			<AddWorkRequestModal
@@ -95,6 +121,9 @@ const styles = StyleSheet.create({
 		borderStyle: "dashed",
 		borderWidth: 1,
 		borderColor: colors.border,
+	},
+	loader: {
+		paddingVertical: 40,
 	},
 });
 
