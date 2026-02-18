@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import api from "./axios";
 import type { ApiResponse } from "../types/api.types";
+import type { WorkItem } from "../types/worker.types";
 import type {
 	ContractListItem,
 	ContractDetail,
@@ -49,6 +50,52 @@ export const getContractDetail = async (
 			axiosError.response?.data?.error?.message ||
 			axiosError.message ||
 			"계약 상세 조회 실패";
+
+		throw new Error(message);
+	}
+};
+
+/**
+ * 근무 기록 목록 조회 (기간별)
+ */
+export const getWorkRecords = async (
+	startDate: string,
+	endDate: string
+): Promise<ApiResponse<WorkItem[]>> => {
+	try {
+		const { data } = await api.get<ApiResponse<WorkItem[]>>(
+			"/api/worker/work-records",
+			{ params: { startDate, endDate } }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<WorkItem[]>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"근무 기록 조회 실패";
+
+		throw new Error(message);
+	}
+};
+
+/**
+ * 근무 기록 상세 조회
+ */
+export const getWorkRecordDetail = async (
+	id: number
+): Promise<ApiResponse<WorkItem>> => {
+	try {
+		const { data } = await api.get<ApiResponse<WorkItem>>(
+			`/api/worker/work-records/${id}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<WorkItem>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"근무 기록 상세 조회 실패";
 
 		throw new Error(message);
 	}

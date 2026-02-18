@@ -53,7 +53,7 @@ const parseWorkItem = (work: WorkItem) => {
 		startMinute: startM,
 		endHour: endH,
 		endMinute: endM,
-		breakMinutes: work.breakMinutes,
+		breakMinutes: work.breakMinutes ?? 0,
 	};
 };
 
