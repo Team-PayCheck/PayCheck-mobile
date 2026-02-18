@@ -10,48 +10,50 @@ import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import { dummyRequests } from "../../../dummyData/workerMyPage";
 import SentRequestCard from "../../../components/mypage/sentRequests/SentRequestCard";
+import { colors } from "../../../constants/colors";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "SentRequests">;
 
 const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [openIdx, setOpenIdx] = useState<number | null>(null);
-
 	const closeDrawer = () => setIsDrawerVisible(false);
-
 	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
+	// 공통 로그아웃 핸들러
+	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
+	const handleLogout = useLogoutHandler(closeDrawer);
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
-			<View style={styles.headerRow}>
-				<View style={{ flex: 1 }}>
-					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-					<Text weight="ExtraBold" style={styles.title}>보낸 근무요청 보기</Text>
+			<View style={styles.scrollContent}>
+				<View style={styles.headerRow}>
+					<View style={{ flex: 1 }}>
+						<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+						<Text weight="ExtraBold" style={styles.title}>보낸 근무요청 보기</Text>
+					</View>
+					<View style={styles.illustWrapper}>
+						<Image
+							source={require("../../../assets/images/mypage/chat.png")}
+							style={styles.illust}
+							resizeMode="contain"
+						/>
+					</View>
 				</View>
-				<View style={styles.illustWrapper}>
-					<Image
-						source={require("../../../assets/images/mypage/chat.png")}
-						style={styles.illust}
-						resizeMode="contain"
-					/>
+				<View style={styles.cardList}>
+					{dummyRequests.map((r, idx) => (
+						<SentRequestCard
+							key={r.workplace + r.date + r.time + idx}
+							request={r}
+							expanded={openIdx === idx}
+							onToggle={() => setOpenIdx(openIdx === idx ? null : idx)}
+						/>
+					))}
 				</View>
 			</View>
-
-			<View style={styles.cardList}>
-				{dummyRequests.map((r, idx) => (
-				  <SentRequestCard
-					key={r.workplace + r.date + r.time + idx}
-					request={r}
-					expanded={openIdx === idx}
-					onToggle={() => setOpenIdx(openIdx === idx ? null : idx)}
-				  />
-				))}
-			</View>
-
 			<MyPageDrawer
 				visible={isDrawerVisible}
 				onClose={closeDrawer}
@@ -59,10 +61,7 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
 				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
 				onPressSentRequests={() => closeDrawer()}
 				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={() => {
-					closeDrawer();
-					Alert.alert("로그아웃", "로그아웃 기능은 다음 단계에서 연결됩니다.");
-				}}
+				onPressLogout={handleLogout}
 				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
 			/>
 		</SafeAreaView>
@@ -72,8 +71,13 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
-		paddingHorizontal: 24,
+		backgroundColor: colors.background,
+	},
+	scrollContent: {
+		paddingTop: 10,
+		paddingHorizontal: 20,
+		paddingBottom: 40,
+		gap: 24,
 	},
 	headerRow: {
 		flexDirection: "row",
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
 	title: {
 		marginTop: 4,
 		fontSize: 24,
-		color: "#353535",
+		color: colors.textPrimary,
 		lineHeight: 52,
 	},
 	cardList: {

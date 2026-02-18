@@ -9,6 +9,8 @@ import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
 import { getContracts } from "../../../api/workerApi";
+import { colors } from "../../../constants/colors";
+
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 
@@ -28,6 +30,9 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
+
+	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
+	const handleLogout = useLogoutHandler(closeDrawer);
 
 	// 컴포넌트 마운트 시 근무지(계약) 정보 fetch
 	useEffect(() => {
@@ -75,34 +80,31 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* 상단 헤더 및 타이틀 */}
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
-			<View style={styles.headerRow}>
-				<View style={{ flex: 1 }}>
-					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-					<Text weight="ExtraBold" style={styles.title}>내 근무지</Text>
+			<View style={styles.scrollContent}>
+				<View style={styles.headerRow}>
+					<View style={{ flex: 1 }}>
+						<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+						<Text weight="ExtraBold" style={styles.title}>내 근무지</Text>
+					</View>
+					<View style={styles.illustWrapper}>
+						<Image
+							source={require("../../../assets/images/mypage/location.png")}
+							style={styles.illust}
+							resizeMode="contain"
+						/>
+					</View>
 				</View>
-				<View style={styles.illustWrapper}>
-					<Image
-						source={require("../../../assets/images/mypage/location.png")}
-						style={styles.illust}
-						resizeMode="contain"
-					/>
+				<View style={styles.cardList}>
+					{loading ? (
+						<ActivityIndicator size="large" color={colors.textSecondary} style={{marginTop: 32}} />
+					) : error ? (
+						<Text style={{color: 'red', textAlign: 'center', marginTop: 24}}>{error}</Text>
+					) : (
+						renderWorkplaceCards()
+					)}
 				</View>
 			</View>
-
-			{/* 근무지 카드 리스트, 로딩/에러 처리 */}
-			<View style={styles.cardList}>
-				{loading ? (
-					<ActivityIndicator size="large" color="#aaa" style={{marginTop: 32}} />
-				) : error ? (
-					<Text style={{color: 'red', textAlign: 'center', marginTop: 24}}>{error}</Text>
-				) : (
-					renderWorkplaceCards()
-				)}
-			</View>
-
-			{/* 마이페이지 드로어 */}
 			<MyPageDrawer
 				visible={isDrawerVisible}
 				onClose={closeDrawer}
@@ -110,10 +112,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				onPressWorkplaceManage={() => closeDrawer()}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
 				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={() => {
-					closeDrawer();
-					Alert.alert("로그아웃", "로그아웃 기능은 다음 단계에서 연결됩니다.");
-				}}
+				onPressLogout={handleLogout}
 				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
 			/>
 		</SafeAreaView>
@@ -124,8 +123,13 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
-		paddingHorizontal: 24,
+		backgroundColor: colors.background,
+	},
+	scrollContent: {
+		paddingTop: 10,
+		paddingHorizontal: 20,
+		paddingBottom: 40,
+		gap: 24,
 	},
 	headerRow: {
 		flexDirection: "row",
@@ -147,18 +151,18 @@ const styles = StyleSheet.create({
 	title: {
 		marginTop: 4,
 		fontSize: 24,
-		color: "#353535",
+		color: colors.textPrimary,
 		lineHeight: 52,
 	},
 	cardList: {
 		marginTop: 8,
 	},
 	card: {
-		backgroundColor: "#FFF",
+		backgroundColor: colors.white,
 		borderRadius: 18,
 		paddingHorizontal: 18,
 		paddingVertical: 14,
-		shadowColor: "#000",
+		shadowColor: colors.black,
 		shadowOpacity: 0.07,
 		shadowOffset: { width: 0, height: 3 },
 		shadowRadius: 8,
@@ -167,11 +171,11 @@ const styles = StyleSheet.create({
 	},
 	cardLabel: {
 		fontSize: 16,
-		color: "#848484",
+		color: colors.textSecondary,
 		marginBottom: 6,
 	},
 	cardValue: {
-		color: "#000",
+		color: colors.textPrimary,
 	},
 });
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TextInput, StyleSheet, KeyboardTypeOptions, TouchableOpacity, ViewStyle, TextStyle } from "react-native";
 import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 interface ProfileFieldRowProps {
   label: string;
@@ -37,7 +38,7 @@ const ProfileFieldRow: React.FC<ProfileFieldRowProps> = ({
         style={[styles.input, !editable && styles.readOnlyInput, inputStyle]}
         editable={editable}
         placeholder={placeholder}
-        placeholderTextColor="#A4A4A4"
+        placeholderTextColor={colors.textSecondary}
         keyboardType={keyboardType}
       />
       {onEdit && (
@@ -58,36 +59,36 @@ const styles = StyleSheet.create({
   fieldLabel: {
     width: 68,
     fontSize: 15,
-    color: "#8A8A8A",
+    color: colors.textSecondary,
   },
   input: {
     flex: 1,
     height: 40,
-    backgroundColor: "#F3F3F3",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: colors.border,
     paddingHorizontal: 12,
     fontSize: 15,
-    color: "#4B4B4B",
+    color: colors.textSecondary,
     fontFamily: "Pretendard-Medium",
   },
   readOnlyInput: {
-    color: "#5E5E5E",
+    color: colors.textSecondary,
   },
   editButton: {
     width: 42,
     height: 33,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#DDDDDD",
-    backgroundColor: "#F8F8F8",
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundGrey,
     alignItems: "center",
     justifyContent: "center",
   },
   editButtonText: {
     fontSize: 13,
-    color: "#4D4D4D",
+    color: colors.textSecondary,
   },
 });
 

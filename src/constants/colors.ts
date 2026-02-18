@@ -29,7 +29,7 @@ export const colors = {
 	green: "#28C28D",
 
 	// 기타
-  blue: "#038BFA",
+ 	blue: "#038BFA",
 	grey: "#EEEEEE",
 	white: "#FFFFFF",
 	black: "#000000",

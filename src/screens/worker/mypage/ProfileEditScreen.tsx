@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, View, Image, TextInput } from "react-native";
+import { ScrollView, StyleSheet, View, Image, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -12,6 +12,7 @@ import ProfileFieldRow from "../../../components/mypage/profileEdit/ProfileField
 import ProfilePhoto from "../../../components/mypage/profileEdit/ProfilePhoto";
 import BankSelectModal from "../../../components/signup/BankSelectModal";
 import { TouchableOpacity } from "react-native";
+import { colors } from "../../../constants/colors";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "ProfileEdit">;
@@ -27,131 +28,118 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isBankModalVisible, setIsBankModalVisible] = useState(false);
 
-  // BankSelectModal에서 은행 선택 시 호출
   const handleBankSelect = (selectedBank: string) => {
     setBank(selectedBank);
     setIsBankModalVisible(false);
   };
-
-	const closeDrawer = () => setIsDrawerVisible(false);
-
-	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
-		closeDrawer();
-		navigation.navigate(route);
-	};
+  const closeDrawer = () => setIsDrawerVisible(false);
+  const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
+    closeDrawer();
+    navigation.navigate(route);
+  };
+  const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
+  const handleLogout = useLogoutHandler(closeDrawer);
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header onPressLeft={() => setIsDrawerVisible(true)} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-				<Header onPressLeft={() => setIsDrawerVisible(true)} />
-
-				<View style={styles.headerArea}>
-					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-					<View style={styles.titleRow}>
-						<Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
-						<Image
-							source={require("../../../assets/images/mypage/user.png")}
-							style={styles.titleImage}
-							resizeMode="contain"
-						/>
-					</View>
-				</View>
-
-				<View style={styles.formArea}>
-					<View style={styles.nameRow}>
-						<ProfilePhoto imageSource={require("../../../assets/images/mypage/user.png")}/>
-						<ProfileFieldRow
-							label=""
-							value={name}
-							onChangeText={setName}
-							placeholder="이름"
-							onEdit={() => {}}
-							containerStyle={{ flex: 1 }}
-							inputStyle={{ marginLeft: 10 }}
-						/>
-					</View>
-
-					<ProfileFieldRow
-						label="전화 번호"
-						value={phone}
-						onChangeText={setPhone}
-						placeholder="전화 번호"
-						keyboardType="phone-pad"
-						onEdit={() => {}}
-					/>
-
-					<ProfileFieldRow
-						label="이메일"
-						value={email}
-						onChangeText={setEmail}
-						placeholder="이메일"
-						keyboardType="email-address"
-						onEdit={() => {}}
-					/>
-
-					<ProfileFieldRow
-						label="근무자코드"
-						value={workerCode}
-						editable={false}
-						placeholder="근무자코드"
-						onEdit={() => {}}
-						inputStyle={{ color: "#5E5E5E" }}
-					/>
-
-            <View style={{ gap: 14 }}>
-              <View style={styles.fieldRow}>
-                <Text style={styles.fieldLabel} weight="Medium">은행</Text>
-                <TouchableOpacity
-                  style={styles.bankSelector}
-                  activeOpacity={0.8}
-                  onPress={() => setIsBankModalVisible(true)}
-                >
-                  <Text weight="Medium" style={styles.bankText}>{bank}</Text>
-                  <Ionicons name="chevron-down" size={14} color="#888888" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.fieldRow}>
-                <Text style={styles.fieldLabel} weight="Medium">계좌번호</Text>
-                  <View>
-                  <TextInput
-                    value={accountNumber}
-                    onChangeText={setAccountNumber}
-                    style={styles.input}
-                    placeholder="계좌번호"
-                    placeholderTextColor="#A4A4A4"
-                    keyboardType="number-pad"
-                  />
-                </View>
-                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
-                  <Text weight="Medium" style={styles.editButtonText}>수정</Text>
-                </TouchableOpacity>
-              </View>
+        <View style={styles.headerArea}>
+          <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+          <View style={styles.titleRow}>
+            <Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
+            <Image
+              source={require("../../../assets/images/mypage/user.png")}
+              style={styles.titleImage}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+        <View style={styles.formArea}>
+          <View style={styles.nameRow}>
+            <ProfilePhoto imageSource={require("../../../assets/images/mypage/user.png")}/>
+            <ProfileFieldRow
+              label=""
+              value={name}
+              onChangeText={setName}
+              placeholder="이름"
+              onEdit={() => {}}
+              containerStyle={{ flex: 1 }}
+              inputStyle={{ marginLeft: 10 }}
+            />
+          </View>
+          <ProfileFieldRow
+            label="전화 번호"
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="전화 번호"
+            keyboardType="phone-pad"
+            onEdit={() => {}}
+          />
+          <ProfileFieldRow
+            label="이메일"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="이메일"
+            keyboardType="email-address"
+            onEdit={() => {}}
+          />
+          <ProfileFieldRow
+            label="근무자코드"
+            value={workerCode}
+            editable={false}
+            placeholder="근무자코드"
+            onEdit={() => {}}
+            inputStyle={{ color: colors.textSecondary }}
+          />
+          <View style={{ gap: 14 }}>
+            <View style={styles.fieldRow}>
+              <Text style={styles.fieldLabel} weight="Medium">은행</Text>
+              <TouchableOpacity
+                style={styles.bankSelector}
+                activeOpacity={0.8}
+                onPress={() => setIsBankModalVisible(true)}
+              >
+                <Text weight="Medium" style={styles.bankText}>{bank}</Text>
+                <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
+              </TouchableOpacity>
             </View>
-				</View>
-
-        </ScrollView>
-
-        <BankSelectModal
-          visible={isBankModalVisible}
-          onClose={() => setIsBankModalVisible(false)}
-          onSelect={handleBankSelect}
-          selectedBank={bank}
-        />
-
-			<MyPageDrawer
-				visible={isDrawerVisible}
-				onClose={closeDrawer}
-				onPressProfileEdit={() => closeDrawer()}
-				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
-				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={() => {
-					closeDrawer();
-					Alert.alert("로그아웃", "로그아웃 기능은 다음 단계에서 연결됩니다.");
-				}}
-				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
-			/>
-		</SafeAreaView>
+            <View style={styles.fieldRow}>
+              <Text style={styles.fieldLabel} weight="Medium">계좌번호</Text>
+                <View>
+                <TextInput
+                  value={accountNumber}
+                  onChangeText={setAccountNumber}
+                  style={styles.input}
+                  placeholder="계좌번호"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+                <Text weight="Medium" style={styles.editButtonText}>수정</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+      <BankSelectModal
+        visible={isBankModalVisible}
+        onClose={() => setIsBankModalVisible(false)}
+        onSelect={handleBankSelect}
+        selectedBank={bank}
+      />
+      <MyPageDrawer
+        visible={isDrawerVisible}
+        onClose={closeDrawer}
+        onPressProfileEdit={() => closeDrawer()}
+        onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
+        onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+        onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+        onPressLogout={handleLogout}
+        onPressWithdraw={() => navigateFromDrawer("Withdraw")}
+      />
+    </SafeAreaView>
 	);
 };
 
@@ -159,11 +147,13 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FDFDFD",
-    paddingHorizontal: 24,
+    backgroundColor: colors.background,
   },
   scrollContent: {
-    paddingBottom: 34,
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    gap: 24,
   },
   headerArea: {
     paddingTop: 8,
@@ -177,7 +167,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 4,
     fontSize: 24,
-    color: "#353535",
+    color: colors.textPrimary,
     lineHeight: 52,
   },
   titleImage: {
@@ -203,29 +193,29 @@ const styles = StyleSheet.create({
   fieldLabel: {
     width: 68,
     fontSize: 15,
-    color: "#8A8A8A",
+    color: colors.textSecondary,
   },
   editButton: {
     width: 42,
     height: 33,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#DDDDDD",
-    backgroundColor: "#F8F8F8",
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundGrey,
     alignItems: "center",
     justifyContent: "center",
   },
   editButtonText: {
     fontSize: 13,
-    color: "#4D4D4D",
+    color: colors.textSecondary,
   },
   bankSelector: {
     width: 88,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#F3F3F3",
+    backgroundColor: colors.backgroundGrey,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: colors.border,
     paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -233,18 +223,18 @@ const styles = StyleSheet.create({
   },
   bankText: {
     fontSize: 15,
-    color: "#4B4B4B",
+    color: colors.textSecondary,
 	marginRight: 4,
   },
   input: {
     height: 40,
-    backgroundColor: "#F3F3F3",
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: colors.border,
     paddingHorizontal: 12,
     fontSize: 15,
-    color: "#4B4B4B",
+    color: colors.textSecondary,
     fontFamily: "Pretendard-Medium",
   },
 });

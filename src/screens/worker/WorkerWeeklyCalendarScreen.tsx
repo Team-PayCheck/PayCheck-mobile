@@ -22,14 +22,13 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
 
 const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-	
-		const closeDrawer = () => setIsDrawerVisible(false);
-	
-		const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
-			closeDrawer();
-			navigation.navigate(route);
-		};
-		
+	const closeDrawer = () => setIsDrawerVisible(false);
+	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
+		closeDrawer();
+		navigation.navigate(route);
+	};
+	const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
+	const handleLogout = useLogoutHandler(closeDrawer);
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
@@ -58,10 +57,7 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
 				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={() => {
-					closeDrawer();
-					Alert.alert("로그아웃", "로그아웃 기능은 다음 단계에서 연결됩니다.");
-				}}
+				onPressLogout={handleLogout}
 				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
 			/>
 		</SafeAreaView>

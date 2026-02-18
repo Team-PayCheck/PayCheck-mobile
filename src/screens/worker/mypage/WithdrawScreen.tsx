@@ -8,19 +8,21 @@ import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
+import { colors } from "../../../constants/colors";
+
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "Withdraw">;
 
 const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [loading, setLoading] = useState(false);
-
 	const closeDrawer = () => setIsDrawerVisible(false);
-
 	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
+	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
+	const handleLogout = useLogoutHandler(closeDrawer);
 
 	// 탈퇴 버튼 클릭 시 확인 모달
 	const handleWithdraw = () => {
@@ -56,24 +58,26 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
-			<View style={styles.headerArea}>
-				<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-			</View>
-			<View style={styles.contentArea}>
-				<Image source={require("../../../assets/images/mypage/quit.png")} style={styles.illust} resizeMode="contain" />
-				<Text weight="ExtraBold" style={styles.title}>회원 탈퇴하기</Text>
-				<Text style={styles.desc}>회원 탈퇴시 30일 이후 기존의 고용 정보가 말소됩니다</Text>
-				<View style={styles.buttonRow}>
-					<TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()} disabled={loading}>
-						<Text style={styles.cancelText}>취소</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={styles.withdrawBtn} activeOpacity={0.8} onPress={handleWithdraw} disabled={loading}>
-						{loading ? (
-							<ActivityIndicator color="#fff" />
-						) : (
-							<Text weight="Bold" style={styles.withdrawText}>회원탈퇴</Text>
-						)}
-					</TouchableOpacity>
+			<View style={styles.scrollContent}>
+				<View style={styles.headerArea}>
+					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+				</View>
+				<View style={styles.contentArea}>
+					<Image source={require("../../../assets/images/mypage/quit.png")} style={styles.illust} resizeMode="contain" />
+					<Text weight="ExtraBold" style={styles.title}>회원 탈퇴하기</Text>
+					<Text style={styles.desc}>회원 탈퇴시 30일 이후 기존의 고용 정보가 말소됩니다</Text>
+					<View style={styles.buttonRow}>
+						<TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()} disabled={loading}>
+							<Text style={styles.cancelText}>취소</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.withdrawBtn} activeOpacity={0.8} onPress={handleWithdraw} disabled={loading}>
+							{loading ? (
+								<ActivityIndicator color={colors.white} />
+							) : (
+								<Text weight="Bold" style={styles.withdrawText}>회원탈퇴</Text>
+							)}
+						</TouchableOpacity>
+					</View>
 				</View>
 			</View>
 			<MyPageDrawer
@@ -83,10 +87,7 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
 				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={() => {
-					closeDrawer();
-					Alert.alert("로그아웃", "로그아웃 기능은 다음 단계에서 연결됩니다.");
-				}}
+				onPressLogout={handleLogout}
 				onPressWithdraw={() => closeDrawer()}
 			/>
 		</SafeAreaView>
@@ -96,18 +97,23 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
-		paddingHorizontal: 24,
+		backgroundColor: colors.background,
+	},
+	scrollContent: {
+		flex: 1,
+		paddingTop: 10,
+		paddingHorizontal: 20,
+		paddingBottom: 40,
+		gap: 24,
 	},
 	headerArea: {
 		paddingTop: 10,
 		gap: 16,
 	},
 	contentArea: {
-		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
-		marginTop: 10,
+		marginTop: 60,
 	},
 	illust: {
 		width: 402,
@@ -115,12 +121,12 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		color: "#161616",
+		color: colors.textPrimary,
 		marginBottom: 4,
 		textAlign: "center",
 	},
 	desc: {
-		color: "#848484",
+		color: colors.textSecondary,
 		fontSize: 12,
 		marginBottom: 32,
 		textAlign: "center",
@@ -132,7 +138,7 @@ const styles = StyleSheet.create({
 		gap: 18,
 	},
 	cancelBtn: {
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.white,
 		borderRadius: 22,
 		paddingHorizontal: 32,
 		paddingVertical: 12,
@@ -141,7 +147,7 @@ const styles = StyleSheet.create({
 		marginRight: 2,
 	},
 	withdrawBtn: {
-		backgroundColor: "#F17D77",
+		backgroundColor: colors.red,
 		borderRadius: 22,
 		paddingHorizontal: 32,
 		paddingVertical: 12,
@@ -149,12 +155,12 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	cancelText: {
-		color: "#F17D77",
+		color: colors.red,
 		fontSize: 14,
 		fontWeight: "bold",
 	},
 	withdrawText: {
-		color: "#fff",
+		color: colors.white,
 		fontSize: 14,
 	},
 });
