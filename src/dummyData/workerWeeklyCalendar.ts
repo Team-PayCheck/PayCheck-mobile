@@ -1,8 +1,4 @@
-import type {
-	NoticeItem,
-	WorkItem,
-	WeeklySummaryData,
-} from "../types/worker.types";
+import type { NoticeItem } from "../types/worker.types";
 
 export const dummyNotices: NoticeItem[] = [
 	{
@@ -30,69 +26,3 @@ export const dummyNotices: NoticeItem[] = [
 		time: "18:00",
 	},
 ];
-
-export const dummyWorks: WorkItem[] = [
-	{
-		id: 1,
-		contractId: 10,
-		workerName: "홍길동",
-		workerCode: "W20240001",
-		workplaceName: "교내근로",
-		workDate: "2026-01-24",
-		startTime: "17:00",
-		endTime: "19:00",
-		breakMinutes: 0,
-		totalWorkMinutes: 120,
-		status: "SCHEDULED",
-		isModified: false,
-		memo: "",
-		baseSalary: 20600,
-		nightSalary: 0,
-		holidaySalary: 0,
-		totalSalary: 20600,
-	},
-	{
-		id: 2,
-		contractId: 11,
-		workerName: "홍길동",
-		workerCode: "W20240001",
-		workplaceName: "스타벅스 건대점",
-		workDate: "2026-01-24",
-		startTime: "10:00",
-		endTime: "14:00",
-		breakMinutes: 30,
-		totalWorkMinutes: 210,
-		status: "COMPLETED",
-		isModified: false,
-		memo: "오전 근무",
-		baseSalary: 36050,
-		nightSalary: 0,
-		holidaySalary: 0,
-		totalSalary: 36050,
-	},
-	{
-		id: 3,
-		contractId: 12,
-		workerName: "홍길동",
-		workerCode: "W20240001",
-		workplaceName: "CU 화양점",
-		workDate: "2026-01-25",
-		startTime: "18:00",
-		endTime: "22:00",
-		breakMinutes: 0,
-		totalWorkMinutes: 240,
-		status: "SCHEDULED",
-		isModified: false,
-		memo: "",
-		baseSalary: 41200,
-		nightSalary: 0,
-		holidaySalary: 0,
-		totalSalary: 41200,
-	},
-];
-
-export const dummyWeeklySummary: WeeklySummaryData = {
-	weekLabel: "",
-	totalHours: 24,
-	estimatedPay: 320000,
-};
