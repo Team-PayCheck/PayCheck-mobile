@@ -28,6 +28,7 @@ export interface WorkItem {
 	nightSalary: number | null;
 	holidaySalary: number | null;
 	totalSalary: number | null;
+	salary?: number | null;
 }
 
 export interface WeekDay {
