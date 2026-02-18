@@ -7,6 +7,12 @@
 import { useState, useMemo } from "react";
 import { Dimensions } from "react-native";
 import type { WheelPickerItem } from "../../components/common/WheelPicker";
+import {
+	HOUR_ITEMS,
+	MINUTE_ITEMS,
+	BREAK_ITEMS,
+	getDateItems,
+} from "../../constants/pickerItems";
 
 export type PickerTarget =
 	| "workplace"
@@ -33,36 +39,6 @@ interface WorkRequestSubmitData {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-const HOUR_ITEMS: WheelPickerItem[] = Array.from({ length: 24 }, (_, i) => ({
-	label: String(i).padStart(2, "0"),
-	value: i,
-}));
-
-const MINUTE_ITEMS: WheelPickerItem[] = Array.from({ length: 60 }, (_, i) => ({
-	label: String(i).padStart(2, "0"),
-	value: i,
-}));
-
-const BREAK_ITEMS: WheelPickerItem[] = Array.from({ length: 7 }, (_, i) => ({
-	label: `${i * 10}`,
-	value: i * 10,
-}));
-
-const getDateItems = (): WheelPickerItem[] => {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = now.getMonth();
-	const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-	return Array.from({ length: daysInMonth }, (_, i) => {
-		const day = i + 1;
-		return {
-			label: `${month + 1}/${day}`,
-			value: day,
-		};
-	});
-};
 
 const useWorkRequestForm = (workplacePickerItems: WheelPickerItem[]) => {
 	const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<

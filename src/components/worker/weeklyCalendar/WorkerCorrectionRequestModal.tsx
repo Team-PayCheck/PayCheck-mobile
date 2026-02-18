@@ -1,11 +1,12 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import React from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import PrimaryButton from "../../common/PrimaryButton";
 import WheelPicker from "../../common/WheelPicker";
-import type { WheelPickerItem } from "../../common/WheelPicker";
+import useCorrectionForm from "../../../hooks/worker/useCorrectionForm";
+import type { CorrectionPickerTarget } from "../../../hooks/worker/useCorrectionForm";
 import { colors } from "../../../constants/colors";
 import type { WorkItem } from "../../../types/worker.types";
 
@@ -22,211 +23,23 @@ interface WorkerCorrectionRequestModalProps {
 	}) => void;
 }
 
-type PickerTarget =
-	| "startDate"
-	| "startHour"
-	| "startMinute"
-	| "endDate"
-	| "endHour"
-	| "endMinute"
-	| "breakMinutes"
-	| null;
-
-const HOUR_ITEMS: WheelPickerItem[] = Array.from({ length: 24 }, (_, i) => ({
-	label: String(i).padStart(2, "0"),
-	value: i,
-}));
-
-const MINUTE_ITEMS: WheelPickerItem[] = Array.from({ length: 60 }, (_, i) => ({
-	label: String(i).padStart(2, "0"),
-	value: i,
-}));
-
-const BREAK_ITEMS: WheelPickerItem[] = Array.from({ length: 7 }, (_, i) => ({
-	label: `${i * 10}`,
-	value: i * 10,
-}));
-
-const getDateItems = (workDate: string): WheelPickerItem[] => {
-	const date = new Date(workDate);
-	const year = date.getFullYear();
-	const month = date.getMonth();
-	const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-	return Array.from({ length: daysInMonth }, (_, i) => {
-		const day = i + 1;
-		return {
-			label: `${month + 1}/${day}`,
-			value: day,
-		};
-	});
-};
-
-const parseWorkItem = (work: WorkItem) => {
-	const workDate = new Date(work.workDate);
-	const date = workDate.getDate();
-	const month = workDate.getMonth() + 1;
-	const [startH, startM] = work.startTime.split(":").map(Number);
-	const [endH, endM] = work.endTime.split(":").map(Number);
-
-	return {
-		date,
-		month,
-		startHour: startH,
-		startMinute: startM,
-		endHour: endH,
-		endMinute: endM,
-		breakMinutes: work.breakMinutes,
-	};
-};
-
 const WorkerCorrectionRequestModal: React.FC<
 	WorkerCorrectionRequestModalProps
 > = ({ visible, onClose, work, onSubmit }) => {
-	const [correctedStartDate, setCorrectedStartDate] = useState(1);
-	const [correctedStartHour, setCorrectedStartHour] = useState(0);
-	const [correctedStartMinute, setCorrectedStartMinute] = useState(0);
-	const [correctedEndDate, setCorrectedEndDate] = useState(1);
-	const [correctedEndHour, setCorrectedEndHour] = useState(0);
-	const [correctedEndMinute, setCorrectedEndMinute] = useState(0);
-	const [correctedBreakMinutes, setCorrectedBreakMinutes] = useState(0);
-	const [activePicker, setActivePicker] = useState<PickerTarget>(null);
-
-	const dateItems = useMemo(
-		() => (work ? getDateItems(work.workDate) : []),
-		[work]
-	);
-
-	const original = useMemo(
-		() => (work ? parseWorkItem(work) : null),
-		[work]
-	);
-
-	// 모달 열릴 때 정정 값을 기존 값으로 초기화
-	useEffect(() => {
-		if (visible && original) {
-			setCorrectedStartDate(original.date);
-			setCorrectedStartHour(original.startHour);
-			setCorrectedStartMinute(original.startMinute);
-			setCorrectedEndDate(original.date);
-			setCorrectedEndHour(original.endHour);
-			setCorrectedEndMinute(original.endMinute);
-			setCorrectedBreakMinutes(original.breakMinutes);
-			setActivePicker(null);
-		}
-	}, [visible, original]);
-
-	// 변경 사항 감지
-	const hasChanges = useMemo(() => {
-		if (!original) return false;
-		return (
-			correctedStartDate !== original.date ||
-			correctedStartHour !== original.startHour ||
-			correctedStartMinute !== original.startMinute ||
-			correctedEndDate !== original.date ||
-			correctedEndHour !== original.endHour ||
-			correctedEndMinute !== original.endMinute ||
-			correctedBreakMinutes !== original.breakMinutes
-		);
-	}, [
+	const {
 		original,
-		correctedStartDate,
-		correctedStartHour,
-		correctedStartMinute,
-		correctedEndDate,
-		correctedEndHour,
-		correctedEndMinute,
-		correctedBreakMinutes,
-	]);
+		activePicker,
+		hasChanges,
+		handlePickerChange,
+		togglePicker,
+		getPickerConfig,
+		getDisplayValue,
+		buildSubmitData,
+	} = useCorrectionForm(work, visible);
 
 	const handleSubmit = () => {
-		if (!work || !hasChanges || !original) return;
-
-		const workDate = new Date(work.workDate);
-		const year = workDate.getFullYear();
-		const month = workDate.getMonth() + 1;
-		const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(correctedStartDate).padStart(2, "0")}`;
-
-		onSubmit({
-			workRecordId: work.id,
-			requestedWorkDate: dateStr,
-			requestedStartTime: `${String(correctedStartHour).padStart(2, "0")}:${String(correctedStartMinute).padStart(2, "0")}`,
-			requestedEndTime: `${String(correctedEndHour).padStart(2, "0")}:${String(correctedEndMinute).padStart(2, "0")}`,
-			requestedBreakMinutes: correctedBreakMinutes,
-		});
-	};
-
-	const handlePickerChange = (value: string | number) => {
-		switch (activePicker) {
-			case "startDate":
-				setCorrectedStartDate(value as number);
-				break;
-			case "startHour":
-				setCorrectedStartHour(value as number);
-				break;
-			case "startMinute":
-				setCorrectedStartMinute(value as number);
-				break;
-			case "endDate":
-				setCorrectedEndDate(value as number);
-				break;
-			case "endHour":
-				setCorrectedEndHour(value as number);
-				break;
-			case "endMinute":
-				setCorrectedEndMinute(value as number);
-				break;
-			case "breakMinutes":
-				setCorrectedBreakMinutes(value as number);
-				break;
-		}
-	};
-
-	const getPickerConfig = (): {
-		items: WheelPickerItem[];
-		selectedValue: string | number;
-		width: number;
-	} => {
-		switch (activePicker) {
-			case "startDate":
-			case "endDate":
-				return {
-					items: dateItems,
-					selectedValue:
-						activePicker === "startDate"
-							? correctedStartDate
-							: correctedEndDate,
-					width: 120,
-				};
-			case "startHour":
-			case "endHour":
-				return {
-					items: HOUR_ITEMS,
-					selectedValue:
-						activePicker === "startHour"
-							? correctedStartHour
-							: correctedEndHour,
-					width: 80,
-				};
-			case "startMinute":
-			case "endMinute":
-				return {
-					items: MINUTE_ITEMS,
-					selectedValue:
-						activePicker === "startMinute"
-							? correctedStartMinute
-							: correctedEndMinute,
-					width: 80,
-				};
-			case "breakMinutes":
-				return {
-					items: BREAK_ITEMS,
-					selectedValue: correctedBreakMinutes,
-					width: 80,
-				};
-			default:
-				return { items: [], selectedValue: 0, width: 80 };
-		}
+		const data = buildSubmitData();
+		if (data) onSubmit(data);
 	};
 
 	if (!work || !original) return null;
@@ -241,21 +54,23 @@ const WorkerCorrectionRequestModal: React.FC<
 		</View>
 	);
 
-	const renderSelectField = (target: PickerTarget, displayValue: string) => (
-		<View
+	const renderSelectField = (
+		target: CorrectionPickerTarget,
+		displayValue: string
+	) => (
+		<TouchableOpacity
 			style={[
 				styles.selectField,
 				activePicker === target && styles.selectFieldActive,
 			]}
-			onTouchEnd={() =>
-				setActivePicker(activePicker === target ? null : target)
-			}
+			onPress={() => togglePicker(target)}
+			activeOpacity={0.7}
 		>
 			<Text weight="Medium" style={styles.selectText}>
 				{displayValue}
 			</Text>
 			<Feather name="chevron-down" size={14} color={colors.textMuted} />
-		</View>
+		</TouchableOpacity>
 	);
 
 	return (
@@ -332,16 +147,16 @@ const WorkerCorrectionRequestModal: React.FC<
 						<View style={styles.timeRow}>
 							{renderSelectField(
 								"startDate",
-								`${original.month}/${correctedStartDate}`
+								getDisplayValue("startDate")
 							)}
 							{renderSelectField(
 								"startHour",
-								String(correctedStartHour).padStart(2, "0")
+								getDisplayValue("startHour")
 							)}
 							<Text style={styles.timeSeparator}>:</Text>
 							{renderSelectField(
 								"startMinute",
-								String(correctedStartMinute).padStart(2, "0")
+								getDisplayValue("startMinute")
 							)}
 						</View>
 						<Text weight="Medium" style={styles.tilde}>
@@ -350,16 +165,16 @@ const WorkerCorrectionRequestModal: React.FC<
 						<View style={styles.timeRow}>
 							{renderSelectField(
 								"endDate",
-								`${original.month}/${correctedEndDate}`
+								getDisplayValue("endDate")
 							)}
 							{renderSelectField(
 								"endHour",
-								String(correctedEndHour).padStart(2, "0")
+								getDisplayValue("endHour")
 							)}
 							<Text style={styles.timeSeparator}>:</Text>
 							{renderSelectField(
 								"endMinute",
-								String(correctedEndMinute).padStart(2, "0")
+								getDisplayValue("endMinute")
 							)}
 						</View>
 					</View>
@@ -370,7 +185,7 @@ const WorkerCorrectionRequestModal: React.FC<
 						<View style={styles.breakRow}>
 							{renderSelectField(
 								"breakMinutes",
-								String(correctedBreakMinutes)
+								getDisplayValue("breakMinutes")
 							)}
 							<Text weight="Medium" style={styles.unitText}>
 								분
