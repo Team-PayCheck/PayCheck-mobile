@@ -9,6 +9,7 @@ import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
 import { getContracts } from "../../../api/workerApi";
+import type { ContractListItem } from "../../../types/worker/api.types";
 import { colors } from "../../../constants/colors";
 
 
@@ -20,7 +21,7 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 
 const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-	const [workplaces, setWorkplaces] = useState<any[]>([]);
+	const [workplaces, setWorkplaces] = useState<ContractListItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -40,18 +41,20 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 			setLoading(true);
 			setError(null);
 			try {
-				// 실제 API 호출
-				const res = await getContracts();
-				if (res.success) {
-					setWorkplaces(res.data);
-				} else {
-					setError(res.error?.message || '근무지 정보를 불러오지 못했습니다.');
+					// 실제 API 호출
+					const res = await getContracts();
+					if (res.success && Array.isArray(res.data)) {
+						setWorkplaces(res.data);
+					} else {
+						setWorkplaces([]);
+						setError(res.error?.message || '근무지 정보를 불러오지 못했습니다.');
+					}
+				} catch (e: any) {
+					setWorkplaces([]);
+					setError(e?.message || '근무지 정보를 불러오지 못했습니다.');
+				} finally {
+					setLoading(false);
 				}
-			} catch (e: any) {
-				setError(e?.message || '근무지 정보를 불러오지 못했습니다.');
-			} finally {
-				setLoading(false);
-			}
 		};
 		fetchContracts();
 	}, []);
@@ -64,7 +67,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		return workplaces.map((w, idx) => (
 			<WorkplaceCard
 				key={w.id || idx}
-				name={w.workplaceName || w.workerName || '-'}
+				name={w.workerName || '-'}
 				joinedAt={w.contractStartDate ? formatDate(w.contractStartDate) : '-'}
 				wage={w.hourlyWage ? `${w.hourlyWage.toLocaleString()}원` : '-'}
 			/>

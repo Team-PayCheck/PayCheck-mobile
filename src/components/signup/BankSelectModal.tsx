@@ -1,7 +1,6 @@
 import React from "react";
 import {
 	View,
-	Modal,
 	StyleSheet,
 	TouchableOpacity,
 	FlatList,
@@ -9,6 +8,7 @@ import {
 	Image,
 } from "react-native";
 import { Text } from "../common/Text";
+import BottomSheetModal from "../common/BottomSheetModal";
 import { colors } from "../../constants/colors";
 import { BANK_INFO, BANK_NAMES, type BankName } from "../../constants/bank";
 
@@ -20,7 +20,7 @@ interface BankSelectModalProps {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = (SCREEN_WIDTH - 48 - 24) / 3; // 패딩 24*2, 간격 12*2
+const ITEM_WIDTH = (SCREEN_WIDTH - 48 - 24) / 3;
 
 const BankSelectModal: React.FC<BankSelectModalProps> = ({
 	visible,
@@ -74,60 +74,24 @@ const BankSelectModal: React.FC<BankSelectModalProps> = ({
 	};
 
 	return (
-		<Modal
-			visible={visible}
-			transparent
-			animationType="slide"
-			onRequestClose={onClose}
-		>
-			<TouchableOpacity
-				style={styles.overlay}
-				activeOpacity={1}
-				onPress={onClose}
-			>
-				<TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
-					<View style={styles.handle} />
-					<Text weight="Bold" style={styles.title}>
-						은행을 선택해주세요
-					</Text>
-					<FlatList
-						data={BANK_NAMES}
-						renderItem={renderBankItem}
-						keyExtractor={(item) => item}
-						numColumns={3}
-						contentContainerStyle={styles.listContent}
-						columnWrapperStyle={styles.row}
-						showsVerticalScrollIndicator={false}
-					/>
-				</TouchableOpacity>
-			</TouchableOpacity>
-		</Modal>
+		<BottomSheetModal visible={visible} onClose={onClose} maxHeight="80%">
+			<Text weight="Bold" style={styles.title}>
+				은행을 선택해주세요
+			</Text>
+			<FlatList
+				data={BANK_NAMES}
+				renderItem={renderBankItem}
+				keyExtractor={(item) => item}
+				numColumns={3}
+				contentContainerStyle={styles.listContent}
+				columnWrapperStyle={styles.row}
+				showsVerticalScrollIndicator={false}
+			/>
+		</BottomSheetModal>
 	);
 };
 
 const styles = StyleSheet.create({
-	overlay: {
-		flex: 1,
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
-		justifyContent: "flex-end",
-	},
-	modalContainer: {
-		backgroundColor: colors.white,
-		borderTopLeftRadius: 24,
-		borderTopRightRadius: 24,
-		paddingTop: 12,
-		paddingHorizontal: 24,
-		paddingBottom: 40,
-		maxHeight: "80%",
-	},
-	handle: {
-		width: 40,
-		height: 4,
-		backgroundColor: colors.grey,
-		borderRadius: 2,
-		alignSelf: "center",
-		marginBottom: 20,
-	},
 	title: {
 		fontSize: 18,
 		color: colors.textPrimary,

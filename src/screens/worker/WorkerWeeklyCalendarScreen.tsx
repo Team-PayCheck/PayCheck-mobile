@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Alert, StyleSheet, ScrollView, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../../components/layout/Header";
@@ -9,14 +9,18 @@ import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
 import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
+import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
+import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
+import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
+import useWorkRecords from "../../hooks/worker/useWorkRecords";
 import { colors } from "../../constants/colors";
 import {
-	dummyWeekDays,
-	dummyWeekTitle,
-	dummyNotices,
-	dummyWorks,
-	dummyWeeklySummary,
-} from "../../dummyData/workerWeeklyCalendar";
+	getWeekTitle,
+	getWeekDays,
+	getWeekLabel,
+	getWeekRange,
+} from "../../utils/date";
+import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
 
@@ -29,6 +33,39 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	};
 	const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
+
+	
+	const today = new Date();
+	const weekTitle = getWeekTitle(today);
+	const weekDays = getWeekDays(today);
+	const weekLabel = getWeekLabel(today);
+	const { startDate, endDate } = useMemo(() => getWeekRange(today), []);
+
+	const { works, isLoading } = useWorkRecords(startDate, endDate);
+
+	const {
+		correctionModalVisible,
+		selectedWork,
+		openCorrectionModal,
+		closeCorrectionModal,
+		handleCorrectionSubmit,
+		addModalVisible,
+		openAddModal,
+		closeAddModal,
+		handleAddWorkSubmit,
+	} = useCorrectionRequest();
+
+	// 주간 요약 계산
+	const totalMinutes = works.reduce(
+		(sum, w) => sum + w.totalWorkMinutes,
+		0
+	);
+	const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
+	const estimatedPay = works.reduce(
+		(sum, w) => sum + (w.totalSalary ?? 0),
+		0
+	);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
@@ -38,18 +75,33 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				showsVerticalScrollIndicator={false}
 			>
 				<WeeklyDateBar
-					weekTitle={dummyWeekTitle}
-					weekDays={dummyWeekDays}
+					weekTitle={weekTitle}
+					weekDays={weekDays}
 				/>
 
 				<NoticeBoard notices={dummyNotices} />
 
-				<WorkListSection works={dummyWorks} />
+				{isLoading ? (
+					<ActivityIndicator
+						size="large"
+						color={colors.primary}
+						style={styles.loader}
+					/>
+				) : (
+					<WorkListSection
+						works={works}
+						onPressAdd={openAddModal}
+						onPressCorrectionRequest={openCorrectionModal}
+					/>
+				)}
 
 				<View style={styles.dashedLine} />
 
-				<WeeklySummary summary={dummyWeeklySummary} />
+				<WeeklySummary
+					summary={{ weekLabel, totalHours, estimatedPay }}
+				/>
 			</ScrollView>
+			
 			<MyPageDrawer
 				visible={isDrawerVisible}
 				onClose={closeDrawer}
@@ -59,6 +111,19 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
 				onPressLogout={handleLogout}
 				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
+			/>
+
+			<AddWorkRequestModal
+				visible={addModalVisible}
+				onClose={closeAddModal}
+				onSubmit={handleAddWorkSubmit}
+			/>
+
+			<WorkerCorrectionRequestModal
+				visible={correctionModalVisible}
+				onClose={closeCorrectionModal}
+				work={selectedWork}
+				onSubmit={handleCorrectionSubmit}
 			/>
 		</SafeAreaView>
 	);
@@ -82,6 +147,9 @@ const styles = StyleSheet.create({
 		borderStyle: "dashed",
 		borderWidth: 1,
 		borderColor: colors.border,
+	},
+	loader: {
+		paddingVertical: 40,
 	},
 });
 

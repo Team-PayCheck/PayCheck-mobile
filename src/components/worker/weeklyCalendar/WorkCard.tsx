@@ -61,7 +61,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 						{work.workplaceName}
 					</Text>
 					<Text weight="Bold" style={styles.dateTime}>
-						{formatDate(work.workDate)} {work.startTime} ~ {work.endTime}
+						{formatDate(work.workDate)} {work.startTime.slice(0, 5)} ~ {work.endTime.slice(0, 5)}
 					</Text>
 				</View>
 				<View style={styles.headerRight}>
@@ -90,7 +90,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>휴게 시간</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{work.breakMinutes} 분
+									{work.breakMinutes ?? 0} 분
 								</Text>
 							</View>
 						</View>
@@ -101,7 +101,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>시급</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{formatCurrency(work.salary ?? 0)} 원
+									{work.salary != null ? `${formatCurrency(work.salary)} 원` : "? 원"}
 								</Text>
 							</View>
 						</View>
@@ -109,7 +109,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>총 급여</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{formatCurrency(work.totalSalary)} 원
+									{formatCurrency(work.totalSalary ?? 0)} 원
 								</Text>
 							</View>
 						</View>
