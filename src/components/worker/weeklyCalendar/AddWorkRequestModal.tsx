@@ -6,6 +6,7 @@ import {
 	ActivityIndicator,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
 import WheelPicker from "../../common/WheelPicker";
 import BottomSheetModal from "../../common/BottomSheetModal";
@@ -191,20 +192,13 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 
 			{/* 요청 보내기 버튼 */}
 			<View style={styles.submitRow}>
-				<TouchableOpacity
-					style={[
-						styles.submitButton,
-						!selectedWorkplaceId && styles.submitButtonDisabled,
-					]}
+				<PrimaryButton
+					text="요청 보내기"
 					onPress={handleSubmit}
-					activeOpacity={0.8}
 					disabled={!selectedWorkplaceId}
-				>
-					<Feather name="send" size={16} color={colors.white} />
-					<Text weight="Bold" style={styles.submitText}>
-						요청 보내기
-					</Text>
-				</TouchableOpacity>
+					icon={<Feather name="send" size={16} color={colors.white} />}
+					size="compact"
+				/>
 			</View>
 		</BottomSheetModal>
 	);
@@ -311,22 +305,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "flex-end",
 		marginTop: 8,
-	},
-	submitButton: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 8,
-		backgroundColor: colors.primary,
-		paddingHorizontal: 24,
-		paddingVertical: 14,
-		borderRadius: 28,
-	},
-	submitButtonDisabled: {
-		backgroundColor: colors.textDisabled,
-	},
-	submitText: {
-		fontSize: 15,
-		color: colors.white,
 	},
 });
 
