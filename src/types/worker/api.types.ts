@@ -1,3 +1,33 @@
+// 계약 목록 아이템 (GET /api/worker/contracts)
+export interface ContractListItem {
+	id: number;
+	workerName: string;
+	workerCode: string;
+	workerPhone: string;
+	hourlyWage: number;
+	contractStartDate: string;
+	contractEndDate: string | null;
+	isActive: boolean;
+}
+
+// 계약 상세 (GET /api/worker/contracts/{id})
+export interface ContractDetail {
+	id: number;
+	workplaceId: number;
+	workplaceName: string;
+	workerId: number;
+	workerName: string;
+	workerCode: string;
+	workerPhone: string;
+	hourlyWage: number;
+	workSchedules: string;
+	contractStartDate: string;
+	contractEndDate: string | null;
+	paymentDay: number;
+	isActive: boolean;
+	payrollDeductionType: string;
+}
+
 // 정정요청 타입
 export type RequestType = "CREATE" | "UPDATE" | "DELETE";
 export type CorrectionStatus = "PENDING" | "APPROVED" | "REJECTED";

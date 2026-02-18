@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
 	View,
 	Modal,
@@ -6,24 +6,25 @@ import {
 	TouchableOpacity,
 	Dimensions,
 	Animated,
+	ActivityIndicator,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import WheelPicker from "../../common/WheelPicker";
 import type { WheelPickerItem } from "../../common/WheelPicker";
+import { getContracts, getContractDetail } from "../../../api/workerApi";
 import { colors } from "../../../constants/colors";
 import { formatCurrency } from "../../../utils/format";
 
-export interface WorkplaceOption {
-	id: number;
-	name: string;
-	salary: number;
+interface WorkplaceOption {
+	contractId: number;
+	workplaceName: string;
+	hourlyWage: number;
 }
 
 interface AddWorkRequestModalProps {
 	visible: boolean;
 	onClose: () => void;
-	workplaces: WorkplaceOption[];
 	onSubmit: (data: {
 		contractId: number;
 		requestedWorkDate: string;
@@ -80,9 +81,10 @@ const getDateItems = (): WheelPickerItem[] => {
 const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 	visible,
 	onClose,
-	workplaces,
 	onSubmit,
 }) => {
+	const [workplaces, setWorkplaces] = useState<WorkplaceOption[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
 	const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<
 		number | null
 	>(null);
@@ -100,8 +102,37 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const overlayAnim = useRef(new Animated.Value(0)).current;
 
+	// 모달 열릴 때 계약 목록 → 상세 조회하여 근무지 목록 구성
+	const fetchWorkplaces = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			const contractsRes = await getContracts();
+			const activeContracts =
+				contractsRes.data?.filter((c) => c.isActive) ?? [];
+
+			const details = await Promise.all(
+				activeContracts.map(async (contract) => {
+					const detailRes = await getContractDetail(contract.id);
+					return {
+						contractId: contract.id,
+						workplaceName:
+							detailRes.data?.workplaceName ?? "알 수 없음",
+						hourlyWage: detailRes.data?.hourlyWage ?? 0,
+					};
+				})
+			);
+
+			setWorkplaces(details);
+		} catch {
+			setWorkplaces([]);
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
+
 	useEffect(() => {
 		if (visible) {
+			fetchWorkplaces();
 			Animated.parallel([
 				Animated.timing(overlayAnim, {
 					toValue: 1,
@@ -143,16 +174,16 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 	const workplaceItems: WheelPickerItem[] = useMemo(
 		() =>
 			workplaces.map((wp) => ({
-				label: wp.name,
-				value: wp.id,
+				label: wp.workplaceName,
+				value: wp.contractId,
 			})),
 		[workplaces]
 	);
 
 	const selectedWorkplace = workplaces.find(
-		(wp) => wp.id === selectedWorkplaceId
+		(wp) => wp.contractId === selectedWorkplaceId
 	);
-	const salary = selectedWorkplace?.salary ?? 0;
+	const salary = selectedWorkplace?.hourlyWage ?? 0;
 
 	const handleSubmit = () => {
 		if (!selectedWorkplaceId) return;
@@ -206,7 +237,7 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 			case "workplace":
 				return {
 					items: workplaceItems,
-					selectedValue: selectedWorkplaceId ?? workplaces[0]?.id ?? 0,
+					selectedValue: selectedWorkplaceId ?? workplaces[0]?.contractId ?? 0,
 					width: SCREEN_WIDTH - 80,
 				};
 			case "date":
@@ -252,7 +283,7 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 		let displayValue = "";
 		switch (target) {
 			case "workplace":
-				displayValue = selectedWorkplace?.name ?? "근무지를 선택하세요..";
+				displayValue = selectedWorkplace?.workplaceName ?? "근무지를 선택하세요..";
 				break;
 			case "date": {
 				const month = new Date().getMonth() + 1;
@@ -353,9 +384,17 @@ const AddWorkRequestModal: React.FC<AddWorkRequestModalProps> = ({
 						<Text weight="Medium" style={styles.label}>
 							근무지
 						</Text>
-						{renderSelectField("근무지", "workplace", {
-							alignSelf: "flex-start",
-						})}
+						{isLoading ? (
+							<ActivityIndicator
+								size="small"
+								color={colors.primary}
+								style={{ alignSelf: "flex-start", padding: 10 }}
+							/>
+						) : (
+							renderSelectField("근무지", "workplace", {
+								alignSelf: "flex-start",
+							})
+						)}
 					</View>
 
 					{/* 근무 시간 */}

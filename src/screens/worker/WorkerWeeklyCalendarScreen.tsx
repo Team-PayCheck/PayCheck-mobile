@@ -16,13 +16,6 @@ import {
 	dummyWeeklySummary,
 } from "../../dummyData/workerWeeklyCalendar";
 
-// TODO: API 연동 시 근로자의 근무지 목록을 가져오는 로직으로 교체
-const dummyWorkplaces = [
-	{ id: 10, name: "교내근로", salary: 10300 },
-	{ id: 11, name: "스타벅스 건대점", salary: 10300 },
-	{ id: 12, name: "CU 화양점", salary: 10300 },
-];
-
 const WorkerWeeklyCalendarScreen: React.FC = () => {
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
@@ -81,7 +74,6 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 			<AddWorkRequestModal
 				visible={addModalVisible}
 				onClose={() => setAddModalVisible(false)}
-				workplaces={dummyWorkplaces}
 				onSubmit={handleAddWorkSubmit}
 			/>
 		</SafeAreaView>
