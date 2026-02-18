@@ -1,3 +1,8 @@
+/**
+ * 근무 추가 요청(CREATE) 및 근무 기록 정정 요청(UPDATE) 모달의
+ * 상태 관리와 API 호출을 담당하는 훅.
+ * 주간캘린더, 월간캘린더 등 여러 스크린에서 재사용 가능.
+ */
 import { useState, useCallback } from "react";
 import { Alert } from "react-native";
 import { createCorrectionRequest } from "../../api/workerApi";
