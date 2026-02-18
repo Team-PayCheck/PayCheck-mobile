@@ -3,7 +3,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { useOnboardingStore } from "../../stores/onboardingStore";
 import api from "../../api/axios";
 
-type InitialRoute = "Onboarding" | "Welcome" | "EmployerHome" | "WorkerHome";
+type InitialRoute = "Onboarding" | "Welcome" | "EmployerHome" | "WorkerWeeklyCalendar";
 
 export const useOnboardingStatus = () => {
 	const [initialRoute, setInitialRoute] = useState<InitialRoute>("Onboarding");
@@ -51,8 +51,8 @@ export const useOnboardingStatus = () => {
 			if (isLoggedIn) {
 				const isValid = await validateToken();
 				if (isValid) {
-					const targetRoute = userInfo?.userType === "EMPLOYER" ? "EmployerHome" : "WorkerHome";
-					setInitialRoute("WorkerHome");
+					const targetRoute = userInfo?.userType === "EMPLOYER" ? "EmployerHome" : "WorkerWeeklyCalendar";
+					setInitialRoute("WorkerWeeklyCalendar"); // !!!! 일단 근로자 홈으로 고정 (추후 userType에 따라 분기)
 				} else {
 					// 토큰 만료 + 갱신 실패 → Welcome으로
 					setInitialRoute("Welcome");

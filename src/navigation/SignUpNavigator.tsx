@@ -17,7 +17,7 @@ export type SignUpStackParamList = {
 	Step5Complete: undefined;
 	// RootNavigator의 화면들 (완료 후 이동용)
 	EmployerHome: undefined;
-	WorkerHome: undefined;
+	WorkerWeeklyCalendar: undefined;
 	WorkplaceManage: undefined;
 	Welcome: undefined;
 };
