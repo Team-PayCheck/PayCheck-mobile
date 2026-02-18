@@ -64,7 +64,7 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 					<View style={styles.menuGroup}>
 						<MenuButton
 							title="내 프로필 수정"
-							iconSource={require("../../../assets/images/signup/worker-icon.png")}
+							iconSource={require("../../../assets/images/mypage/user.png")}
 							onPress={onPressProfileEdit}
 						/>
 						<MenuButton

@@ -44,13 +44,15 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={() => setIsDrawerVisible(true)} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerArea}>
-          <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-          <View style={styles.titleRow}>
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
             <Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
+          </View>
+          <View style={styles.illustWrapper}>
             <Image
               source={require("../../../assets/images/mypage/user.png")}
-              style={styles.titleImage}
+              style={styles.illust}
               resizeMode="contain"
             />
           </View>
@@ -155,25 +157,28 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     gap: 24,
   },
-  headerArea: {
-    paddingTop: 8,
-    gap: 12,
-  },
-  titleRow: {
+  headerRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
+    paddingTop: 10,
+    marginBottom: 12,
+  },
+  illustWrapper: {
+    width: 100,
+    height: 100,
+    marginTop: -8,
+    marginRight: -8,
+  },
+  illust: {
+    width: "100%",
+    height: "100%",
   },
   title: {
     marginTop: 4,
     fontSize: 24,
     color: colors.textPrimary,
     lineHeight: 52,
-  },
-  titleImage: {
-    width: 100,
-    height: 100,
-    marginTop: -2,
   },
   formArea: {
     marginTop: 8,
