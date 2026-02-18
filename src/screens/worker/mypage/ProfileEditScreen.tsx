@@ -59,7 +59,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         </View>
         <View style={styles.formArea}>
           <View style={styles.nameRow}>
-            <ProfilePhoto imageSource={require("../../../assets/images/mypage/user.png")}/>
+            <ProfilePhoto imageSource={require("../../../assets/images/mypage/basicProfileImage.png")}/>
             <ProfileFieldRow
               label=""
               value={name}

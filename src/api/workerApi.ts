@@ -2,12 +2,35 @@ import { AxiosError } from "axios";
 import api from "./axios";
 import type { ApiResponse } from "../types/api.types";
 import type { WorkItem } from "../types/worker.types";
+import type { WorkerResponse } from "./userApiResponse.type";
 import type {
 	ContractListItem,
 	ContractDetail,
 	CorrectionRequestParams,
 	CorrectionRequestData,
 } from "../types/worker/api.types";
+
+
+/**
+ * 근로자 정보 조회
+ */
+export const getWorkerInfo = async (
+	userId: number
+): Promise<ApiResponse<WorkerResponse>> => {
+	try {
+		const { data } = await api.get<ApiResponse<WorkerResponse>>(
+			`/api/workers/user/${userId}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<WorkerResponse>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"근로자 정보 조회 실패";
+		throw new Error(message);
+	}
+};
 
 /**
  * 근로자 계약 목록 조회

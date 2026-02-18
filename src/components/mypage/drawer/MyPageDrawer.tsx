@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ProfileCard from "./ProfileCard";
+import { useWorkerData } from "../../../hooks/worker/useUserData";
 import MenuButton from "./MenuButton";
 import SmallActionButton from "./SmallActionButton";
 import { colors } from "../../../constants/colors";
@@ -38,6 +39,7 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 	onPressLogout,
 	onPressWithdraw,
 }) => {
+	const { user, worker, isLoading } = useWorkerData();
 	const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
 
 	useEffect(() => {
@@ -52,14 +54,25 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 		<Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
 			<View style={styles.overlay}>
 				<Pressable style={styles.backdrop} onPress={onClose} />
-				<Animated.View style={[styles.drawerContainer, { transform: [{ translateX }] }]}>
+				<Animated.View style={[styles.drawerContainer, { transform: [{ translateX }] }]}> 
 					<View style={styles.drawerTop}>
 						<TouchableOpacity onPress={onClose} activeOpacity={0.8}>
 							<Ionicons name="close" size={30} color={colors.textPrimary} />
 						</TouchableOpacity>
 					</View>
 
-					<ProfileCard name="홍길동" code="@gildonghong123" />
+					{/* 프로필 정보 연동 */}
+						{isLoading ? (
+							<ProfileCard name="로딩중" code="..." />
+						) : worker ? (
+							<ProfileCard
+								name={worker.name}
+								code={worker.workerCode ? `@${worker.workerCode}` : "-"}
+								imageUri={user?.profileImageUrl}
+							/>
+						) : (
+							<ProfileCard name="정보 없음" code="-" />
+						)}
 
 					<View style={styles.menuGroup}>
 						<MenuButton

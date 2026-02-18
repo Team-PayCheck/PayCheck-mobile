@@ -16,7 +16,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ name, code, imageUri }) => {
 			       source={
 				       imageUri
 					       ? { uri: imageUri }
-					       : require("../../../assets/images/mypage/user.png")
+					       : require("../../../assets/images/mypage/basicProfileImage.png")
 			       }
 			       style={styles.profileImage}
 		       />
