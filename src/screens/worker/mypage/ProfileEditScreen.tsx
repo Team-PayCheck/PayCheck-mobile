@@ -3,7 +3,6 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  Image,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
@@ -45,17 +44,8 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
-            <Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
-          </View>
-          <View style={styles.illustWrapper}>
-            <Image
-              source={require("../../../assets/images/mypage/user.png")}
-              style={styles.illust}
-              resizeMode="contain"
-            />
-          </View>
+          <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+          <Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
         </View>
 
         {isLoading ? (
@@ -156,21 +146,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
     paddingTop: 10,
     marginBottom: 12,
-  },
-  illustWrapper: {
-    width: 100,
-    height: 100,
-    marginTop: -8,
-    marginRight: -8,
-  },
-  illust: {
-    width: "100%",
-    height: "100%",
   },
   title: {
     marginTop: 4,
