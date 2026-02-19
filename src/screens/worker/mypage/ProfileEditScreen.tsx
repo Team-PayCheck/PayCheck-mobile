@@ -19,6 +19,7 @@ import { colors } from "../../../constants/colors";
 import { useWorkerData } from "../../../hooks/worker/useUserData";
 import ProfileEditModal from "../../../components/mypage/ProfileEditModal";
 import AccountEditModal from "../../../components/mypage/AccountEditModal";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "ProfileEdit">;
 
@@ -33,7 +34,6 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
     closeDrawer();
     navigation.navigate(route);
   };
-  const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   const profileImageUri = user?.profileImageUrl ?? null;

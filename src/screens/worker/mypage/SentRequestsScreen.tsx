@@ -17,6 +17,7 @@ import SentRequestCard from "../../../components/mypage/sentRequests/SentRequest
 import { colors } from "../../../constants/colors";
 import { useGetCorrectionRequests } from "../../../hooks/worker/useGetCorrectionRequests";
 import type { CorrectionStatus } from "../../../api/worker/types";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "SentRequests">;
 
@@ -34,7 +35,6 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
     closeDrawer();
     navigation.navigate(route);
   };
-  const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   const {

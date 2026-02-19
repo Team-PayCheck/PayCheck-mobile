@@ -9,6 +9,7 @@ import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import { colors } from "../../../constants/colors";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "Withdraw">;
@@ -21,7 +22,6 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
-	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 탈퇴 버튼 클릭 시 확인 모달

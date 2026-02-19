@@ -11,6 +11,7 @@ import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceC
 import { getContracts } from "../../../api/worker";
 import type { ContractListItem } from "../../../api/worker/types";
 import { colors } from "../../../constants/colors";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
@@ -32,7 +33,6 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		navigation.navigate(route);
 	};
 
-	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 컴포넌트 마운트 시 근무지(계약) 정보 fetch
