@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 24,
     color: colors.textPrimary,
+    lineHeight: 52,
     marginBottom: 16,
   },
   filterRow: {
