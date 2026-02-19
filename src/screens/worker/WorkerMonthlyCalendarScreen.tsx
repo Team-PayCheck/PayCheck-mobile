@@ -10,13 +10,22 @@ import { workerMonthlyWorkList, workplaceSalaryList } from "../../dummyData/work
 import { colors } from "../../constants/colors";
 import MonthlySalarySummary from "../../components/worker/monthlyCalendar/MonthlySalarySummary";
 import WorkplaceSalarySummary from "../../components/worker/monthlyCalendar/WorkplaceSalarySummary";
+import { WorkerStackParamList } from "../../navigation/WorkerStack";
 
-const WorkerMonthlyCalendarScreen: React.FC = () => {
+const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const closeDrawer = () => setIsDrawerVisible(false);
   const openDrawer = () => setIsDrawerVisible(true);
+
+  // Drawer 내비게이션 핸들러
+  const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
+    closeDrawer();
+    navigation.navigate(route);
+  };
+  const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
+  const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   // 월 이동 핸들러
   const handlePrevMonth = () => {
@@ -91,7 +100,12 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
       <MyPageDrawer
         visible={isDrawerVisible}
         onClose={closeDrawer}
-        // ...기타 Drawer 핸들러는 이후 추가
+        onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
+        onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
+        onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+        onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+        onPressLogout={handleLogout}
+        onPressWithdraw={() => navigateFromDrawer("Withdraw")}
       />
     </SafeAreaView>
   );

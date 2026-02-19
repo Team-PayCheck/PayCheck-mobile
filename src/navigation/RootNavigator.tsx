@@ -7,8 +7,6 @@ import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerStack from "../navigation/WorkerStack";
-import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
-import WorkerMonthlyCalendarScreen from "../screens/worker/WorkerMonthlyCalendarScreen";
 import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
 
 export type RootStackParamList = {
@@ -33,7 +31,7 @@ const RootNavigator = () => {
 	return (
 		<NavigationContainer>
 			<Stack.Navigator
-				initialRouteName={"WorkerMonthlyCalendar"} // 월간캘린더 구현하고 initialRoute로 바꾸는거 잊지말기 제발
+				initialRouteName={initialRoute} 
 				screenOptions={{
 					headerShown: false,
 				}}
@@ -51,7 +49,7 @@ const RootNavigator = () => {
 							onLoginSuccess={(userType) => {
 								// userType에 따라 다른 화면으로 이동
 								const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerWeeklyCalendar';
-								props.navigation.replace("WorkerMonthlyCalendar"); // 월간캘린더 구현하고 targetRoute로 바꾸는거 잊지말기 제발
+								props.navigation.replace(targetRoute); 
 							}}
 							onSignUpNeeded={(kakaoAccessToken) => {
 								// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
@@ -69,7 +67,6 @@ const RootNavigator = () => {
 				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
 				<Stack.Screen name="WorkerWeeklyCalendar" component={WorkerStack} />
-				<Stack.Screen name="WorkerMonthlyCalendar" component={WorkerMonthlyCalendarScreen} />
 				<Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>

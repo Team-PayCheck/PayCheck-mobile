@@ -4,6 +4,9 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "./Text";
 import { colors } from "../../constants/colors";
 import type { WeekDay } from "../../types/worker.types";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { WorkerStackParamList } from "../../navigation/WorkerStack";
 
 interface WeeklyDateBarProps {
 	weekTitle: string;
@@ -20,11 +23,20 @@ const WeeklyDateBar: React.FC<WeeklyDateBarProps> = ({
 	onPressCalendarIcon,
 	onPressDay,
 }) => {
+	const navigation = useNavigation<NativeStackNavigationProp<WorkerStackParamList>>();
 	const getIsSelected = (day: WeekDay) => {
 		if (selectedDate !== undefined) {
 			return day.date === selectedDate;
 		}
 		return day.isToday;
+	};
+
+	const handleCalendarIcon = () => {
+		if (onPressCalendarIcon) {
+			onPressCalendarIcon();
+		} else {
+			navigation.navigate("WorkerMonthlyCalendar");
+		}
 	};
 
 	return (
@@ -34,7 +46,7 @@ const WeeklyDateBar: React.FC<WeeklyDateBarProps> = ({
 				<Text weight="ExtraBold" style={styles.weekTitle}>
 					{weekTitle}
 				</Text>
-				<TouchableOpacity onPress={onPressCalendarIcon} activeOpacity={0.7}>
+				<TouchableOpacity onPress={handleCalendarIcon} activeOpacity={0.7}>
 					<Feather name="calendar" size={22} color={colors.textPrimary} />
 				</TouchableOpacity>
 			</View>
