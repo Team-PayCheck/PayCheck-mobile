@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Text } from "../common/Text";
 import { colors } from "../../constants/colors";
 
@@ -27,7 +27,12 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
   dotInfo,
 }) => {
   return (
-    <View style={styles.cell}>
+    <TouchableOpacity
+      style={styles.cell}
+      activeOpacity={type === 'current' ? 0.7 : 1}
+      disabled={type !== 'current'}
+      onPress={() => type === 'current' && onPress(date)}
+    >
       {/* 날짜 숫자 및 스타일 */}
       <Text
         style={[
@@ -38,7 +43,8 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
           type !== 'current' && styles.outsideMonth,
         ]}
         weight="SemiBold"
-        onPress={() => type === 'current' && onPress(date)}
+        selectable={false}
+        suppressHighlighting={true}
       >
         {date.getDate()}
       </Text>
@@ -94,7 +100,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
           return dots;
         })()}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
