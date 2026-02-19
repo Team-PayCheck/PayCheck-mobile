@@ -49,7 +49,7 @@ const RootNavigator = () => {
 							onLoginSuccess={(userType) => {
 								// userType에 따라 다른 화면으로 이동
 								const targetRoute = userType === 'EMPLOYER' ? 'EmployerHome' : 'WorkerWeeklyCalendar';
-								props.navigation.replace("WorkerWeeklyCalendar");
+								props.navigation.replace(targetRoute);
 							}}
 							onSignUpNeeded={(kakaoAccessToken) => {
 								// 회원가입 화면으로 이동하면서 카카오 액세스 토큰 전달
