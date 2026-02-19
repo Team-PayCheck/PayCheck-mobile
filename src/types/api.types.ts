@@ -7,7 +7,14 @@ export interface ApiResponse<T = unknown> {
 	error?: {
 		message: string;
 		code?: string;
+		fieldErrors?: FieldError[];
 	};
+}
+
+// 필드별 유효성 검증 에러
+export interface FieldError {
+	field: string;
+	message: string;
 }
 
 // Axios 커스텀 요청 설정 (_retry 속성 추가)

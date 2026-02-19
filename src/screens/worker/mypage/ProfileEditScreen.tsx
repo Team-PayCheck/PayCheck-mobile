@@ -18,12 +18,14 @@ import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import { ProfileImagePicker } from "../../../components/signup";
 import { colors } from "../../../constants/colors";
 import { useWorkerData } from "../../../hooks/worker/useUserData";
+import ProfileEditModal from "../../../components/mypage/ProfileEditModal";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "ProfileEdit">;
 
 const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
-  const { user, worker, isLoading } = useWorkerData();
+  const { user, worker, isLoading, refetch } = useWorkerData();
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isProfileEditVisible, setIsProfileEditVisible] = useState(false);
 
   const closeDrawer = () => setIsDrawerVisible(false);
   const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
@@ -67,7 +69,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
                 <InfoRow label="이름" value={user?.name ?? "-"} />
                 <InfoRow label="전화번호" value={user?.phone ?? "-"} />
               </View>
-              <TouchableOpacity style={styles.sectionButton} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.sectionButton} activeOpacity={0.8} onPress={() => setIsProfileEditVisible(true)}>
                 <Text weight="SemiBold" style={styles.sectionButtonText}>프로필 수정하기</Text>
               </TouchableOpacity>
             </View>
@@ -105,6 +107,13 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
         onPressLogout={handleLogout}
         onPressWithdraw={() => navigateFromDrawer("Withdraw")}
+      />
+
+      <ProfileEditModal
+        visible={isProfileEditVisible}
+        onClose={() => setIsProfileEditVisible(false)}
+        user={user}
+        onSuccess={refetch}
       />
     </SafeAreaView>
   );
