@@ -13,10 +13,11 @@ export const colors = {
 	backgroundGrey: "#F5F5F5",
 
 	// 텍스트
-	textPrimary: "#353535",
+	textPrimary: "#161616",
 	textSecondary: "#777777",
 	textMuted: "#AAAAAA",
 	textDisabled: "#CCCCCC",
+	
 
 	// 테두리/구분선
 	border: "#E8E8E8",

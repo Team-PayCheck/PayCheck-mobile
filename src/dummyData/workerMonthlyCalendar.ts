@@ -1,5 +1,31 @@
 import type { WorkItem } from "../types/worker.types";
 
+// 근무지별 급여 더미 데이터
+export const workplaceSalaryList = [
+  {
+    workplaceName: "버거킹",
+    baseSalary: 200000,
+    deduction: 50000,
+    maxSalary: 250000,
+    status: "송금 대기중",
+  },
+  {
+    workplaceName: "교내근로",
+    baseSalary: 200000,
+    deduction: 50000,
+    maxSalary: 250000,
+    status: "송금 대기중",
+  },
+  {
+    workplaceName: "맥도날드",
+    baseSalary: 200000,
+    deduction: 50000,
+    maxSalary: 250000,
+    status: "송금 대기중",
+  },
+];
+
+// 월별 근무 리스트 더미 데이터
 export const workerMonthlyWorkList: WorkItem[] = [
   {
     id: 1,

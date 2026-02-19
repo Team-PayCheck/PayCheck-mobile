@@ -6,9 +6,10 @@ import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import SelectedDateWorkList from "../../components/worker/monthlyCalendar/SelectedDateWorkList";
-import { workerMonthlyWorkList } from "../../dummyData/workerMonthlyCalendar";
+import { workerMonthlyWorkList, workplaceSalaryList } from "../../dummyData/workerMonthlyCalendar";
 import { colors } from "../../constants/colors";
 import MonthlySalarySummary from "../../components/worker/monthlyCalendar/MonthlySalarySummary";
+import WorkplaceSalarySummary from "../../components/worker/monthlyCalendar/WorkplaceSalarySummary";
 
 const WorkerMonthlyCalendarScreen: React.FC = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -47,6 +48,9 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const estimatedPay = workerMonthlyWorkList.reduce((sum, w) => sum + (w.totalSalary ?? 0), 0);
 
+  // 근무지별 급여 더미 데이터 (실제 로직은 추후 API 연동)
+  const workplaces = workplaceSalaryList;
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={openDrawer} />
@@ -79,7 +83,10 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
           totalHours={totalHours}
           estimatedPay={estimatedPay}
         />
-        {/* 이후 급여 상세 카드 영역 추가 */}
+        <WorkplaceSalarySummary
+          workplaces={workplaces}
+          onPressDetail={() => {}}
+        />
       </ScrollView>
       <MyPageDrawer
         visible={isDrawerVisible}
