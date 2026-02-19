@@ -228,27 +228,3 @@ export const workerMonthlyWorkList: WorkItem[] = [
     salary: 10000,
   },
 ];
-
-// Calendar(월간캘린더)에서 날짜별 점(dot) 표시용 데이터 변환 함수
-// - count: 해당 날짜의 근무 개수(최대 3개까지 점으로 표시)
-// - hasCorrectionRequest: 해당 날짜에 정정요청(수정됨)이 1개라도 있으면 true → 첫 점이 빨간색
-//   (isModified가 true인 근무가 있으면 true)
-//
-// 반환 형태: { [date: string]: { count: number; hasCorrectionRequest: boolean } }
-export function getWorkDotsFromWorkList(workList: WorkItem[]) {
-  const dots: { [date: string]: { count: number; hasCorrectionRequest: boolean } } = {};
-  for (const work of workList) {
-    const date = work.workDate;
-    // 날짜별 객체가 없으면 초기화
-    if (!dots[date]) {
-      dots[date] = { count: 0, hasCorrectionRequest: false };
-    }
-    // 근무 1건 추가
-    dots[date].count++;
-    // 정정요청(수정됨)이 있으면 해당 날짜에 표시
-    if (work.isModified) {
-      dots[date].hasCorrectionRequest = true;
-    }
-  }
-  return dots;
-}
