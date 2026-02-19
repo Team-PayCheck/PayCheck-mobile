@@ -1,98 +1,226 @@
 import React from "react";
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
+import type {
+  CorrectionRequestResponse,
+  CorrectionRequestData,
+} from "../../../api/worker/types";
 
-export interface SentRequestCardProps {
-  request: any;
+interface SentRequestCardProps {
+  request: CorrectionRequestResponse;
   expanded: boolean;
   onToggle: () => void;
+  detail: CorrectionRequestData | null;
+  isDetailLoading: boolean;
+  onDelete?: (id: number) => void;
+  isDeleting?: boolean;
 }
 
-const SentRequestCard: React.FC<SentRequestCardProps> = ({ request, expanded, onToggle }) => {
-  const r = request;
+/** type 한글 라벨 */
+const TYPE_LABEL: Record<string, string> = {
+  CREATE: "추가",
+  UPDATE: "수정",
+  DELETE: "삭제",
+};
+
+/** status 한글 라벨 + 스타일 키 */
+const STATUS_CONFIG: Record<string, { label: string; style: "pending" | "approved" | "rejected" }> = {
+  PENDING: { label: "대기", style: "pending" },
+  APPROVED: { label: "승인", style: "approved" },
+  REJECTED: { label: "거절", style: "rejected" },
+};
+
+/** "HH:mm" or "HH:mm:ss" → { hour, min } */
+const parseTime = (time: string | null) => {
+  if (!time) return { hour: "--", min: "--" };
+  const [h, m] = time.split(":");
+  return { hour: h, min: m };
+};
+
+/** "2026-02-18" → "2/18" */
+const formatShortDate = (date: string) => {
+  const d = new Date(date);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+};
+
+/** "2026-02-18" → "2026.02.18" */
+const formatFullDate = (date: string) => date.replace(/-/g, ".");
+
+const SentRequestCard: React.FC<SentRequestCardProps> = ({
+  request,
+  expanded,
+  onToggle,
+  detail,
+  isDetailLoading,
+  onDelete,
+  isDeleting,
+}) => {
+  const statusConfig = STATUS_CONFIG[request.status] ?? { label: request.status, style: "pending" };
+  const typeLabel = TYPE_LABEL[request.type] ?? request.type;
+  const reqStart = parseTime(request.requestedStartTime);
+  const reqEnd = parseTime(request.requestedEndTime);
+
+  const handleDelete = () => {
+    Alert.alert("요청 취소", "이 요청을 취소하시겠습니까?", [
+      { text: "아니오", style: "cancel" },
+      { text: "취소하기", style: "destructive", onPress: () => onDelete?.(request.id) },
+    ]);
+  };
+
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View style={{ marginBottom: 16 }}>
       <View style={[styles.card, expanded && styles.cardExpanded]}>
         {/* 카드 헤더 */}
-        <View style={styles.cardHeaderRow}>
+        <TouchableOpacity style={styles.cardHeaderRow} onPress={onToggle} activeOpacity={0.7}>
           <View style={styles.cardLeft}>
-            <Image
-              source={r.image}
-              style={styles.profileImg}
-              resizeMode="cover"
-            />
+            <View style={styles.typeBadge}>
+              <Text weight="Bold" style={styles.typeBadgeText}>{typeLabel}</Text>
+            </View>
             <View style={styles.infoCol}>
-              <Text weight="Medium" style={styles.profileName}>{r.workplace}</Text>
-              <Text weight="Bold" style={styles.timeText}>{`${r.date} ${r.time}`}</Text>
+              <Text weight="Medium" style={styles.workplaceName}>{request.workplaceName}</Text>
+              <Text weight="Bold" style={styles.timeText}>
+                {formatShortDate(request.workDate)} {reqStart.hour}:{reqStart.min} ~ {reqEnd.hour}:{reqEnd.min}
+              </Text>
             </View>
           </View>
           <View style={styles.cardRight}>
-            <View style={[styles.statusPill, r.status === "대기" ? styles.statusPending : styles.statusApproved]}>
-              <Text weight="Medium" style={r.status === "대기" ? styles.statusPendingText : styles.statusApprovedText}>{r.status}</Text>
+            <View style={[styles.statusPill, styles[`status_${statusConfig.style}`]]}>
+              <Text weight="Medium" style={styles[`statusText_${statusConfig.style}`]}>{statusConfig.label}</Text>
             </View>
             <Feather
               name={expanded ? "chevron-up" : "chevron-down"}
               size={22}
               color={colors.textSecondary}
               style={{ marginLeft: 6 }}
-              onPress={onToggle}
             />
           </View>
-        </View>
+        </TouchableOpacity>
+
         {/* 카드 상세 */}
         {expanded && (
           <View style={styles.detailBox}>
-            <View style={styles.detailGapCol}>
-              <Text style={styles.detailLabel}>근무지</Text>
-              <View style={styles.detailValueBox}>
-                <Text style={styles.detailValueText}>{r.detail.workplaceName}</Text>
-              </View>
-              <Text style={styles.detailLabel}>근무 시간</Text>
-              <View style={styles.detailTimeRow}>
-                <View style={styles.detailDateBox}>
-                  <Text style={styles.detailValueText}>{r.detail.workDate}</Text>
-                </View>
-                <View style={styles.detailHourRow}>
-                  <View style={styles.detailHourBox}>
-                    <Text style={styles.detailValueText}>{r.detail.startHour}</Text>
-                  </View>
-                  <Text>:</Text>
-                  <View style={styles.detailHourBox}>
-                    <Text style={styles.detailValueText}>{r.detail.startMin}</Text>
-                  </View>
-                  <Text style={styles.detailTilde}>~</Text>
-                  <View style={styles.detailHourBox}>
-                    <Text style={styles.detailValueText}>{r.detail.endHour}</Text>
-                  </View>
-                  <Text>:</Text>
-                  <View style={styles.detailHourBox}>
-                    <Text style={styles.detailValueText}>{r.detail.endMin}</Text>
+            {isDetailLoading ? (
+              <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 20 }} />
+            ) : detail ? (
+              <View style={styles.detailGapCol}>
+                {/* 요청 유형 */}
+                <View>
+                  <Text style={styles.detailLabel}>요청 유형</Text>
+                  <View style={styles.detailValueBox}>
+                    <Text style={styles.detailValueText}>근무 {typeLabel} 요청</Text>
                   </View>
                 </View>
-              </View>
-              <View style={styles.detailRowWithGap}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.detailLabel}>휴게 시간</Text>
-                  <View style={styles.detailWageBox}>
-                    <Text style={styles.detailValueText}>{r.detail.breakMin}</Text>
-                    <Text style={styles.detailUnit}>분</Text>
+
+                {/* 요청 근무 시간 */}
+                <View>
+                  <Text style={styles.detailLabel}>요청 근무 시간</Text>
+                  <View style={styles.detailTimeRow}>
+                    <View style={styles.detailDateBox}>
+                      <Text style={styles.detailValueText}>{formatFullDate(detail.requestedWorkDate)}</Text>
+                    </View>
+                    <View style={styles.detailHourRow}>
+                      <View style={styles.detailHourBox}>
+                        <Text style={styles.detailValueText}>{parseTime(detail.requestedStartTime).hour}</Text>
+                      </View>
+                      <Text>:</Text>
+                      <View style={styles.detailHourBox}>
+                        <Text style={styles.detailValueText}>{parseTime(detail.requestedStartTime).min}</Text>
+                      </View>
+                      <Text style={styles.detailTilde}>~</Text>
+                      <View style={styles.detailHourBox}>
+                        <Text style={styles.detailValueText}>{parseTime(detail.requestedEndTime).hour}</Text>
+                      </View>
+                      <Text>:</Text>
+                      <View style={styles.detailHourBox}>
+                        <Text style={styles.detailValueText}>{parseTime(detail.requestedEndTime).min}</Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.detailLabel}>시급</Text>
-                  <View style={styles.detailWageBox}>
-                    <Text style={styles.detailValueText}>{r.detail.wage}</Text>
-                    <Text style={styles.detailUnit}>원</Text>
+
+                {/* 원본 근무 시간 (UPDATE/DELETE) */}
+                {detail.type !== "CREATE" && detail.originalStartTime && (
+                  <View>
+                    <Text style={styles.detailLabel}>기존 근무 시간</Text>
+                    <View style={styles.detailTimeRow}>
+                      <View style={styles.detailDateBox}>
+                        <Text style={styles.detailValueText}>{formatFullDate(detail.originalWorkDate!)}</Text>
+                      </View>
+                      <View style={styles.detailHourRow}>
+                        <View style={styles.detailHourBox}>
+                          <Text style={styles.detailValueText}>{parseTime(detail.originalStartTime).hour}</Text>
+                        </View>
+                        <Text>:</Text>
+                        <View style={styles.detailHourBox}>
+                          <Text style={styles.detailValueText}>{parseTime(detail.originalStartTime).min}</Text>
+                        </View>
+                        <Text style={styles.detailTilde}>~</Text>
+                        <View style={styles.detailHourBox}>
+                          <Text style={styles.detailValueText}>{parseTime(detail.originalEndTime!).hour}</Text>
+                        </View>
+                        <Text>:</Text>
+                        <View style={styles.detailHourBox}>
+                          <Text style={styles.detailValueText}>{parseTime(detail.originalEndTime!).min}</Text>
+                        </View>
+                      </View>
+                    </View>
                   </View>
-                </View>
+                )}
+
+                {/* 휴게 시간 */}
+                {detail.requestedBreakMinutes != null && (
+                  <View>
+                    <Text style={styles.detailLabel}>휴게 시간</Text>
+                    <View style={styles.detailValueBox}>
+                      <Text style={styles.detailValueText}>{detail.requestedBreakMinutes}분</Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* 메모 */}
+                {detail.requestedMemo && (
+                  <View>
+                    <Text style={styles.detailLabel}>메모</Text>
+                    <View style={styles.detailValueBox}>
+                      <Text style={styles.detailValueText}>{detail.requestedMemo}</Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* 처리 일시 */}
+                {detail.reviewedAt && (
+                  <View>
+                    <Text style={styles.detailLabel}>처리 일시</Text>
+                    <View style={styles.detailValueBox}>
+                      <Text style={styles.detailValueText}>
+                        {formatFullDate(detail.reviewedAt.split("T")[0])} {detail.reviewedAt.split("T")[1]?.slice(0, 5)}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* 삭제 버튼 (PENDING만) */}
+                {request.status === "PENDING" && onDelete && (
+                  <View style={styles.detailActionRow}>
+                    <TouchableOpacity onPress={handleDelete} disabled={isDeleting} activeOpacity={0.7}>
+                      <Text weight="Medium" style={styles.detailDelete}>
+                        {isDeleting ? "취소 중..." : "요청 취소"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-              <View style={styles.detailActionRow}>
-                <Text style={styles.detailEdit}>수정</Text>
-                <Text style={styles.detailDelete}>삭제</Text>
-              </View>
-            </View>
+            ) : (
+              <Text style={styles.detailLabel}>상세 정보를 불러올 수 없습니다.</Text>
+            )}
           </View>
         )}
       </View>
@@ -111,7 +239,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 8,
     elevation: 3,
-    marginBottom: 0,
   },
   cardExpanded: {
     paddingBottom: 0,
@@ -121,69 +248,83 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  detailBox: {
-    marginTop: 18,
-    marginBottom: 32,
-  },
   cardLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    flex: 1,
   },
-  profileImg: {
+  typeBadge: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: colors.grey,
-  },
-  infoCol: {
+    backgroundColor: colors.primaryLight,
+    alignItems: "center",
     justifyContent: "center",
   },
-  profileName: {
-    fontSize: 15,
+  typeBadgeText: {
+    fontSize: 13,
+    color: colors.primary,
+  },
+  infoCol: {
+    flex: 1,
+  },
+  workplaceName: {
+    fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 2,
   },
   timeText: {
-    fontSize: 18,
+    fontSize: 16,
     color: colors.textPrimary,
   },
   cardRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 0,
   },
   statusPill: {
-    minWidth: 60,
-    height: 32,
-    borderRadius: 16,
+    minWidth: 52,
+    height: 28,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     marginRight: 2,
   },
-  statusPending: {
+  status_pending: {
     backgroundColor: colors.blue,
   },
-  statusApproved: {
+  status_approved: {
+    backgroundColor: colors.green,
+  },
+  status_rejected: {
     backgroundColor: colors.grey,
   },
-  statusPendingText: {
+  statusText_pending: {
     color: colors.white,
-    fontSize: 15,
+    fontSize: 13,
   },
-  statusApprovedText: {
+  statusText_approved: {
+    color: colors.white,
+    fontSize: 13,
+  },
+  statusText_rejected: {
     color: colors.textSecondary,
-    fontSize: 15,
+    fontSize: 13,
   },
 
+  // 상세
+  detailBox: {
+    marginTop: 18,
+    marginBottom: 20,
+  },
   detailGapCol: {
     gap: 14,
   },
   detailLabel: {
     color: colors.textSecondary,
-    fontSize: 15,
-    marginBottom: 2,
+    fontSize: 13,
+    marginBottom: 6,
   },
   detailValueBox: {
     backgroundColor: colors.backgroundGrey,
@@ -194,7 +335,7 @@ const styles = StyleSheet.create({
   },
   detailValueText: {
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
   },
   detailTimeRow: {
     flexDirection: "row",
@@ -207,7 +348,6 @@ const styles = StyleSheet.create({
     padding: 8,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    minWidth: 56,
     alignItems: "center",
   },
   detailHourRow: {
@@ -227,39 +367,15 @@ const styles = StyleSheet.create({
   detailTilde: {
     marginHorizontal: 4,
   },
-  detailRowWithGap: {
-    flexDirection: "row",
-    gap: 16,
-    marginTop: 8,
-  },
-  detailWageBox: {
-    backgroundColor: colors.backgroundGrey,
-    borderRadius: 8,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  detailUnit: {
-    color: colors.textSecondary,
-    fontSize: 15,
-    marginLeft: 2,
-  },
   detailActionRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 18,
-    marginTop: 10,
-  },
-  detailEdit: {
-    color: colors.blue,
-    fontSize: 15,
+    marginTop: 4,
   },
   detailDelete: {
     color: colors.deleteRed,
-    fontSize: 15,
+    fontSize: 14,
   },
-});
+}) as any;
 
 export default SentRequestCard;
