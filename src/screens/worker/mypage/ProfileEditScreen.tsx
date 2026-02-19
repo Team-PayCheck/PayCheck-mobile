@@ -19,6 +19,7 @@ import { ProfileImagePicker } from "../../../components/signup";
 import { colors } from "../../../constants/colors";
 import { useWorkerData } from "../../../hooks/worker/useUserData";
 import ProfileEditModal from "../../../components/mypage/ProfileEditModal";
+import AccountEditModal from "../../../components/mypage/AccountEditModal";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "ProfileEdit">;
 
@@ -26,6 +27,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
   const { user, worker, isLoading, refetch } = useWorkerData();
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isProfileEditVisible, setIsProfileEditVisible] = useState(false);
+  const [isAccountEditVisible, setIsAccountEditVisible] = useState(false);
 
   const closeDrawer = () => setIsDrawerVisible(false);
   const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
@@ -90,7 +92,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
                 <InfoRow label="은행" value={worker?.bankName ?? "-"} />
                 <InfoRow label="계좌번호" value={worker?.accountNumber ?? "-"} />
               </View>
-              <TouchableOpacity style={styles.sectionButton} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.sectionButton} activeOpacity={0.8} onPress={() => setIsAccountEditVisible(true)}>
                 <Text weight="SemiBold" style={styles.sectionButtonText}>계좌 정보 수정하기</Text>
               </TouchableOpacity>
             </View>
@@ -113,6 +115,13 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         visible={isProfileEditVisible}
         onClose={() => setIsProfileEditVisible(false)}
         user={user}
+        onSuccess={refetch}
+      />
+
+      <AccountEditModal
+        visible={isAccountEditVisible}
+        onClose={() => setIsAccountEditVisible(false)}
+        worker={worker}
         onSuccess={refetch}
       />
     </SafeAreaView>
