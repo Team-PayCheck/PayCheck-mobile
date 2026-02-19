@@ -3,36 +3,139 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "../common/Text";
 import { colors } from "../../constants/colors";
 
+interface CalendarCellProps {
+  date: Date;
+  type: 'prev' | 'current' | 'next';
+  isToday: boolean;
+  isSelected: boolean;
+  isWeekend: boolean;
+  onPress: (date: Date) => void;
+  dotInfo?: {
+    count: number;
+    hasCorrectionRequest: boolean;
+  };
+}
+
+// 개별 날짜 셀: 날짜, 오늘/선택여부, 점 표시
+const CalendarCell: React.FC<CalendarCellProps> = ({
+  date,
+  type,
+  isToday,
+  isSelected,
+  isWeekend,
+  onPress,
+  dotInfo,
+}) => {
+  return (
+    <View style={styles.cell}>
+      {/* 날짜 숫자 및 스타일 */}
+      <Text
+        style={[
+          styles.dateText,
+          isToday && styles.todayCircle,
+          isSelected && !isToday && styles.selectedDate,
+          isWeekend && (date.getDay() === 0 ? { color: colors.red } : { color: colors.blue }),
+          type !== 'current' && styles.outsideMonth,
+        ]}
+        weight="SemiBold"
+        onPress={() => type === 'current' && onPress(date)}
+      >
+        {date.getDate()}
+      </Text>
+      {/* 근무 점(최대 3개, 빨간/파란색) */}
+      <View style={styles.dotRow}>
+        {dotInfo && dotInfo.count > 0 && (() => {
+          const dots = [];
+          const maxDots = Math.min(dotInfo.count, 3);
+          // 정정 요청 있으면 빨간 점 1개 + 파란 점
+          if (dotInfo.hasCorrectionRequest) {
+            dots.push(
+              <View
+                key={0}
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 2.5,
+                  backgroundColor: colors.red,
+                  marginHorizontal: 1,
+                }}
+              />
+            );
+            for (let k = 1; k < maxDots; k++) {
+              dots.push(
+                <View
+                  key={k}
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: 2.5,
+                    backgroundColor: colors.blue,
+                    marginHorizontal: 1,
+                  }}
+                />
+              );
+            }
+          } else { // 정정 요청 없으면 모두 파란 점
+            for (let k = 0; k < maxDots; k++) {
+              dots.push(
+                <View
+                  key={k}
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: 2.5,
+                    backgroundColor: colors.blue,
+                    marginHorizontal: 1,
+                  }}
+                />
+              );
+            }
+          }
+          return dots;
+        })()}
+      </View>
+    </View>
+  );
+};
+
+
 interface MonthlyCalendarProps {
   year: number;
   month: number; // 0-indexed
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
-  // 추후 workDots, onMonthChange 등 추가 가능
+  workDots?: {
+    [dateKey: string]: {
+      count: number;
+      hasCorrectionRequest: boolean;
+    };
+  };
 }
 
 const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
+// 월간 캘린더 전체: 요일 헤더, 날짜 셀 그리드
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   year,
   month,
   selectedDate,
   onDateSelect,
+  workDots,
 }) => {
-  // 캘린더 그리드 생성 (해당 월이 포함된 주만)
+  // 캘린더 셀 2차원 배열 생성 (이전/다음달 포함)
   const firstDay = new Date(year, month, 1).getDay();
   const lastDate = new Date(year, month + 1, 0).getDate();
   const prevMonthLastDate = new Date(year, month, 0).getDate();
-  type CalendarCell = { date: Date; type: 'prev' | 'current' | 'next' };
-  const calendar: CalendarCell[][] = [];
+  type CalendarCellType = { date: Date; type: 'prev' | 'current' | 'next' };
+  const calendar: CalendarCellType[][] = [];
   let day = 1;
   let nextMonthDay = 1;
   let weekIdx = 0;
   let done = false;
   while (!done) {
-    const week: CalendarCell[] = [];
+    const week: CalendarCellType[] = [];
     for (let j = 0; j < 7; j++) {
-      let cell: CalendarCell;
+      let cell: CalendarCellType;
       if (weekIdx === 0 && j < firstDay) {
         cell = {
           date: new Date(year, month - 1, prevMonthLastDate - (firstDay - j - 1)),
@@ -80,11 +183,12 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             </Text>
           ))}
         </View>
-        {/* 날짜 그리드 */}
+        {/* 날짜 셀 그리드 */}
         {calendar.map((week, i) => (
           <View key={`week-${i}`} style={styles.row}>
             {week.map((cell, j) => {
               const { date, type } = cell;
+              // 오늘/선택여부 계산
               const isToday = (() => {
                 const now = new Date();
                 return (
@@ -98,24 +202,22 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                 date.getFullYear() === selectedDate.getFullYear() &&
                 date.getMonth() === selectedDate.getMonth() &&
                 date.getDate() === selectedDate.getDate();
-              const cellKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${type}-w${i}-c${j}`;
+              const isWeekend = j === 0 || j === 6;
+              // YYYY-MM-DD 포맷 키
+              const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              // workDots에서 해당 날짜 정보 조회
+              const dotInfo = type === 'current' ? workDots?.[dateKey] : undefined;
               return (
-                <View key={cellKey} style={styles.cell}>
-                  <Text
-                    style={[
-                      styles.dateText,
-                      isToday && styles.todayCircle,
-                      isSelected && !isToday && styles.selectedDate,
-                      j === 0 && { color: colors.red },
-                      j === 6 && { color: colors.blue },
-                      type !== 'current' && styles.outsideMonth,
-                    ]}
-                    weight="SemiBold"
-                    onPress={() => type === 'current' && onDateSelect(date)}
-                  >
-                    {date.getDate()}
-                  </Text>
-                </View>
+                <CalendarCell
+                  key={dateKey + '-' + type + '-w' + i + '-c' + j}
+                  date={date}
+                  type={type}
+                  isToday={isToday}
+                  isSelected={isSelected}
+                  isWeekend={isWeekend}
+                  onPress={onDateSelect}
+                  dotInfo={dotInfo}
+                />
               );
             })}
           </View>
@@ -137,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: '100%',
+    marginBottom: 7,
   },
   dayOfWeek: {
     flex: 1,
@@ -144,7 +247,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textPrimary,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 7,
   },
   cell: {
     flex: 1,
@@ -172,7 +275,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary, // 오늘: 파란색
     color: colors.white,
   },
-  // selectedOnToday 스타일 제거
+  dotRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 8,
+  },
   outsideMonth: {
     color: colors.textMuted,
   },

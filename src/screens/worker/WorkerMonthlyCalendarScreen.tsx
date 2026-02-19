@@ -5,6 +5,7 @@ import Header from "../../components/layout/Header";
 import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
+import type { WorkItem } from "../../types/worker.types";
 import SelectedDateWorkList from "../../components/worker/monthlyCalendar/SelectedDateWorkList";
 import { workerMonthlyWorkList, workplaceSalaryList } from "../../dummyData/workerMonthlyCalendar";
 import { colors } from "../../constants/colors";
@@ -44,14 +45,33 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // 선택된 날짜의 더미 근무 데이터만 필터링
+  // 선택된 날짜의 근무 데이터만 필터링
   const selectedWorks = workerMonthlyWorkList.filter(
     (w) =>
       w.workDate ===
       `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`
   );
 
-  // 월간 요약 계산 (더미데이터 전체 기준)
+  // 날짜별 근무 개수/정정요청(빨간 점) 여부 workDots 생성
+  const workDots: {
+    [dateKey: string]: {
+      count: number;
+      hasCorrectionRequest: boolean;
+    };
+  } = {};
+  workerMonthlyWorkList.forEach((work: WorkItem) => {
+    const date = work.workDate;
+    if (!workDots[date]) {
+      workDots[date] = { count: 0, hasCorrectionRequest: false };
+    }
+    workDots[date].count++;
+    // isModified가 true면 해당 날짜 빨간 점
+    if (work.isModified) {
+      workDots[date].hasCorrectionRequest = true;
+    }
+  });
+
+  // 월간 요약 계산 (근무 총 시간/급여)
   const monthLabel = `${month + 1}월`;
   const totalMinutes = workerMonthlyWorkList.reduce((sum, w) => sum + w.totalWorkMinutes, 0);
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
@@ -60,6 +80,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   // 근무지별 급여 더미 데이터 (실제 로직은 추후 API 연동)
   const workplaces = workplaceSalaryList;
 
+  // 주요 화면 렌더링: 캘린더, 근무리스트, 요약, 드로어
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={openDrawer} />
@@ -76,17 +97,21 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
           onPressWeeklyView={() => {}}
         />
         <View style={styles.dashedLine} />
+        {/* 월간 캘린더 */}
         <MonthlyCalendar
           year={year}
           month={month}
           selectedDate={selectedDate}
           onDateSelect={setSelectedDate}
+          workDots={workDots}
         />
+        {/* 선택 날짜 근무리스트 */}
         <SelectedDateWorkList
           works={selectedWorks}
           onPressAdd={() => {}}
           onPressCorrectionRequest={() => {}}
         />
+        {/* 월간 요약/급여 */}
         <MonthlySalarySummary
           monthLabel={monthLabel}
           totalHours={totalHours}
@@ -97,6 +122,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
           onPressDetail={() => {}}
         />
       </ScrollView>
+      {/* 마이페이지 드로어 */}
       <MyPageDrawer
         visible={isDrawerVisible}
         onClose={closeDrawer}
