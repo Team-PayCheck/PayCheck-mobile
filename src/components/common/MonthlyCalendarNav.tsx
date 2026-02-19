@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../../constants/colors";
-import { Text } from "../../common/Text";
+import { colors } from "../../constants/colors";
+import { Text } from "../common/Text";
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
