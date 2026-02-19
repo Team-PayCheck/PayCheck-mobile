@@ -28,7 +28,7 @@ const AccountSettingsScreen: React.FC<Props> = ({ navigation }) => {
 			<View style={styles.scrollContent}>
 				<View style={styles.headerRow}>
 					<View style={{ flex: 1 }}>
-						<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+						<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
 						<Text weight="ExtraBold" style={styles.title}>계정 이용 / 이용동의</Text>
 					</View>
 					<View style={styles.illustWrapper}>

@@ -44,7 +44,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={styles.headerRow}>
-          <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+          <HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
           <Text weight="ExtraBold" style={styles.title}>내 프로필 수정</Text>
         </View>
 

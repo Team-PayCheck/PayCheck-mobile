@@ -60,7 +60,7 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<View style={styles.scrollContent}>
 				<View style={styles.headerArea}>
-					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+					<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
 				</View>
 				<View style={styles.contentArea}>
 					<Image source={require("../../../assets/images/mypage/quit.png")} style={styles.illust} resizeMode="contain" />

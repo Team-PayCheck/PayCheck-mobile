@@ -55,7 +55,7 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
       <Header onPressLeft={() => setIsDrawerVisible(true)} />
 
       <View style={styles.headerSection}>
-        <HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+        <HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
         <Text weight="ExtraBold" style={styles.title}>보낸 근무요청 보기</Text>
 
         {/* 필터 탭 */}
