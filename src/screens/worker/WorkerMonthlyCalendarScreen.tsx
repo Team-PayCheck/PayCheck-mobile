@@ -3,12 +3,16 @@ import { StyleSheet, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/layout/Header";
 import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
+import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
+import MonthlyCalendar from "../../components/common/MonthlyCalendar";
+import SelectedDateWorkList from "../../components/worker/monthlyCalendar/SelectedDateWorkList";
+import { workerMonthlyWorkList } from "../../dummyData/workerMonthlyCalendar";
 import { colors } from "../../constants/colors";
-import MonthlyCalendarNav from "../../components/worker/monthlyCalendar/MonthlyCalendarNav";
 
 const WorkerMonthlyCalendarScreen: React.FC = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const closeDrawer = () => setIsDrawerVisible(false);
   const openDrawer = () => setIsDrawerVisible(true);
 
@@ -29,6 +33,13 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
+  // 선택된 날짜의 더미 근무 데이터만 필터링
+  const selectedWorks = workerMonthlyWorkList.filter(
+    (w) =>
+      w.workDate ===
+      `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={openDrawer} />
@@ -45,7 +56,18 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
           onPressWeeklyView={() => {}}
         />
         <View style={styles.dashedLine} />
-        {/* 이후 달력, 근무, 급여 영역 추가 */}
+        <MonthlyCalendar
+          year={year}
+          month={month}
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+        />
+        <SelectedDateWorkList
+          works={selectedWorks}
+          onPressAdd={() => {}}
+          onPressCorrectionRequest={() => {}}
+        />
+        {/* 이후 급여 영역 추가 */}
       </ScrollView>
       <MyPageDrawer
         visible={isDrawerVisible}
