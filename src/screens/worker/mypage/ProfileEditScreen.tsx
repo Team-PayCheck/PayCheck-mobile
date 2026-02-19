@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, View, Image, TextInput } from "react-native";
+import { ScrollView, StyleSheet, View, Image, TextInput, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -13,23 +13,19 @@ import ProfilePhoto from "../../../components/mypage/profileEdit/ProfilePhoto";
 import BankSelectModal from "../../../components/signup/BankSelectModal";
 import { TouchableOpacity } from "react-native";
 import { colors } from "../../../constants/colors";
+import { useWorkerData } from "../../../hooks/worker/useUserData";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "ProfileEdit">;
 
 
 const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
-  const [name, setName] = useState("김나현");
-  const [phone, setPhone] = useState("010-5156-1565");
-  const [email, setEmail] = useState("abc@naver.com");
-  const [workerCode] = useState("dfae45");
-  const [bank, setBank] = useState("하나은행");
-  const [accountNumber, setAccountNumber] = useState("777-7777-7777-7777");
+  const { user, worker, isLoading } = useWorkerData();
+
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isBankModalVisible, setIsBankModalVisible] = useState(false);
 
   const handleBankSelect = (selectedBank: string) => {
-    setBank(selectedBank);
     setIsBankModalVisible(false);
   };
   const closeDrawer = () => setIsDrawerVisible(false);
@@ -39,6 +35,10 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
   };
   const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
+
+  const profileImageSource = user?.profileImageUrl
+    ? { uri: user.profileImageUrl }
+    : require("../../../assets/images/mypage/basicProfileImage.png");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,79 +57,73 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
             />
           </View>
         </View>
-        <View style={styles.formArea}>
-          <View style={styles.nameRow}>
-            <ProfilePhoto imageSource={require("../../../assets/images/mypage/basicProfileImage.png")}/>
+
+        {isLoading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+        ) : (
+          <View style={styles.formArea}>
+            <View style={styles.nameRow}>
+              <ProfilePhoto imageSource={profileImageSource} />
+              <ProfileFieldRow
+                label=""
+                value={user?.name ?? ""}
+                editable={false}
+                placeholder="이름"
+                containerStyle={{ flex: 1 }}
+                inputStyle={{ marginLeft: 10 }}
+              />
+            </View>
             <ProfileFieldRow
-              label=""
-              value={name}
-              onChangeText={setName}
-              placeholder="이름"
-              onEdit={() => {}}
-              containerStyle={{ flex: 1 }}
-              inputStyle={{ marginLeft: 10 }}
+              label="전화 번호"
+              value={user?.phone ?? ""}
+              editable={false}
+              placeholder="전화 번호"
+              keyboardType="phone-pad"
             />
-          </View>
-          <ProfileFieldRow
-            label="전화 번호"
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="전화 번호"
-            keyboardType="phone-pad"
-            onEdit={() => {}}
-          />
-          <ProfileFieldRow
-            label="이메일"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="이메일"
-            keyboardType="email-address"
-            onEdit={() => {}}
-          />
-          <ProfileFieldRow
-            label="근무자코드"
-            value={workerCode}
-            editable={false}
-            placeholder="근무자코드"
-            onEdit={() => {}}
-            inputStyle={{ color: colors.textSecondary }}
-          />
-          <View style={{ gap: 14 }}>
-            <View style={styles.fieldRow}>
-              <Text style={styles.fieldLabel} weight="Medium">은행</Text>
-              <TouchableOpacity
-                style={styles.bankSelector}
-                activeOpacity={0.8}
-                onPress={() => setIsBankModalVisible(true)}
-              >
-                <Text weight="Medium" style={styles.bankText}>{bank}</Text>
-                <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.fieldRow}>
-              <Text style={styles.fieldLabel} weight="Medium">계좌번호</Text>
-                <View>
-                <TextInput
-                  value={accountNumber}
-                  onChangeText={setAccountNumber}
-                  style={styles.input}
-                  placeholder="계좌번호"
-                  placeholderTextColor={colors.textSecondary}
-                  keyboardType="number-pad"
-                />
+            <ProfileFieldRow
+              label="근무자코드"
+              value={worker?.workerCode ?? ""}
+              editable={false}
+              placeholder="근무자코드"
+              inputStyle={{ color: colors.textSecondary }}
+            />
+            <View style={{ gap: 14 }}>
+              <View style={styles.fieldRow}>
+                <Text style={styles.fieldLabel} weight="Medium">은행</Text>
+                <TouchableOpacity
+                  style={styles.bankSelector}
+                  activeOpacity={0.8}
+                  onPress={() => setIsBankModalVisible(true)}
+                >
+                  <Text weight="Medium" style={styles.bankText}>{worker?.bankName ?? "-"}</Text>
+                  <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
-                <Text weight="Medium" style={styles.editButtonText}>수정</Text>
-              </TouchableOpacity>
+              <View style={styles.fieldRow}>
+                <Text style={styles.fieldLabel} weight="Medium">계좌번호</Text>
+                  <View>
+                  <TextInput
+                    value={worker?.accountNumber ?? ""}
+                    editable={false}
+                    style={styles.input}
+                    placeholder="계좌번호"
+                    placeholderTextColor={colors.textSecondary}
+                    keyboardType="number-pad"
+                  />
+                </View>
+                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+                  <Text weight="Medium" style={styles.editButtonText}>수정</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
       <BankSelectModal
         visible={isBankModalVisible}
         onClose={() => setIsBankModalVisible(false)}
         onSelect={handleBankSelect}
-        selectedBank={bank}
+        selectedBank={worker?.bankName ?? ""}
       />
       <MyPageDrawer
         visible={isDrawerVisible}
@@ -215,7 +209,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   bankSelector: {
-    width: 88,
+    width: 120,
     height: 40,
     borderRadius: 10,
     backgroundColor: colors.backgroundGrey,
