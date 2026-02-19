@@ -36,6 +36,7 @@ export const colors = {
 	black: "#000000",
 	disabled: "#EEEEEE",
 	deleteRed: "#FF4D4F",
+	lightBlue: "#a8cfff",
 } as const;
 
 export type ColorName = keyof typeof colors;

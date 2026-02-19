@@ -28,12 +28,12 @@ const WorkplaceSalaryCard: React.FC<WorkplaceSalaryCardProps> = ({
         </View>
       </View>
       <View style={styles.salaryRow}>
-        <Text style={styles.label}>기본급여</Text>
-        <Text style={styles.value}>{formatCurrency(baseSalary)}</Text>
+        <Text style={styles.label} weight="SemiBold">기본급여</Text>
+        <Text style={styles.value} weight="SemiBold">{formatCurrency(baseSalary)}</Text>
       </View>
       <View style={styles.salaryRow}>
-        <Text style={styles.label}>초과 및 기타 공제</Text>
-        <Text style={styles.value}>{formatCurrency(deduction)}</Text>
+        <Text style={styles.label} weight="SemiBold">초과 및 기타 공제</Text>
+        <Text style={styles.value} weight="SemiBold">{formatCurrency(deduction)}</Text>
       </View>
       <View style={styles.maxRow}>
         <Text style={styles.maxText} weight="SemiBold">최대 {formatCurrency(maxSalary)}원</Text>

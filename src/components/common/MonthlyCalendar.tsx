@@ -1,5 +1,7 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "../common/Text";
+import { colors } from "../../constants/colors";
 
 interface MonthlyCalendarProps {
   year: number;
@@ -17,36 +19,31 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedDate,
   onDateSelect,
 }) => {
-  // 1일이 무슨 요일인지
+  // 캘린더 그리드 생성 (해당 월이 포함된 주만)
   const firstDay = new Date(year, month, 1).getDay();
-  // 해당 월의 마지막 날짜
   const lastDate = new Date(year, month + 1, 0).getDate();
-  // 이전 달 마지막 날짜
   const prevMonthLastDate = new Date(year, month, 0).getDate();
-
-  // 6주(6행) * 7일(7열) 그리드 생성 (이전/다음 달 날짜 포함)
   type CalendarCell = { date: Date; type: 'prev' | 'current' | 'next' };
   const calendar: CalendarCell[][] = [];
   let day = 1;
   let nextMonthDay = 1;
-  for (let i = 0; i < 6; i++) {
+  let weekIdx = 0;
+  let done = false;
+  while (!done) {
     const week: CalendarCell[] = [];
     for (let j = 0; j < 7; j++) {
       let cell: CalendarCell;
-      if (i === 0 && j < firstDay) {
-        // 이전 달
+      if (weekIdx === 0 && j < firstDay) {
         cell = {
           date: new Date(year, month - 1, prevMonthLastDate - (firstDay - j - 1)),
           type: 'prev',
         };
       } else if (day > lastDate) {
-        // 다음 달
         cell = {
           date: new Date(year, month + 1, nextMonthDay++),
           type: 'next',
         };
       } else {
-        // 이번 달
         cell = {
           date: new Date(year, month, day++),
           type: 'current',
@@ -54,97 +51,130 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       }
       week.push(cell);
     }
-    calendar.push(week);
+    // 이번 주에 이번 달 날짜가 하나라도 있으면 추가
+    if (week.some(cell => cell.type === 'current')) {
+      calendar.push(week);
+    } else if (day > lastDate) {
+      // 이번 달 날짜가 없고, 이미 이번 달을 다 채웠으면 종료
+      done = true;
+    }
+    weekIdx++;
   }
 
   return (
-    <View style={styles.container}>
-      {/* 요일 헤더 */}
-      <View style={styles.row}>
-        {daysOfWeek.map((d, idx) => (
-          <Text
-            key={d}
-            style={[
-              styles.dayOfWeek,
-              (idx === 0 || idx === 6) && styles.weekend,
-            ]}
-          >
-            {d}
-          </Text>
+    <View style={styles.outerContainer}>
+      <View style={styles.calendarBox}>
+        {/* 요일 헤더 */}
+        <View style={styles.row}>
+          {daysOfWeek.map((d, idx) => (
+            <Text
+              key={`dow-${idx}`}
+              style={[
+                styles.dayOfWeek,
+                idx === 0 && { color: colors.red },
+                idx === 6 && { color: colors.blue },
+              ]}
+              weight="Bold"
+            >
+              {d}
+            </Text>
+          ))}
+        </View>
+        {/* 날짜 그리드 */}
+        {calendar.map((week, i) => (
+          <View key={`week-${i}`} style={styles.row}>
+            {week.map((cell, j) => {
+              const { date, type } = cell;
+              const isToday = (() => {
+                const now = new Date();
+                return (
+                  date.getFullYear() === now.getFullYear() &&
+                  date.getMonth() === now.getMonth() &&
+                  date.getDate() === now.getDate()
+                );
+              })();
+              const isSelected =
+                type === 'current' &&
+                date.getFullYear() === selectedDate.getFullYear() &&
+                date.getMonth() === selectedDate.getMonth() &&
+                date.getDate() === selectedDate.getDate();
+              const cellKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${type}-w${i}-c${j}`;
+              return (
+                <View key={cellKey} style={styles.cell}>
+                  <Text
+                    style={[
+                      styles.dateText,
+                      isToday && styles.todayCircle,
+                      isSelected && !isToday && styles.selectedDate,
+                      j === 0 && { color: colors.red },
+                      j === 6 && { color: colors.blue },
+                      type !== 'current' && styles.outsideMonth,
+                    ]}
+                    weight="SemiBold"
+                    onPress={() => type === 'current' && onDateSelect(date)}
+                  >
+                    {date.getDate()}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
         ))}
       </View>
-      {/* 날짜 그리드 */}
-      {calendar.map((week, i) => (
-        <View key={`week-${i}`} style={styles.row}>
-          {week.map((cell, j) => {
-            const { date, type } = cell;
-            const isSelected =
-              type === 'current' &&
-              date.getFullYear() === selectedDate.getFullYear() &&
-              date.getMonth() === selectedDate.getMonth() &&
-              date.getDate() === selectedDate.getDate();
-            const cellKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${type}`;
-            return (
-              <View key={cellKey} style={styles.cell}>
-                <Text
-                  style={[
-                    styles.dateText,
-                    isSelected && styles.selectedDate,
-                    (j === 0 || j === 6) && styles.weekend,
-                    type !== 'current' && styles.outsideMonth,
-                  ]}
-                  onPress={() => type === 'current' && onDateSelect(date)}
-                >
-                  {date.getDate()}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 16,
-    marginBottom: 8,
+  outerContainer: {
+    alignItems: 'center',
+  },
+  calendarBox: {
+    width: 320, 
+    paddingVertical: 12,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
+    width: '100%',
   },
   dayOfWeek: {
     flex: 1,
     textAlign: "center",
     fontSize: 13,
-    color: "#222",
+    color: colors.textPrimary,
     fontWeight: "bold",
     marginBottom: 8,
-  },
-  weekend: {
-    color: "#f38181",
   },
   cell: {
     flex: 1,
     aspectRatio: 1,
     alignItems: "center",
     justifyContent: "center",
+    minWidth: 32,
+    maxWidth: 38,
   },
   dateText: {
     fontSize: 15,
     textAlign: "center",
-    color: "#222",
+    color: colors.textPrimary,
     padding: 4,
     borderRadius: 16,
+    minWidth: 28,
+    minHeight: 28,
+    overflow: 'hidden',
   },
   selectedDate: {
-    backgroundColor: "#769fcd",
-    color: "#fff",
+    backgroundColor: colors.lightBlue, // 선택한 날: 하늘색
+    color: colors.white,
   },
+  todayCircle: {
+    backgroundColor: colors.primary, // 오늘: 파란색
+    color: colors.white,
+  },
+  // selectedOnToday 스타일 제거
   outsideMonth: {
-    color: "#d3d3d3",
+    color: colors.textMuted,
   },
 });
 
