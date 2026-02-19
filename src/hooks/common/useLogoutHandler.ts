@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { logout } from "../../api/authApi";
+import { logout } from "../../api/auth";
 
 /**
  * 로그아웃 핸들러

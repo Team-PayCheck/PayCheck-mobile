@@ -8,10 +8,10 @@ import Constants from "expo-constants";
 import { getAuthState } from "../stores/authStore";
 import type {
 	ApiResponse,
-	AuthSuccessData,
 	CustomAxiosRequestConfig,
 	RefreshSubscriber,
 } from "../types/api.types";
+import type { AuthSuccessData } from "./auth/types";
 
 const env = Constants.expoConfig?.extra || {};
 const API_BASE_URL =

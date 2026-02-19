@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { deleteMyAccount, logout } from "../../../api/authApi";
+import { deleteMyAccount, logout } from "../../../api/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import HomeBackButton from "../../../components/common/HomeBackButton";

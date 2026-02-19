@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { getUserProfile } from "../../api/userApi";
-import { getWorkerInfo } from "../../api/workerApi";
-import type { UserResponse, WorkerResponse } from "../../api/userApiResponse.type";
+import { getUserProfile } from "../../api/user";
+import { getWorkerInfo } from "../../api/worker";
+import type { UserResponse, WorkerResponse } from "../../api/user/types";
 
 interface UseUserDataReturn {
   user: UserResponse | null;

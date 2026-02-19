@@ -5,7 +5,7 @@
  */
 import { useState, useCallback } from "react";
 import { Alert } from "react-native";
-import { createCorrectionRequest } from "../../api/workerApi";
+import { createCorrectionRequest } from "../../api/worker";
 import type { WorkItem } from "../../types/worker.types";
 
 const useCorrectionRequest = () => {

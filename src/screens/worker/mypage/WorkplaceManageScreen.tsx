@@ -8,8 +8,8 @@ import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
-import { getContracts } from "../../../api/workerApi";
-import type { ContractListItem } from "../../../types/worker/api.types";
+import { getContracts } from "../../../api/worker";
+import type { ContractListItem } from "../../../api/worker/types";
 import { colors } from "../../../constants/colors";
 
 

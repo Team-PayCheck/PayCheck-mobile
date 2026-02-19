@@ -3,7 +3,7 @@
  * 주간캘린더, 월간캘린더 등에서 startDate/endDate를 전달하여 재사용.
  */
 import { useState, useEffect, useCallback } from "react";
-import { getWorkRecords } from "../../api/workerApi";
+import { getWorkRecords } from "../../api/worker";
 import type { WorkItem } from "../../types/worker.types";
 
 const useWorkRecords = (startDate: string, endDate: string) => {

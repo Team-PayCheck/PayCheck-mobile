@@ -7,11 +7,11 @@ import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
 import { requestNotificationPermission } from "../../../utils/notification";
-import { kakaoRegisterWithToken } from "../../../api/authApi";
+import { kakaoRegisterWithToken } from "../../../api/auth";
 import { useSignUpStore, useAuthStore } from "../../../stores";
 import { showError } from "../../../utils/alert";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
-import type { LoginError } from "../../../types/api.types";
+import type { LoginError } from "../../../api/auth/types";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step4Alarm">;
 

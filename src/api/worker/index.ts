@@ -1,14 +1,14 @@
 import { AxiosError } from "axios";
-import api from "./axios";
-import type { ApiResponse } from "../types/api.types";
-import type { WorkItem } from "../types/worker.types";
-import type { WorkerResponse } from "./userApiResponse.type";
+import api from "../axios";
+import type { ApiResponse } from "../../types/api.types";
+import type { WorkItem } from "../../types/worker.types";
+import type { WorkerResponse } from "../user/types";
 import type {
 	ContractListItem,
 	ContractDetail,
 	CorrectionRequestParams,
 	CorrectionRequestData,
-} from "../types/worker/api.types";
+} from "./types";
 
 
 /**

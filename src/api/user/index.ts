@@ -1,19 +1,15 @@
-import {api} from './axios';
-import type { ApiResponse } from './workerApiResponse.type';
-import type { UserUpdateRequest, WorkerUpdateRequest } from './userApiRequest.type';
-import type { UserResponse, WorkerResponse } from './userApiResponse.type';
+import { api } from '../axios';
+import type { ApiResponse } from '../../types/api.types';
+import type { UserUpdateRequest, WorkerUpdateRequest, UserResponse, WorkerResponse } from './types';
 
 // 타입 re-export (다른 파일에서 import할 수 있도록)
 export type {
+  UserType,
   UserUpdateRequest,
   WorkerUpdateRequest,
-} from './userApiRequest.type';
-
-export type {
-  UserType,
   UserResponse,
   WorkerResponse,
-} from './userApiResponse.type';
+} from './types';
 
 // ============ API 함수 ============
 
