@@ -8,6 +8,7 @@ import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import SelectedDateWorkList from "../../components/worker/monthlyCalendar/SelectedDateWorkList";
 import { workerMonthlyWorkList } from "../../dummyData/workerMonthlyCalendar";
 import { colors } from "../../constants/colors";
+import MonthlySalarySummary from "../../components/worker/monthlyCalendar/MonthlySalarySummary";
 
 const WorkerMonthlyCalendarScreen: React.FC = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -40,6 +41,12 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
       `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`
   );
 
+  // 월간 요약 계산 (더미데이터 전체 기준)
+  const monthLabel = `${month + 1}월`;
+  const totalMinutes = workerMonthlyWorkList.reduce((sum, w) => sum + w.totalWorkMinutes, 0);
+  const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
+  const estimatedPay = workerMonthlyWorkList.reduce((sum, w) => sum + (w.totalSalary ?? 0), 0);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={openDrawer} />
@@ -67,7 +74,12 @@ const WorkerMonthlyCalendarScreen: React.FC = () => {
           onPressAdd={() => {}}
           onPressCorrectionRequest={() => {}}
         />
-        {/* 이후 급여 영역 추가 */}
+        <MonthlySalarySummary
+          monthLabel={monthLabel}
+          totalHours={totalHours}
+          estimatedPay={estimatedPay}
+        />
+        {/* 이후 급여 상세 카드 영역 추가 */}
       </ScrollView>
       <MyPageDrawer
         visible={isDrawerVisible}
