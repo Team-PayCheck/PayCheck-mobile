@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 
 const EmployerHomeScreen: React.FC = () => {
 	return (
@@ -16,7 +17,7 @@ const EmployerHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FDFDFD",
+		backgroundColor: colors.background,
 	},
 	content: {
 		flex: 1,
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		color: "#111111",
+		color: colors.textPrimary,
 	},
 });
 

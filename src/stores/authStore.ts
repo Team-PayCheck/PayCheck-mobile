@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { UserInfo } from "../types/api.types";
+import type { UserInfo } from "../api/auth/types";
 
 interface AuthState {
 	// 상태

@@ -10,9 +10,9 @@ import {
 import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
-import { kakaoLoginWithToken } from "../../api/authApi";
+import { kakaoLoginWithToken } from "../../api/auth";
 import { useAuthStore } from "../../stores/authStore";
-import type { LoginError } from "../../types/api.types";
+import type { LoginError } from "../../api/auth/types";
 import { colors } from "../../constants/colors";
 
 interface WelcomeScreenProps {

@@ -24,6 +24,7 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft, onPressRight }) => {
 const styles = StyleSheet.create({
   header: {
     paddingTop: 12,
+    paddingBottom: 12,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",

@@ -1,13 +1,38 @@
 import { AxiosError } from "axios";
-import api from "./axios";
-import type { ApiResponse } from "../types/api.types";
-import type { WorkItem } from "../types/worker.types";
+import api from "../axios";
+import type { ApiResponse } from "../../types/api.types";
+import type { WorkItem } from "../../types/worker.types";
+import type { WorkerResponse } from "../user/types";
 import type {
 	ContractListItem,
 	ContractDetail,
 	CorrectionRequestParams,
 	CorrectionRequestData,
-} from "../types/worker/api.types";
+	CorrectionRequestResponse,
+	CorrectionStatus,
+} from "./types";
+
+
+/**
+ * 근로자 정보 조회
+ */
+export const getWorkerInfo = async (
+	userId: number
+): Promise<ApiResponse<WorkerResponse>> => {
+	try {
+		const { data } = await api.get<ApiResponse<WorkerResponse>>(
+			`/api/workers/user/${userId}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<WorkerResponse>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"근로자 정보 조회 실패";
+		throw new Error(message);
+	}
+};
 
 /**
  * 근로자 계약 목록 조회
@@ -97,6 +122,73 @@ export const getWorkRecordDetail = async (
 			axiosError.message ||
 			"근무 기록 상세 조회 실패";
 
+		throw new Error(message);
+	}
+};
+
+/**
+ * 정정요청 목록 조회 (보낸 근무 요청)
+ * GET /api/worker/correction-requests?status=PENDING
+ */
+export const getCorrectionRequests = async (
+	status?: CorrectionStatus
+): Promise<ApiResponse<CorrectionRequestResponse[]>> => {
+	try {
+		const { data } = await api.get<ApiResponse<CorrectionRequestResponse[]>>(
+			"/api/worker/correction-requests",
+			{ params: status ? { status } : undefined }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<CorrectionRequestResponse[]>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"정정요청 목록 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 정정요청 상세 조회
+ * GET /api/worker/correction-requests/{id}
+ */
+export const getCorrectionRequestDetail = async (
+	id: number
+): Promise<ApiResponse<CorrectionRequestData>> => {
+	try {
+		const { data } = await api.get<ApiResponse<CorrectionRequestData>>(
+			`/api/worker/correction-requests/${id}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<CorrectionRequestData>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"정정요청 상세 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 정정요청 취소 (PENDING 상태만 가능)
+ * DELETE /api/worker/correction-requests/{id}
+ */
+export const deleteCorrectionRequest = async (
+	id: number
+): Promise<ApiResponse<null>> => {
+	try {
+		const { data } = await api.delete<ApiResponse<null>>(
+			`/api/worker/correction-requests/${id}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<null>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"정정요청 취소 실패";
 		throw new Error(message);
 	}
 };

@@ -4,7 +4,7 @@
  * - WheelPicker용 items 변환까지 포함
  */
 import { useState, useMemo, useCallback } from "react";
-import { getContracts, getContractDetail } from "../../api/workerApi";
+import { getContracts, getContractDetail } from "../../api/worker";
 import type { WheelPickerItem } from "../../components/common/WheelPicker";
 
 interface WorkplaceOption {

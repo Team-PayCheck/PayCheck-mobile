@@ -1,13 +1,15 @@
 import { AxiosError } from "axios";
 import CookieManager from "@react-native-cookies/cookies";
-import api from "./axios";
-import { getAuthState } from "../stores/authStore";
+import api from "../axios";
+import { getAuthState } from "../../stores/authStore";
 import type {
 	ApiResponse,
+} from "../../types/api.types";
+import type {
 	AuthSuccessData,
 	KakaoRegisterParams,
 	LoginError,
-} from "../types/api.types";
+} from "./types";
 
 /**
  * 카카오 액세스 토큰으로 백엔드 로그인 요청
@@ -69,4 +71,12 @@ export const logout = async (): Promise<void> => {
 		getAuthState().logout();
 		await CookieManager.clearAll();
 	}
+};
+
+/**
+ * 회원 탈퇴
+ */
+export const deleteMyAccount = async () => {
+	const { data } = await api.delete("/api/users/me");
+	return data;
 };

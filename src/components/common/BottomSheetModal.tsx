@@ -6,6 +6,8 @@ import {
 	TouchableOpacity,
 	Animated,
 	Dimensions,
+	KeyboardAvoidingView,
+	Platform,
 	type DimensionValue,
 } from "react-native";
 import { colors } from "../../constants/colors";
@@ -78,35 +80,43 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 			animationType="none"
 			onRequestClose={handleClose}
 		>
-			<View style={styles.overlay}>
-				<Animated.View
-					style={[
-						styles.overlayBackground,
-						{ opacity: overlayAnim },
-					]}
-				>
-					<TouchableOpacity
-						style={StyleSheet.absoluteFill}
-						activeOpacity={1}
-						onPress={handleClose}
-					/>
-				</Animated.View>
-				<Animated.View
-					style={[
-						styles.modalContainer,
-						{ maxHeight },
-						{ transform: [{ translateY }] },
-					]}
-				>
-					<View style={styles.handle} />
-					{children}
-				</Animated.View>
-			</View>
+			<KeyboardAvoidingView
+				style={styles.keyboardAvoid}
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+			>
+				<View style={styles.overlay}>
+					<Animated.View
+						style={[
+							styles.overlayBackground,
+							{ opacity: overlayAnim },
+						]}
+					>
+						<TouchableOpacity
+							style={StyleSheet.absoluteFill}
+							activeOpacity={1}
+							onPress={handleClose}
+						/>
+					</Animated.View>
+					<Animated.View
+						style={[
+							styles.modalContainer,
+							{ maxHeight },
+							{ transform: [{ translateY }] },
+						]}
+					>
+						<View style={styles.handle} />
+						{children}
+					</Animated.View>
+				</View>
+			</KeyboardAvoidingView>
 		</Modal>
 	);
 };
 
 const styles = StyleSheet.create({
+	keyboardAvoid: {
+		flex: 1,
+	},
 	overlay: {
 		flex: 1,
 		justifyContent: "flex-end",

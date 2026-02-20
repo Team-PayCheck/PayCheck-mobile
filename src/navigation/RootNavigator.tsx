@@ -6,6 +6,7 @@ import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
+import WorkerStack from "../navigation/WorkerStack";
 import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
 import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
 
@@ -65,7 +66,7 @@ const RootNavigator = () => {
 					)}
 				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerHomeScreen} />
-				<Stack.Screen name="WorkerWeeklyCalendar" component={WorkerWeeklyCalendarScreen} />
+				<Stack.Screen name="WorkerWeeklyCalendar" component={WorkerStack} />
 				<Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>

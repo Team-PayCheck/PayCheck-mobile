@@ -13,7 +13,7 @@ export const colors = {
 	backgroundGrey: "#F5F5F5",
 
 	// 텍스트
-	textPrimary: "#111111",
+	textPrimary: "#161616",
 	textSecondary: "#777777",
 	textMuted: "#AAAAAA",
 	textDisabled: "#CCCCCC",
@@ -29,11 +29,12 @@ export const colors = {
 	green: "#28C28D",
 
 	// 기타
-  blue: "#038BFA",
+ 	blue: "#038BFA",
 	grey: "#EEEEEE",
 	white: "#FFFFFF",
 	black: "#000000",
 	disabled: "#EEEEEE",
+	deleteRed: "#FF4D4F",
 } as const;
 
 export type ColorName = keyof typeof colors;

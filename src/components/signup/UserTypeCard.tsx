@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, Image, View } from "react-native";
 import { Text } from "../common/Text";
 import { colors } from "../../constants/colors";
-import type { UserType } from "../../types/signup.types";
+import type { UserType } from "../../api/user/types";
 
 interface UserTypeCardProps {
 	type: UserType;

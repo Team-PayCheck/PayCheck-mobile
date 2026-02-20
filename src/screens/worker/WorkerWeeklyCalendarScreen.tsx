@@ -1,7 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../../components/layout/Header";
+import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../components/common/BottomSheetModal";
+import { Text } from "../../components/common/Text";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
+import { WorkerStackParamList } from "../../navigation/WorkerStack";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
@@ -19,7 +25,20 @@ import {
 } from "../../utils/date";
 import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 
-const WorkerWeeklyCalendarScreen: React.FC = () => {
+type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
+
+const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
+	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+	const closeDrawer = () => setIsDrawerVisible(false);
+	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
+		closeDrawer();
+		navigation.navigate(route);
+	};
+	const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
+
+	
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
 	const weekDays = getWeekDays(today);
@@ -53,7 +72,7 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Header />
+			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
@@ -86,6 +105,28 @@ const WorkerWeeklyCalendarScreen: React.FC = () => {
 					summary={{ weekLabel, totalHours, estimatedPay }}
 				/>
 			</ScrollView>
+			
+
+				<MyPageDrawer
+					visible={isDrawerVisible}
+					onClose={closeDrawer}
+					onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
+					onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
+					onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+					onPressAccountSettings={() => {
+						setIsDrawerVisible(false);
+						setTimeout(() => setIsAccountSheetVisible(true), 220);
+					}}
+					onPressLogout={handleLogout}
+					onPressWithdraw={() => navigateFromDrawer("Withdraw")}
+				/>
+
+				<BottomSheetModal
+					visible={isAccountSheetVisible}
+					onClose={() => setIsAccountSheetVisible(false)}
+				>
+					<AccountTermsContent />
+				</BottomSheetModal>
 
 			<AddWorkRequestModal
 				visible={addModalVisible}

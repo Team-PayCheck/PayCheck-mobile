@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SignUpScreenLayout, UserTypeCard } from "../../../components/signup";
 import { useSignUpStore } from "../../../stores";
-import type { UserType } from "../../../types/signup.types";
+import type { UserType } from "../../../api/user/types";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step1UserType">;

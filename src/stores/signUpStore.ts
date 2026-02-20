@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { UserType } from "../types/signup.types";
+import type { UserType } from "../api/user/types";
 
 interface SignUpState {
 	// 카카오 액세스 토큰 (persist 안 함)
