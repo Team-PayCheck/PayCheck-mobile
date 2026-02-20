@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import {
 	Animated,
-	Dimensions,
 	Modal,
 	Pressable,
 	StyleSheet,
@@ -26,7 +25,6 @@ interface MyPageDrawerProps {
 	onPressWithdraw?: () => void;
 }
 
-const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = 288;
 
 const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
@@ -93,7 +91,10 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 						<MenuButton
 							title="계정 이용 / 이용동의"
 							iconSource={require("../../../assets/images/mypage/info.png")}
-							onPress={onPressAccountSettings}
+							onPress={() => {
+								// 페이지 이동 대신 부모 스크린에 신호 전달
+								if (onPressAccountSettings) onPressAccountSettings();
+							}}
 						/>
 					</View>
 

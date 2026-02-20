@@ -13,6 +13,8 @@ import HomeBackButton from "../../../components/common/HomeBackButton";
 import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import { ProfileImagePicker } from "../../../components/signup";
 import { colors } from "../../../constants/colors";
@@ -28,6 +30,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isProfileEditVisible, setIsProfileEditVisible] = useState(false);
   const [isAccountEditVisible, setIsAccountEditVisible] = useState(false);
+  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
 
   const closeDrawer = () => setIsDrawerVisible(false);
   const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
@@ -90,16 +93,27 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </ScrollView>
 
+
       <MyPageDrawer
         visible={isDrawerVisible}
         onClose={closeDrawer}
         onPressProfileEdit={() => closeDrawer()}
         onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
         onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-        onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+        onPressAccountSettings={() => {
+          setIsDrawerVisible(false);
+          setTimeout(() => setIsAccountSheetVisible(true), 220);
+        }}
         onPressLogout={handleLogout}
         onPressWithdraw={() => navigateFromDrawer("Withdraw")}
       />
+
+      <BottomSheetModal
+        visible={isAccountSheetVisible}
+        onClose={() => setIsAccountSheetVisible(false)}
+      >
+        <AccountTermsContent />
+      </BottomSheetModal>
 
       <ProfileEditModal
         visible={isProfileEditVisible}

@@ -12,6 +12,8 @@ import HomeBackButton from "../../../components/common/HomeBackButton";
 import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import SentRequestCard from "../../../components/mypage/sentRequests/SentRequestCard";
 import { colors } from "../../../constants/colors";
@@ -36,6 +38,7 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate(route);
   };
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
+  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
 
   const {
     requests,
@@ -107,16 +110,27 @@ const SentRequestsScreen: React.FC<Props> = ({ navigation }) => {
         />
       )}
 
+
       <MyPageDrawer
         visible={isDrawerVisible}
         onClose={closeDrawer}
         onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
         onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
         onPressSentRequests={() => closeDrawer()}
-        onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+        onPressAccountSettings={() => {
+          setIsDrawerVisible(false);
+          setTimeout(() => setIsAccountSheetVisible(true), 220);
+        }}
         onPressLogout={handleLogout}
         onPressWithdraw={() => navigateFromDrawer("Withdraw")}
       />
+
+      <BottomSheetModal
+        visible={isAccountSheetVisible}
+        onClose={() => setIsAccountSheetVisible(false)}
+      >
+        <AccountTermsContent />
+      </BottomSheetModal>
     </SafeAreaView>
   );
 };
