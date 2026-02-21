@@ -37,10 +37,10 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
       <Text
         style={[
           styles.dateText,
-          isToday && styles.todayCircle,
-          isSelected && !isToday && styles.selectedDate,
-          isWeekend && (date.getDay() === 0 ? { color: colors.red } : { color: colors.blue }),
+          isWeekend && !isToday && !isSelected && (date.getDay() === 0 ? { color: colors.red } : { color: colors.blue }),
           type !== 'current' && styles.outsideMonth,
+          isSelected && !isToday && styles.selectedDate,
+          isToday && styles.todayCircle,
         ]}
         weight="SemiBold"
         selectable={false}
