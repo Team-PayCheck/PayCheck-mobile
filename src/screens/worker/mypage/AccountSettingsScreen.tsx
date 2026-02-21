@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Image, View } from "react-native";
+import { StyleSheet, Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import HomeBackButton from "../../../components/common/HomeBackButton";
