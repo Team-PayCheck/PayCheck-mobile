@@ -35,7 +35,7 @@ const WeeklyDateBar: React.FC<WeeklyDateBarProps> = ({
 		if (onPressCalendarIcon) {
 			onPressCalendarIcon();
 		} else {
-			navigation.navigate("WorkerMonthlyCalendar");
+			navigation.replace("WorkerMonthlyCalendar");
 		}
 	};
 
