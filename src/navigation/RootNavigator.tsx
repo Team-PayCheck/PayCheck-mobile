@@ -15,7 +15,6 @@ export type RootStackParamList = {
 	SignUp: { kakaoAccessToken: string };
 	EmployerHome: undefined;
 	WorkerWeeklyCalendar: undefined;
-	WorkerMonthlyCalendar: undefined;
 	WorkplaceManage: undefined;
 };
 
