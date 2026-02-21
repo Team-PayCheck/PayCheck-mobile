@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   value: {
-    fontSize: 14,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   maxRow: {
