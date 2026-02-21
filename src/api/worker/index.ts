@@ -10,6 +10,7 @@ import type {
 	CorrectionRequestData,
 	CorrectionRequestResponse,
 	CorrectionStatus,
+	PaymentResponse,
 } from "./types";
 
 
@@ -214,6 +215,28 @@ export const createCorrectionRequest = async (
 			axiosError.message ||
 			"정정요청 실패";
 
+		throw new Error(message);
+	}
+};
+
+/**
+ * 송금 내역 목록 조회
+ * GET /api/worker/payments
+ */
+export const getPayments = async (): Promise<
+	ApiResponse<PaymentResponse[]>
+> => {
+	try {
+		const { data } = await api.get<ApiResponse<PaymentResponse[]>>(
+			"/api/worker/payments"
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<PaymentResponse[]>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"송금 내역 조회 실패";
 		throw new Error(message);
 	}
 };
