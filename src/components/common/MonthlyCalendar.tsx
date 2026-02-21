@@ -108,7 +108,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
 interface MonthlyCalendarProps {
   year: number;
   month: number; // 0-indexed
-  selectedDate: Date;
+  selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
   workDots?: {
     [dateKey: string]: {
@@ -204,6 +204,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                 );
               })();
               const isSelected =
+                selectedDate !== null &&
                 type === 'current' &&
                 date.getFullYear() === selectedDate.getFullYear() &&
                 date.getMonth() === selectedDate.getMonth() &&

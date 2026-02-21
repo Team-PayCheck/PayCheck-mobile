@@ -17,7 +17,7 @@ import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const closeDrawer = () => setIsDrawerVisible(false);
   const openDrawer = () => setIsDrawerVisible(true);
 
@@ -30,27 +30,25 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
 
   // 월 이동 핸들러
   const handlePrevMonth = () => {
-    setCurrentDate((prev) => {
-      const prevMonth = new Date(prev.getFullYear(), prev.getMonth() - 1, 1);
-      return prevMonth;
-    });
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    setSelectedDate(null);
   };
   const handleNextMonth = () => {
-    setCurrentDate((prev) => {
-      const nextMonth = new Date(prev.getFullYear(), prev.getMonth() + 1, 1);
-      return nextMonth;
-    });
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setSelectedDate(null);
   };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
   // 선택된 날짜의 근무 데이터만 필터링
-  const selectedWorks = workerMonthlyWorkList.filter(
-    (w) =>
-      w.workDate ===
-      `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`
-  );
+  const selectedWorks = selectedDate
+    ? workerMonthlyWorkList.filter(
+        (w) =>
+          w.workDate ===
+          `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`
+      )
+    : [];
 
   // 날짜별 근무 개수/정정요청(빨간 점) 여부 workDots 생성
   const workDots: {
@@ -105,11 +103,13 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
           workDots={workDots}
         />
         {/* 선택 날짜 근무리스트 */}
-        <SelectedDateWorkList
-          works={selectedWorks}
-          onPressAdd={() => {}}
-          onPressCorrectionRequest={() => {}}
-        />
+        {selectedDate && (
+          <SelectedDateWorkList
+            works={selectedWorks}
+            onPressAdd={() => {}}
+            onPressCorrectionRequest={() => {}}
+          />
+        )}
         {/* 월간 요약/급여 */}
         <MonthlySalarySummary
           monthLabel={monthLabel}
