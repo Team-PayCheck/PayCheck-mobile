@@ -7,6 +7,7 @@ import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 import { colors } from "../../../constants/colors";
 
 
@@ -19,7 +20,6 @@ const AccountSettingsScreen: React.FC<Props> = ({ navigation }) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
-	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	return (

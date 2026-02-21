@@ -12,6 +12,7 @@ import { colors } from "../../constants/colors";
 import MonthlySalarySummary from "../../components/worker/monthlyCalendar/MonthlySalarySummary";
 import WorkplaceSalarySummary from "../../components/worker/monthlyCalendar/WorkplaceSalarySummary";
 import { WorkerStackParamList } from "../../navigation/WorkerStack";
+import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 
 const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -25,7 +26,6 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
     closeDrawer();
     navigation.navigate(route);
   };
-  const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   // 월 이동 핸들러
