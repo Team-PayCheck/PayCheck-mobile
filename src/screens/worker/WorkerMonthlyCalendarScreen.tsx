@@ -9,7 +9,7 @@ import type { WorkItem } from "../../types/worker.types";
 import SelectedDateWorkList from "../../components/worker/monthlyCalendar/SelectedDateWorkList";
 import MonthlySalarySummary from "../../components/worker/monthlyCalendar/MonthlySalarySummary";
 import WorkplaceSalarySummary from "../../components/worker/monthlyCalendar/WorkplaceSalarySummary";
-import { workplaceSalaryList } from "../../dummyData/workerMonthlyCalendar";
+import usePayments from "../../hooks/worker/usePayments";
 import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
@@ -56,6 +56,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
 
   // API 연동
   const { works, isLoading, refetch } = useWorkRecords(startDate, endDate);
+  const { workplaces } = usePayments(year, month + 1);
 
   const {
     correctionModalVisible,
@@ -160,7 +161,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
           estimatedPay={estimatedPay}
         />
         <WorkplaceSalarySummary
-          workplaces={workplaceSalaryList}
+          workplaces={workplaces}
           onPressDetail={() => {}}
         />
       </ScrollView>
