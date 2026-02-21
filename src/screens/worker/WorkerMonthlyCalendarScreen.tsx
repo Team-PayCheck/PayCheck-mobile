@@ -12,6 +12,8 @@ import WorkplaceSalarySummary from "../../components/worker/monthlyCalendar/Work
 import usePayments from "../../hooks/worker/usePayments";
 import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
+import BottomSheetModal from "../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
 import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
@@ -22,6 +24,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
   const closeDrawer = () => setIsDrawerVisible(false);
   const openDrawer = () => setIsDrawerVisible(true);
 
@@ -172,10 +175,19 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
         onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
         onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
         onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-        onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+        onPressAccountSettings={() => {
+          setIsDrawerVisible(false);
+          setTimeout(() => setIsAccountSheetVisible(true), 220);
+        }}
         onPressLogout={handleLogout}
         onPressWithdraw={() => navigateFromDrawer("Withdraw")}
       />
+      <BottomSheetModal
+				visible={isAccountSheetVisible}
+				onClose={() => setIsAccountSheetVisible(false)}
+			>
+				<AccountTermsContent />
+			</BottomSheetModal>
       {/* 근무 추가 요청 모달 */}
       <AddWorkRequestModal
         visible={addModalVisible}

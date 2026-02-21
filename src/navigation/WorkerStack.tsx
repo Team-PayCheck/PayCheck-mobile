@@ -5,7 +5,6 @@ import WorkerMonthlyCalendarScreen from "../screens/worker/WorkerMonthlyCalendar
 import ProfileEditScreen from "../screens/worker/mypage/ProfileEditScreen";
 import WorkplaceManageScreen from "../screens/worker/mypage/WorkplaceManageScreen";
 import SentRequestsScreen from "../screens/worker/mypage/SentRequestsScreen";
-import AccountSettingsScreen from "../screens/worker/mypage/AccountSettingsScreen";
 import WithdrawScreen from "../screens/worker/mypage/WithdrawScreen";
 
 export type WorkerStackParamList = {
@@ -33,7 +32,6 @@ const WorkerStack = () => {
 		       <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
 		       <Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 		       <Stack.Screen name="SentRequests" component={SentRequestsScreen} />
-		       <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
 		       <Stack.Screen name="Withdraw" component={WithdrawScreen} />
 	       </Stack.Navigator>
        );
