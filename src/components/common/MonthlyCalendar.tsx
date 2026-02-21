@@ -50,55 +50,17 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
       </Text>
       {/* 근무 점(최대 3개, 빨간/파란색) */}
       <View style={styles.dotRow}>
-        {dotInfo && dotInfo.count > 0 && (() => {
-          const dots = [];
-          const maxDots = Math.min(dotInfo.count, 3);
-          // 정정 요청 있으면 빨간 점 1개 + 파란 점
-          if (dotInfo.hasCorrectionRequest) {
-            dots.push(
-              <View
-                key={0}
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: 2.5,
-                  backgroundColor: colors.red,
-                  marginHorizontal: 1,
-                }}
-              />
-            );
-            for (let k = 1; k < maxDots; k++) {
-              dots.push(
-                <View
-                  key={k}
-                  style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: 2.5,
-                    backgroundColor: colors.blue,
-                    marginHorizontal: 1,
-                  }}
-                />
-              );
-            }
-          } else { // 정정 요청 없으면 모두 파란 점
-            for (let k = 0; k < maxDots; k++) {
-              dots.push(
-                <View
-                  key={k}
-                  style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: 2.5,
-                    backgroundColor: colors.blue,
-                    marginHorizontal: 1,
-                  }}
-                />
-              );
-            }
-          }
-          return dots;
-        })()}
+        {dotInfo && dotInfo.count > 0 &&
+          Array.from({ length: Math.min(dotInfo.count, 3) }, (_, k) => (
+            <View
+              key={k}
+              style={[
+                styles.dot,
+                k === 0 && dotInfo.hasCorrectionRequest ? styles.dotRed : styles.dotBlue,
+              ]}
+            />
+          ))
+        }
       </View>
     </TouchableOpacity>
   );
@@ -290,6 +252,18 @@ const styles = StyleSheet.create({
   },
   outsideMonth: {
     color: colors.textMuted,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    marginHorizontal: 1,
+  },
+  dotBlue: {
+    backgroundColor: colors.blue,
+  },
+  dotRed: {
+    backgroundColor: colors.red,
   },
 });
 
