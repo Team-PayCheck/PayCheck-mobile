@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getUserProfile } from "../../api/user";
 import { getWorkerInfo } from "../../api/worker";
 import type { UserResponse, WorkerResponse } from "../../api/user/types";
@@ -7,6 +7,7 @@ interface UseUserDataReturn {
   user: UserResponse | null;
   worker: WorkerResponse | null;
   isLoading: boolean;
+  refetch: () => Promise<void>;
 }
 
 /**
@@ -21,11 +22,24 @@ export function useWorkerData(): UseUserDataReturn {
   const [worker, setWorker] = useState<WorkerResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // 근로자 정보 조회
-    const fetchWorkerInfo = async (userId: number) => {
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      // 1. 사용자 프로필 조회
+      const userRes = await getUserProfile();
+
+      if (!userRes.success || !userRes.data) {
+        setUser(null);
+        setWorker(null);
+        return;
+      }
+
+      setUser(userRes.data);
+
+      // 2. 근로자 정보 조회
       try {
-        const workerResponse = await getWorkerInfo(userId);
+        const workerResponse = await getWorkerInfo(userRes.data.id);
         const hasValidWorkerData = workerResponse.success && workerResponse.data;
 
         if (hasValidWorkerData && workerResponse.data) {
@@ -37,36 +51,18 @@ export function useWorkerData(): UseUserDataReturn {
         console.error('근로자 정보 조회 실패:', workerError);
         setWorker(null);
       }
-    };
-    
-    // 사용자 데이터 조회
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-
-        // 1. 사용자 프로필 조회
-        const userRes = await getUserProfile();
-
-        if (!userRes.success || !userRes.data) {
-          setUser(null);
-          setWorker(null);
-          return;
-        }
-
-        setUser(userRes.data);
-
-        // 2. 근로자 정보 조회
-        await fetchWorkerInfo(userRes.data.id);
-      } catch (error) {
-        console.error('사용자 프로필 조회 실패:', error);
-        setUser(null);
-        setWorker(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+    } catch (error) {
+      console.error('사용자 프로필 조회 실패:', error);
+      setUser(null);
+      setWorker(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { user, worker, isLoading };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { user, worker, isLoading, refetch: fetchData };
 }

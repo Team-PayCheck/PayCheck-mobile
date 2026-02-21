@@ -6,11 +6,13 @@ import { colors } from "../../constants/colors";
 interface ProfileImagePickerProps {
 	imageUri?: string | null;
 	onPress: () => void;
+	showCameraIcon?: boolean;
 }
 
 const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({
 	imageUri,
 	onPress,
+	showCameraIcon = true,
 }) => {
 	return (
 		<TouchableOpacity
@@ -22,12 +24,16 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({
 				{imageUri ? (
 					<Image source={{ uri: imageUri }} style={styles.image} />
 				) : (
-					<View style={styles.placeholder} />
+					<View style={styles.placeholder}>
+					<Ionicons name="person" size={60} color={colors.white} />
+				</View>
 				)}
 			</View>
-			<View style={styles.cameraButton}>
-				<Ionicons name="camera-outline" size={20} color={colors.textPrimary} />
-			</View>
+			{showCameraIcon && (
+				<View style={styles.cameraButton}>
+					<Ionicons name="camera-outline" size={20} color={colors.textPrimary} />
+				</View>
+			)}
 		</TouchableOpacity>
 	);
 };
@@ -52,6 +58,8 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 		backgroundColor: colors.grey,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 	cameraButton: {
 		position: "absolute",

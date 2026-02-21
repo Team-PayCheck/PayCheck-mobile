@@ -10,7 +10,7 @@ export interface UserResponse {
   name: string;
   phone: string;
   userType: UserType;
-  profileImageUrl?: string;
+  profileImageUrl: string | null;
 }
 
 /** [PUT] /api/users/me 요청 데이터 */

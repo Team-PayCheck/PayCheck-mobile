@@ -16,33 +16,45 @@ PayCheck 웹 프로젝트(payCheck-frontend)를 React Native(Expo)로 모바일 
 
 ```
 src/
-├── api/              # API 연동 (axios 인스턴스, 인터셉터)
+├── api/              # API 연동 (도메인별 폴더 구조)
+│   ├── axios.ts      # Axios 인스턴스 + 인터셉터
+│   ├── auth/         # 인증 API (로그인, 회원가입, 로그아웃)
+│   ├── user/         # 사용자 API (프로필 조회/수정)
+│   └── worker/       # 근로자 API (계약, 근무기록, 정정요청)
 ├── assets/           # 폰트, 이미지
 ├── components/       # 재사용 컴포넌트
-│   ├── common/       # 공통 (Text, PrimaryButton 등)
+│   ├── common/       # 공통 (Text, PrimaryButton, BottomSheetModal, WheelPicker 등)
 │   ├── employer/     # 고용주 전용
-│   ├── layout/       # 레이아웃
-│   ├── mypage/       # 마이페이지
+│   ├── layout/       # 레이아웃 (Header)
+│   ├── mypage/       # 마이페이지 (Drawer, 프로필 수정, 근무지 관리 등)
 │   ├── signup/       # 회원가입 (ProgressBar, FormInput 등)
 │   ├── skeleton/     # 로딩 스켈레톤
-│   └── worker/       # 근로자 전용
+│   └── worker/       # 근로자 전용 (주간 캘린더, 근무 카드 등)
 ├── hooks/            # 커스텀 훅
-│   ├── common/       # useOnboardingStatus 등
+│   ├── common/       # useOnboardingStatus, useLogoutHandler
 │   ├── employer/
-│   └── worker/
+│   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData 등
 ├── navigation/       # 네비게이션 설정
+│   ├── RootNavigator.tsx
+│   ├── SignUpNavigator.tsx
+│   ├── OnboardingStack.tsx
+│   └── WorkerStack.tsx
 ├── screens/          # 화면 컴포넌트
-│   ├── auth/         # 회원가입
+│   ├── auth/         # 회원가입 (Step1~5)
 │   ├── employer/     # 고용주 화면 (EmployerHomeScreen 등)
 │   ├── onboarding/   # 온보딩, 로그인
-│   ├── mypage/       # 마이페이지
-│   └── worker/       # 근로자 화면 (WorkerHomeScreen 등)
+│   └── worker/       # 근로자 화면 (주간 캘린더, 마이페이지 서브 화면)
 ├── stores/           # Zustand 전역 상태 (authStore, onboardingStore, signUpStore)
-├── types/            # TypeScript 타입 (api.types.ts 등)
-└── utils/            # 유틸리티 함수
+├── types/            # TypeScript 타입 (공통 API 타입, UI 도메인 타입)
+├── constants/        # 상수 (colors, bank, pickerItems)
+└── utils/            # 유틸리티 함수 (alert, date, format, image, notification)
 ```
 
 ## 주요 기능
+
+### 근로자 기능
+- 주간 캘린더: 근무 기록 조회, 근무 추가/정정 요청
+- 마이페이지: Drawer 메뉴, 프로필 수정, 근무지 관리, 보낸 요청, 회원탈퇴
 
 ### 인증
 - 카카오 네이티브 SDK 로그인 (`@react-native-seoul/kakao-login`)

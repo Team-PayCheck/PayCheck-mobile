@@ -7,8 +7,11 @@ import HomeBackButton from "../../../components/common/HomeBackButton";
 import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import { colors } from "../../../constants/colors";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "Withdraw">;
@@ -16,12 +19,12 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "Withdraw">;
 const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
 	const closeDrawer = () => setIsDrawerVisible(false);
 	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
-	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 탈퇴 버튼 클릭 시 확인 모달
@@ -60,7 +63,7 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<View style={styles.scrollContent}>
 				<View style={styles.headerArea}>
-					<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+					<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
 				</View>
 				<View style={styles.contentArea}>
 					<Image source={require("../../../assets/images/mypage/quit.png")} style={styles.illust} resizeMode="contain" />
@@ -86,10 +89,20 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 				onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
 				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+				onPressAccountSettings={() => {
+					setIsDrawerVisible(false);
+					setTimeout(() => setIsAccountSheetVisible(true), 220);
+				}}
 				onPressLogout={handleLogout}
 				onPressWithdraw={() => closeDrawer()}
 			/>
+
+			<BottomSheetModal
+				visible={isAccountSheetVisible}
+				onClose={() => setIsAccountSheetVisible(false)}
+			>
+				<AccountTermsContent />
+			</BottomSheetModal>
 		</SafeAreaView>
 	);
 };

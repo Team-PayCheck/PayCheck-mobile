@@ -4,6 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Header from "../../components/layout/Header";
 import MyPageDrawer from "../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../components/common/BottomSheetModal";
+import { Text } from "../../components/common/Text";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../navigation/WorkerStack";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
@@ -26,6 +29,7 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
 
 const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
 	const closeDrawer = () => setIsDrawerVisible(false);
 	const navigateFromDrawer = (route: keyof WorkerStackParamList) => {
 		closeDrawer();
@@ -102,16 +106,27 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				/>
 			</ScrollView>
 			
-			<MyPageDrawer
-				visible={isDrawerVisible}
-				onClose={closeDrawer}
-				onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
-				onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
-				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
-				onPressLogout={handleLogout}
-				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
-			/>
+
+				<MyPageDrawer
+					visible={isDrawerVisible}
+					onClose={closeDrawer}
+					onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
+					onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
+					onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+					onPressAccountSettings={() => {
+						setIsDrawerVisible(false);
+						setTimeout(() => setIsAccountSheetVisible(true), 220);
+					}}
+					onPressLogout={handleLogout}
+					onPressWithdraw={() => navigateFromDrawer("Withdraw")}
+				/>
+
+				<BottomSheetModal
+					visible={isAccountSheetVisible}
+					onClose={() => setIsAccountSheetVisible(false)}
+				>
+					<AccountTermsContent />
+				</BottomSheetModal>
 
 			<AddWorkRequestModal
 				visible={addModalVisible}

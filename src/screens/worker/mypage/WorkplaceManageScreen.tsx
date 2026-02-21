@@ -6,11 +6,14 @@ import HomeBackButton from "../../../components/common/HomeBackButton";
 import { Text } from "../../../components/common/Text";
 import Header from "../../../components/layout/Header";
 import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
 import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceCard";
 import { getContracts } from "../../../api/worker";
 import type { ContractListItem } from "../../../api/worker/types";
 import { colors } from "../../../constants/colors";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
@@ -24,6 +27,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [workplaces, setWorkplaces] = useState<ContractListItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
 
 	const closeDrawer = () => setIsDrawerVisible(false);
 
@@ -32,7 +36,6 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		navigation.navigate(route);
 	};
 
-	const { useLogoutHandler } = require("../../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	// 컴포넌트 마운트 시 근무지(계약) 정보 fetch
@@ -87,7 +90,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 			<View style={styles.scrollContent}>
 				<View style={styles.headerRow}>
 					<View style={{ flex: 1 }}>
-						<HomeBackButton onPress={() => navigation.navigate("WorkerHomeMain")} />
+						<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "WorkerHomeMain" }] })} />
 						<Text weight="ExtraBold" style={styles.title}>내 근무지</Text>
 					</View>
 					<View style={styles.illustWrapper}>
@@ -114,10 +117,20 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
 				onPressWorkplaceManage={() => closeDrawer()}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
-				onPressAccountSettings={() => navigateFromDrawer("AccountSettings")}
+				onPressAccountSettings={() => {
+					setIsDrawerVisible(false);
+					setTimeout(() => setIsAccountSheetVisible(true), 220);
+				}}
 				onPressLogout={handleLogout}
 				onPressWithdraw={() => navigateFromDrawer("Withdraw")}
 			/>
+
+			<BottomSheetModal
+				visible={isAccountSheetVisible}
+				onClose={() => setIsAccountSheetVisible(false)}
+			>
+				<AccountTermsContent />
+			</BottomSheetModal>
 		</SafeAreaView>
 	);
 };
