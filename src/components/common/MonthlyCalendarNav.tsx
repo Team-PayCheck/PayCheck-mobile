@@ -18,7 +18,6 @@ interface MonthlyCalendarNavProps {
   month: number; // 0-indexed
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  onPressWeeklyView?: () => void;
 }
 
 const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
@@ -26,11 +25,10 @@ const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
   month,
   onPrevMonth,
   onNextMonth,
-  onPressWeeklyView,
 }) => {
   const navigation = useNavigation<NativeStackNavigationProp<WorkerStackParamList>>();
   const handleWeeklyView = () => {
-    navigation.navigate("WorkerHomeMain");
+    navigation.replace("WorkerHomeMain");
   };
   return (
     <View style={styles.monthNavRow}>
