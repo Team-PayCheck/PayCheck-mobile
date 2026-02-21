@@ -43,6 +43,7 @@ const usePayments = (year: number, month: number) => {
 					try {
 						const salaryRes = await getSalaryDetail(payment.salaryId);
 						const salary = salaryRes.data;
+						if (!salary) return null;
 						return {
 							workplaceName: salary.workplaceName,
 							baseSalary: salary.totalGrossPay,
