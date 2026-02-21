@@ -13,25 +13,42 @@ interface WorkCardProps {
 	onPressCorrectionRequest?: (work: WorkItem) => void;
 }
 
-const StatusBadge: React.FC<{ status: WorkItem["status"] }> = ({ status }) => {
-	const isScheduled = status === "SCHEDULED";
+const isCurrentlyWorking = (work: WorkItem): boolean => {
+	const now = new Date();
+	const [startH, startM] = work.startTime.split(":").map(Number);
+	const [endH, endM] = work.endTime.split(":").map(Number);
+
+	const start = new Date(`${work.workDate}T00:00:00`);
+	start.setHours(startH, startM, 0, 0);
+
+	const end = new Date(`${work.workDate}T00:00:00`);
+	end.setHours(endH, endM, 0, 0);
+
+	return now >= start && now <= end;
+};
+
+const StatusBadge: React.FC<{ work: WorkItem }> = ({ work }) => {
+	const working = work.status === "SCHEDULED" && isCurrentlyWorking(work);
+	const isScheduled = work.status === "SCHEDULED" && !working;
+
+	const badgeStyle = working
+		? styles.statusWorking
+		: isScheduled
+			? styles.statusScheduled
+			: styles.statusCompleted;
+
+	const textStyle = working
+		? styles.statusTextWorking
+		: isScheduled
+			? styles.statusTextScheduled
+			: styles.statusTextCompleted;
+
+	const label = working ? "근무중" : isScheduled ? "근무예정" : "근무완료";
+
 	return (
-		<View
-			style={[
-				styles.statusBadge,
-				isScheduled ? styles.statusScheduled : styles.statusCompleted,
-			]}
-		>
-			<Text
-				weight="SemiBold"
-				style={[
-					styles.statusText,
-					isScheduled
-						? styles.statusTextScheduled
-						: styles.statusTextCompleted,
-				]}
-			>
-				{isScheduled ? "근무예정" : "근무완료"}
+		<View style={[styles.statusBadge, badgeStyle]}>
+			<Text weight="SemiBold" style={[styles.statusText, textStyle]}>
+				{label}
 			</Text>
 		</View>
 	);
@@ -65,7 +82,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 					</Text>
 				</View>
 				<View style={styles.headerRight}>
-					<StatusBadge status={work.status} />
+					<StatusBadge work={work} />
 					<Feather
 						name={isExpanded ? "chevron-up" : "chevron-down"}
 						size={20}
@@ -183,6 +200,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 		borderRadius: 10,
 	},
+	statusWorking: {
+		backgroundColor: colors.primary,
+	},
 	statusScheduled: {
 		backgroundColor: colors.green,
 	},
@@ -191,6 +211,9 @@ const styles = StyleSheet.create({
 	},
 	statusText: {
 		fontSize: 11,
+	},
+	statusTextWorking: {
+		color: colors.white,
 	},
 	statusTextScheduled: {
 		color: colors.white,
