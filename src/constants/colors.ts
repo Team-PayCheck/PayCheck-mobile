@@ -30,8 +30,8 @@ export const colors = {
 	green: "#28C28D",
 
 	// 기타
- 	blue: "#038BFA",
-	grey: "#EEEEEE",
+  blue: "#038BFA",
+	grey: "#A0A0A0",
 	white: "#FFFFFF",
 	black: "#000000",
 	disabled: "#EEEEEE",

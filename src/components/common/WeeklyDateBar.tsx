@@ -54,35 +54,36 @@ const WeeklyDateBar: React.FC<WeeklyDateBarProps> = ({
 			{/* 요일/날짜 카드 행 */}
 			<View style={styles.daysRow}>
 				{weekDays.map((day) => {
-					const isToday = getIsSelected(day);
-					const hasScheduled = !isToday && day.workStatus === "SCHEDULED";
-					const hasCompleted = !isToday && day.workStatus === "COMPLETED";
+					const isSelected = getIsSelected(day);
+					const hasWork = !!day.workStatus && day.workStatus !== "DELETED";
+					const isPastWithWork = !isSelected && day.isPast && hasWork;
+					const isFutureWithWork = !isSelected && !day.isPast && hasWork;
 					return (
 						<TouchableOpacity
 							key={day.date}
 							style={[
 								styles.dayCard,
-								isToday && styles.dayCardToday,
-								hasScheduled && styles.dayCardScheduled,
-								hasCompleted && styles.dayCardCompleted,
+								isSelected && styles.dayCardToday,
+								isFutureWithWork && styles.dayCardScheduled,
+								isPastWithWork && styles.dayCardCompleted,
 							]}
 							onPress={() => onPressDay?.(day)}
 							activeOpacity={0.7}
 						>
 							<Text
-								weight={isToday ? "Bold" : "Medium"}
+								weight={isSelected ? "Bold" : "Medium"}
 								style={[
 									styles.dayLabel,
-									isToday && styles.textToday,
+									isSelected && styles.textToday,
 								]}
 							>
 								{day.dayLabel}
 							</Text>
 							<Text
-								weight={isToday ? "Bold" : "SemiBold"}
+								weight={isSelected ? "Bold" : "SemiBold"}
 								style={[
 									styles.dateText,
-									isToday && styles.textToday,
+									isSelected && styles.textToday,
 								]}
 							>
 								{day.date}
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.mint,
 	},
 	dayCardCompleted: {
-		backgroundColor: colors.grey,
+		backgroundColor: colors.disabled,
 	},
 	dayLabel: {
 		fontSize: 12,
