@@ -16,6 +16,7 @@ import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkR
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
 import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
+import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 import { colors } from "../../constants/colors";
 import {
 	getWeekTitle,
@@ -35,7 +36,6 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 		closeDrawer();
 		navigation.navigate(route);
 	};
-	const { useLogoutHandler } = require("../../hooks/common/useLogoutHandler");
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	

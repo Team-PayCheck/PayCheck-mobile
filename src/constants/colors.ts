@@ -17,6 +17,7 @@ export const colors = {
 	textSecondary: "#777777",
 	textMuted: "#AAAAAA",
 	textDisabled: "#CCCCCC",
+	
 
 	// 테두리/구분선
 	border: "#E8E8E8",
@@ -35,6 +36,7 @@ export const colors = {
 	black: "#000000",
 	disabled: "#EEEEEE",
 	deleteRed: "#FF4D4F",
+	lightBlue: "#a8cfff",
 } as const;
 
 export type ColorName = keyof typeof colors;

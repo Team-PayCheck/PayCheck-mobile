@@ -7,7 +7,6 @@ import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerStack from "../navigation/WorkerStack";
-import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
 import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
 
 export type RootStackParamList = {

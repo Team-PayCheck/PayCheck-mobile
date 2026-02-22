@@ -182,7 +182,7 @@ export interface SalaryDetailResponse {
 // ============ 송금 관련 타입 ============
 
 /** 송금 상태 */
-export type PaymentStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 /** 송금 내역 조회 응답 아이템 (/api/worker/payments) */
 export interface PaymentResponse {
