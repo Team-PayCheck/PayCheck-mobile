@@ -18,6 +18,7 @@ import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
 import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 import { colors } from "../../constants/colors";
+import type { WeekDay } from "../../types/worker.types";
 import {
 	getWeekTitle,
 	getWeekDays,
@@ -41,11 +42,24 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
-	const weekDays = getWeekDays(today);
+	const baseWeekDays = getWeekDays(today);
 	const weekLabel = getWeekLabel(today);
 	const { startDate, endDate } = useMemo(() => getWeekRange(today), []);
 
 	const { works, isLoading } = useWorkRecords(startDate, endDate);
+
+	// 근무 데이터를 날짜 카드에 매핑
+	const weekDays = useMemo(() => {
+		const workDateMap = new Map<number, string>();
+		works.forEach((w) => {
+			const date = new Date(`${w.workDate}T00:00:00`).getDate();
+			workDateMap.set(date, w.status);
+		});
+		return baseWeekDays.map((day) => ({
+			...day,
+			workStatus: workDateMap.get(day.date) as WeekDay["workStatus"],
+		}));
+	}, [baseWeekDays, works]);
 
 	const {
 		correctionModalVisible,

@@ -51,13 +51,18 @@ export const getWeekDays = (baseDate: Date): WeekDay[] => {
 
 	const todayStr = baseDate.toDateString();
 
+	const todayStart = new Date(baseDate);
+	todayStart.setHours(0, 0, 0, 0);
+
 	return DAY_LABELS.map((label, i) => {
 		const d = new Date(monday);
 		d.setDate(monday.getDate() + i);
+		d.setHours(0, 0, 0, 0);
 		return {
 			dayLabel: label,
 			date: d.getDate(),
 			isToday: d.toDateString() === todayStr,
+			isPast: d.getTime() < todayStart.getTime(),
 		};
 	});
 };
