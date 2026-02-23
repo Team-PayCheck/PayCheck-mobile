@@ -179,6 +179,9 @@ export interface SalaryDetailResponse {
 	paymentDueDate: string;
 }
 
+/** 급여 자동 계산 응답 (POST /api/worker/salaries/contracts/{contractId}/calculate) */
+export type SalaryCalculateResponse = SalaryDetailResponse;
+
 // ============ 송금 관련 타입 ============
 
 /** 송금 상태 */

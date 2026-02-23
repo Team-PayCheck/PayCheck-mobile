@@ -12,6 +12,7 @@ import type {
 	CorrectionStatus,
 	PaymentResponse,
 	SalaryDetailResponse,
+	SalaryCalculateResponse,
 } from "./types";
 
 
@@ -238,6 +239,32 @@ export const getSalaryDetail = async (
 			axiosError.response?.data?.error?.message ||
 			axiosError.message ||
 			"급여 상세 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 급여 자동 계산
+ * POST /api/worker/salaries/contracts/{contractId}/calculate?year=2026&month=2
+ */
+export const calculateSalary = async (
+	contractId: number,
+	year: number,
+	month: number
+): Promise<ApiResponse<SalaryCalculateResponse>> => {
+	try {
+		const { data } = await api.post<ApiResponse<SalaryCalculateResponse>>(
+			`/api/worker/salaries/contracts/${contractId}/calculate`,
+			null,
+			{ params: { year, month } }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<SalaryCalculateResponse>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"급여 계산 실패";
 		throw new Error(message);
 	}
 };
