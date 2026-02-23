@@ -154,7 +154,11 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     fetchWorkers();
   }, [workplaceId]);
 
-  return { workers, isLoading };
+  const removeWorker = (contractId: number) => {
+    setWorkers((prev) => prev.filter((w) => w.contractId !== contractId));
+  };
+
+  return { workers, isLoading, removeWorker };
 };
 
 export default useWorkplaceContracts;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, FlatList, ActivityIndicator, View } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -20,6 +20,7 @@ import type {
 } from "../../api/employer/types";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
+import { deleteContract } from "../../api/employer";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -38,7 +39,7 @@ const WorkerManageScreen: React.FC = () => {
     setSelectedWorkplaceId,
   } = useWorkplaceManagement();
 
-  const { workers, isLoading: isWorkersLoading } = useWorkplaceContracts(selectedWorkplaceId);
+  const { workers, isLoading: isWorkersLoading, removeWorker } = useWorkplaceContracts(selectedWorkplaceId);
 
   const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
@@ -82,9 +83,17 @@ const WorkerManageScreen: React.FC = () => {
     console.log("update", contractId, data);
   };
 
-  const handleResign = (contractId: number) => {
-    // TODO: API 연동
-    console.log("resign", contractId);
+  const handleResign = async (contractId: number) => {
+    try {
+      await deleteContract(contractId);
+      removeWorker(contractId);
+      setExpandedContractId(null);
+      if (selectedFilterId !== "all") {
+        setSelectedFilterId("all");
+      }
+    } catch {
+      Alert.alert("퇴사 처리 실패", "퇴사 처리 중 오류가 발생했습니다.");
+    }
   };
 
   // 필터 적용: "all"이면 전체, 특정 id면 해당 근무자만
