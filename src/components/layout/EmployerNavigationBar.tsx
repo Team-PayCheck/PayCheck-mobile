@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "../common/Text";
 import { colors } from "../../constants/colors";
 
-export type EmployerTabName = "home" | "employee" | "transfer";
+export type EmployerTabName = "home" | "worker" | "transfer";
 
 interface TabItem {
   name: EmployerTabName;
@@ -21,7 +21,7 @@ const TAB_ITEMS: TabItem[] = [
     iconPressed: require("../../assets/images/navigationBar/home_pressed.png"),
   },
   {
-    name: "employee",
+    name: "worker",
     label: "직원관리",
     icon: require("../../assets/images/navigationBar/user-check.png"),
     iconPressed: require("../../assets/images/navigationBar/user-check_pressed.png"),
