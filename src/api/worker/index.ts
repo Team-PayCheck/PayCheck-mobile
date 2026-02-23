@@ -245,7 +245,7 @@ export const getSalaryDetail = async (
 
 /**
  * 급여 자동 계산
- * POST /api/worker/salaries/contracts/{contractId}/calculate?year=2026&month=2
+ * POST /api/worker/salaries/contracts/{contractId}/calculate?year=&month=
  */
 export const calculateSalary = async (
 	contractId: number,
