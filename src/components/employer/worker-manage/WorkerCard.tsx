@@ -10,6 +10,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import WorkTimeRow from "./WorkTimeRow";
+import WorkScheduleCalendarModal from "./WorkScheduleCalendarModal";
 import { colors } from "../../../constants/colors";
 import type {
   EmployerWorkerContract,
@@ -23,7 +24,6 @@ interface WorkerCardProps {
   onToggle: () => void;
   onUpdate: (contractId: number, data: ContractUpdateRequest) => void;
   onResign: (contractId: number) => void;
-  onOpenCalendar: (worker: EmployerWorkerContract) => void;
 }
 
 let rowKeyCounter = 1000;
@@ -35,8 +35,8 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   onToggle,
   onUpdate,
   onResign,
-  onOpenCalendar,
 }) => {
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const [hourlyWage, setHourlyWage] = useState(
     worker.hourlyWage.toLocaleString()
   );
@@ -239,7 +239,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
             </Text>
             <TouchableOpacity
               style={styles.calendarViewButton}
-              onPress={() => onOpenCalendar(worker)}
+              onPress={() => setCalendarVisible(true)}
               activeOpacity={0.7}
             >
               <Feather name="calendar" size={16} color={colors.textSecondary} />
@@ -293,6 +293,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
           </View>
         </View>
       )}
+      {/* 근무 달력 모달 */}
+      <WorkScheduleCalendarModal
+        visible={calendarVisible}
+        onClose={() => setCalendarVisible(false)}
+        workerName={worker.workerName}
+        workSchedules={workSchedules}
+      />
     </View>
   );
 };

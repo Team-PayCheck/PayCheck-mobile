@@ -15,7 +15,6 @@ import WorkerFilterTabs, {
 import WorkerCard from "../../components/employer/worker-manage/WorkerCard";
 import type {
   Workplace,
-  EmployerWorkerContract,
   ContractUpdateRequest,
 } from "../../api/employer/types";
 import {
@@ -81,11 +80,6 @@ const WorkerManageScreen: React.FC = () => {
     console.log("resign", contractId);
   };
 
-  const handleOpenCalendar = (worker: EmployerWorkerContract) => {
-    // TODO: 5단계 - 근무 달력 모달 열기
-    console.log("calendar", worker.workerName);
-  };
-
   // 필터 적용: "all"이면 전체, 특정 id면 해당 근무자만
   const filteredWorkers =
     selectedFilterId === "all"
@@ -115,7 +109,6 @@ const WorkerManageScreen: React.FC = () => {
             onToggle={() => handleCardToggle(item.contractId)}
             onUpdate={handleUpdate}
             onResign={handleResign}
-            onOpenCalendar={handleOpenCalendar}
           />
         )}
         contentContainerStyle={styles.listContent}
@@ -129,7 +122,7 @@ const WorkerManageScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundGrey,
+    backgroundColor: colors.background,
   },
   listContent: {
     paddingTop: 12,
