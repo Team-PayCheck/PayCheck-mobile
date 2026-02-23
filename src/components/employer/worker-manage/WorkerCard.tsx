@@ -129,24 +129,19 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       <TouchableOpacity
         style={styles.header}
         onPress={onToggle}
-        activeOpacity={0.8}
+        activeOpacity={0.7}
       >
         {/* 아바타 */}
         <View style={styles.avatar}>
-          {worker.workerProfileImage ? (
-            // 이후 이미지 적용 가능
-            <Feather name="user" size={22} color={colors.textMuted} />
-          ) : (
-            <Feather name="user" size={22} color={colors.textMuted} />
-          )}
+          <Feather name="user" size={20} color={colors.textMuted} />
         </View>
 
         {/* 이름 + 근무 요일 */}
         <View style={styles.headerInfo}>
-          <Text style={styles.workDays}>
+          <Text weight="SemiBold" style={styles.workDays}>
             {worker.workDaysSummary.join("/")}
           </Text>
-          <Text weight="SemiBold" style={styles.workerName}>
+          <Text weight="Bold" style={styles.workerName}>
             {worker.workerName}
           </Text>
         </View>
@@ -154,14 +149,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         <Feather
           name={isExpanded ? "chevron-up" : "chevron-down"}
           size={20}
-          color={colors.textSecondary}
+          color={colors.black}
         />
       </TouchableOpacity>
 
       {/* ── 펼친 상태 폼 ── */}
       {isExpanded && (
         <View style={styles.form}>
-          <View style={styles.formDivider} />
 
           {/* 근무자 정보 수정 타이틀 */}
           <Text weight="SemiBold" style={styles.formTitle}>
@@ -307,82 +301,74 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 10,
+    padding: 16,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
-    overflow: "hidden",
   },
   // 접힌 헤더
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
     gap: 12,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     backgroundColor: colors.backgroundGrey,
     alignItems: "center",
     justifyContent: "center",
   },
   headerInfo: {
     flex: 1,
+    gap: 2,
   },
   workDays: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginBottom: 3,
   },
   workerName: {
-    fontSize: 16,
+    fontSize: 13,
     color: colors.textPrimary,
   },
   // 펼친 폼
-  formDivider: {
-    height: 1,
-    backgroundColor: colors.borderLight,
-    marginHorizontal: 16,
-  },
   form: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    gap: 12,
   },
   formTitle: {
     fontSize: 16,
     color: colors.textPrimary,
-    marginTop: 16,
-    marginBottom: 14,
   },
   inlineRow: {
     flexDirection: "row",
-    gap: 16,
-    marginBottom: 4,
+    gap: 12,
   },
   inlineField: {
     flex: 1,
   },
   fieldLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
+    fontSize: 12,
+    color: colors.textMuted,
     marginBottom: 6,
   },
   inputWithUnit: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: colors.backgroundGrey,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
   textInput: {
     flex: 1,
@@ -406,27 +392,22 @@ const styles = StyleSheet.create({
   toggleDivider: {
     height: 1,
     backgroundColor: colors.borderLight,
-    marginVertical: 12,
     marginHorizontal: -16,
-    paddingHorizontal: 16,
   },
   toggleItem: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 4,
   },
   // 근무시간 섹션
   scheduleSectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 4,
-    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: colors.textPrimary,
   },
   calendarViewButton: {
@@ -443,8 +424,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-end",
     gap: 4,
-    marginTop: 4,
-    marginBottom: 16,
   },
   addScheduleText: {
     fontSize: 14,
@@ -458,12 +437,12 @@ const styles = StyleSheet.create({
   resignButton: {
     flex: 1,
     backgroundColor: colors.red,
-    borderRadius: 10,
+    borderRadius: 20,
     paddingVertical: 12,
     alignItems: "center",
   },
   resignText: {
-    fontSize: 15,
+    fontSize: 14,
     color: colors.white,
   },
   updateButton: {
@@ -474,12 +453,12 @@ const styles = StyleSheet.create({
     gap: 6,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 10,
+    borderRadius: 20,
     paddingVertical: 12,
   },
   updateText: {
-    fontSize: 15,
-    color: colors.textPrimary,
+    fontSize: 14,
+    color: colors.textSecondary,
   },
 });
 

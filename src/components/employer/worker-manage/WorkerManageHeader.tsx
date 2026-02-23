@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
@@ -16,8 +16,6 @@ interface WorkerManageHeaderProps {
   workplaces: Workplace[];
   onWorkplaceChange: (workplace: Workplace) => void;
   onAddWorker: () => void;
-  onMenuPress?: () => void;
-  onNotificationPress?: () => void;
 }
 
 const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
@@ -25,8 +23,6 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
   workplaces,
   onWorkplaceChange,
   onAddWorker,
-  onMenuPress,
-  onNotificationPress,
 }) => {
   const [workplaceModalVisible, setWorkplaceModalVisible] = useState(false);
 
@@ -37,20 +33,6 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
 
   return (
     <>
-      {/* 상단 아이콘 행 */}
-      <View style={styles.iconRow}>
-        <TouchableOpacity onPress={onMenuPress} activeOpacity={0.8}>
-          <Feather name="align-left" size={28} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onNotificationPress} activeOpacity={0.8}>
-          <Ionicons
-            name="notifications-outline"
-            size={28}
-            color={colors.textPrimary}
-          />
-        </TouchableOpacity>
-      </View>
-
       {/* 근무지 드롭다운 + 근무자 추가 행 */}
       <View style={styles.actionRow}>
         <TouchableOpacity
@@ -120,14 +102,6 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
 };
 
 const styles = StyleSheet.create({
-  iconRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",

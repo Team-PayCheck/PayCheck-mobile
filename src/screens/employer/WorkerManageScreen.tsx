@@ -8,6 +8,7 @@ import EmployerNavigationBar, {
   type EmployerTabName,
 } from "../../components/layout/EmployerNavigationBar";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
+import Header from "../../components/layout/Header";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, {
   type WorkerFilterId,
@@ -88,6 +89,7 @@ const WorkerManageScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
+      <Header /> {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
       <WorkerManageHeader
         selectedWorkplace={selectedWorkplace}
         workplaces={DUMMY_WORKPLACES}
