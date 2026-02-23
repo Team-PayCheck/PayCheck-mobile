@@ -90,7 +90,7 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
                   {workplace.name}
                 </Text>
                 <Text style={styles.workerCountText}>
-                  {workplace.workerCount}명
+                  {workplace.workerCount ?? 0}명
                 </Text>
               </TouchableOpacity>
             );

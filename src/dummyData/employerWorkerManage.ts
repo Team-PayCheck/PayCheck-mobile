@@ -1,8 +1,8 @@
 import type { Workplace, EmployerWorkerContract } from "../api/employer/types";
 
 export const DUMMY_WORKPLACES: Workplace[] = [
-  { id: 1, name: "맥도날드 nn점", workerCount: 12 },
-  { id: 2, name: "스타벅스 n점", workerCount: 5 },
+  { id: 1, businessName: "맥도날드", name: "맥도날드 nn점", workerCount: 12, isActive: true },
+  { id: 2, businessName: "스타벅스", name: "스타벅스 n점", workerCount: 5, isActive: true },
 ];
 
 export const DUMMY_WORKERS: EmployerWorkerContract[] = [
