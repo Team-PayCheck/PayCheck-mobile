@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, ScrollView, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
@@ -59,19 +59,20 @@ const SalaryStatementSheet: React.FC<SalaryStatementSheetProps> = ({
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={styles.scrollContent}
 				>
-					<Text style={styles.title} weight="Bold">
-						급여명세서
-					</Text>
+					<View style={styles.header}>
+						<Text style={styles.title} weight="Bold">
+							급여명세서
+						</Text>
+						<TouchableOpacity onPress={onClose} hitSlop={8}>
+							<Text style={styles.closeButton}>✕</Text>
+						</TouchableOpacity>
+					</View>
 
 					<WorkplaceTabSelector
 						workplaceNames={workplaceNames}
 						selectedIndex={selectedIndex}
 						onSelect={setSelectedIndex}
 					/>
-
-					<Text style={styles.workplaceName} weight="Bold">
-						{currentStatement.workplaceName}
-					</Text>
 
 					<InsuranceToggleDisplay
 						payrollDeductionType={
@@ -111,17 +112,21 @@ const styles = StyleSheet.create({
 	scrollContent: {
 		paddingBottom: 20,
 	},
+	header: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 20,
+	},
 	title: {
 		fontSize: 22,
 		color: colors.textPrimary,
-		marginBottom: 20,
 	},
-	workplaceName: {
-		fontSize: 18,
-		color: colors.textPrimary,
-		marginTop: 16,
+	closeButton: {
+		fontSize: 20,
+		color: colors.textSecondary,
 	},
-	netPayContainer: {
+netPayContainer: {
 		alignItems: "center",
 		marginTop: 28,
 		paddingVertical: 16,
