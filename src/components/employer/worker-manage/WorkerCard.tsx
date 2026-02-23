@@ -133,7 +133,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       >
         {/* 아바타 */}
         <View style={styles.avatar}>
-          <Feather name="user" size={20} color={colors.textMuted} />
+          <Text weight="Bold" style={styles.avatarText}>
+            {worker.workerName.charAt(0)}
+          </Text>
         </View>
 
         {/* 이름 + 근무 요일 */}
@@ -302,7 +304,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: 16,
-    marginHorizontal: 16,
+    marginHorizontal: 25,
     marginBottom: 10,
     padding: 16,
     shadowColor: colors.black,
@@ -325,6 +327,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  avatarText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
   headerInfo: {
     flex: 1,
     gap: 2,
@@ -334,7 +340,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   workerName: {
-    fontSize: 13,
+    fontSize: 15,
     color: colors.textPrimary,
   },
   // 펼친 폼
@@ -357,8 +363,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fieldLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
+    fontSize: 14,
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   inputWithUnit: {
@@ -408,7 +414,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14,
-    color: colors.textPrimary,
+    color: colors.textSecondary,
   },
   calendarViewButton: {
     flexDirection: "row",
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   calendarViewText: {
-    fontSize: 13,
+    fontSize: 14,
     color: colors.textSecondary,
   },
   addScheduleButton: {
@@ -426,7 +432,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   addScheduleText: {
-    fontSize: 14,
+    fontSize: 12,
     color: colors.primary,
   },
   // 하단 버튼
@@ -438,27 +444,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.red,
     borderRadius: 20,
-    paddingVertical: 12,
+    height: 34,
+    paddingVertical: 9,
     alignItems: "center",
   },
   resignText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.white,
   },
   updateButton: {
-    flex: 2,
+    flex: 1.6,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
+    height: 34,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 20,
-    paddingVertical: 12,
+    paddingVertical: 5,
   },
   updateText: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: colors.textPrimary,
   },
 });
 

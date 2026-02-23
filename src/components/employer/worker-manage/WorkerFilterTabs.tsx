@@ -19,7 +19,7 @@ const WorkerFilterTabs: React.FC<WorkerFilterTabsProps> = ({
   onSelect,
 }) => {
   return (
-    <View style={styles.wrapper}>
+    <View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -67,10 +67,6 @@ const WorkerFilterTabs: React.FC<WorkerFilterTabsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
   container: {
     flexDirection: "row",
     gap: 8,

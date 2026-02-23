@@ -89,7 +89,8 @@ const WorkerManageScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <Header /> {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
+      {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
+      <Header />
       <WorkerManageHeader
         selectedWorkplace={selectedWorkplace}
         workplaces={DUMMY_WORKPLACES}
