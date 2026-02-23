@@ -18,8 +18,8 @@ import type {
   WorkplaceDetails,
   ContractUpdateRequest,
 } from "../../api/employer/types";
-import { DUMMY_WORKERS } from "../../dummyData/employerWorkerManage";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
+import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -37,6 +37,8 @@ const WorkerManageScreen: React.FC = () => {
     selectedWorkplaceId,
     setSelectedWorkplaceId,
   } = useWorkplaceManagement();
+
+  const { workers, isLoading: isWorkersLoading } = useWorkplaceContracts(selectedWorkplaceId);
 
   const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
@@ -88,14 +90,14 @@ const WorkerManageScreen: React.FC = () => {
   // 필터 적용: "all"이면 전체, 특정 id면 해당 근무자만
   const filteredWorkers =
     selectedFilterId === "all"
-      ? DUMMY_WORKERS
-      : DUMMY_WORKERS.filter((w) => w.contractId === selectedFilterId);
+      ? workers
+      : workers.filter((w) => w.contractId === selectedFilterId);
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
       <Header />
-      {isWorkplacesLoading || selectedWorkplace === null ? (
+      {isWorkplacesLoading || isWorkersLoading || selectedWorkplace === null ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -108,7 +110,7 @@ const WorkerManageScreen: React.FC = () => {
             onAddWorker={() => {}}
           />
           <WorkerFilterTabs
-            workers={DUMMY_WORKERS}
+            workers={workers}
             selectedId={selectedFilterId}
             onSelect={handleFilterSelect}
           />

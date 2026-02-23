@@ -138,13 +138,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
           </Text>
         </View>
 
-        {/* 이름 + 근무 요일 */}
+        {/* 이름 + 근무 스케줄 */}
         <View style={styles.headerInfo}>
-          <Text weight="SemiBold" style={styles.workDays}>
-            {worker.workDaysSummary.join("/")}
-          </Text>
           <Text weight="Bold" style={styles.workerName}>
             {worker.workerName}
+          </Text>
+          <Text weight="Regular" style={styles.workDays}>
+            {worker.workDaysSummary.join(" / ")}
           </Text>
         </View>
 
