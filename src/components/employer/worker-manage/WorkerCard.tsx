@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: 16,
-    marginHorizontal: 25,
+    marginHorizontal: 20,
     marginBottom: 10,
     padding: 16,
     shadowColor: colors.black,
@@ -343,7 +343,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
   },
-  // 펼친 폼
   form: {
     marginTop: 16,
     paddingTop: 16,
@@ -406,7 +405,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  // 근무시간 섹션
   scheduleSectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -435,7 +433,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.primary,
   },
-  // 하단 버튼
   actionRow: {
     flexDirection: "row",
     gap: 10,

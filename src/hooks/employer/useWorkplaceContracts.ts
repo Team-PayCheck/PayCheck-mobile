@@ -6,9 +6,11 @@ import type {
   Contract,
   ContractWorker,
   WorkScheduleItem,
+  WorkSchedule,
   PayrollDeductionType,
+  ContractUpdateRequest,
 } from "../../api/employer/types";
-import { getContractsByWorkplace, getContract } from "../../api/employer";
+import { getContractsByWorkplace, getContract, updateContract } from "../../api/employer";
 
 // ============ 변환 유틸 ============
 
@@ -55,6 +57,22 @@ const resolveSummaryDay = (dayOfWeek: string | number): string => {
     return DAY_NUMBER_TO_SUMMARY[dayOfWeek] ?? "";
   }
   return DAY_OF_WEEK_TO_SUMMARY[dayOfWeek.toUpperCase()] ?? "";
+};
+
+/** WorkDay (한국어) → dayOfWeek 숫자 변환 */
+const KOREAN_TO_DAY_NUMBER: Record<string, number> = {
+  월요일: 1, 화요일: 2, 수요일: 3, 목요일: 4,
+  금요일: 5, 토요일: 6, 일요일: 7,
+};
+
+/** fourMajorInsurance / incomeTax → payrollDeductionType 변환 */
+const mapDeductionTypeFromUI = (
+  fourMajorInsurance: boolean,
+  incomeTax: boolean
+): PayrollDeductionType => {
+  if (fourMajorInsurance && incomeTax) return "PART_TIME_TAX_AND_INSURANCE";
+  if (incomeTax) return "PART_TIME_TAX_ONLY";
+  return "PART_TIME_NONE";
 };
 
 /** payrollDeductionType → fourMajorInsurance / incomeTax 변환 */
@@ -158,7 +176,50 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     setWorkers((prev) => prev.filter((w) => w.contractId !== contractId));
   };
 
-  return { workers, isLoading, removeWorker };
+  const updateWorker = async (
+    contractId: number,
+    data: ContractUpdateRequest
+  ): Promise<void> => {
+    const apiSchedules: WorkSchedule[] = data.workSchedules
+      .filter((row) => row.day !== "선택")
+      .map((row) => ({
+        dayOfWeek: KOREAN_TO_DAY_NUMBER[row.day] ?? 1,
+        startTime: `${row.startHour}:${row.startMinute}`,
+        endTime: `${row.endHour}:${row.endMinute}`,
+      }));
+
+    await updateContract(contractId, {
+      hourlyWage: data.hourlyWage,
+      paymentDay: data.paymentDay,
+      workSchedules: apiSchedules,
+      payrollDeductionType: mapDeductionTypeFromUI(
+        data.fourMajorInsurance,
+        data.incomeTax
+      ),
+    });
+
+    const newWorkDaysSummary = data.workSchedules
+      .filter((row) => row.day !== "선택")
+      .map((row) => row.day.charAt(0));
+
+    setWorkers((prev) =>
+      prev.map((w) =>
+        w.contractId === contractId
+          ? {
+              ...w,
+              hourlyWage: data.hourlyWage,
+              paymentDay: data.paymentDay,
+              fourMajorInsurance: data.fourMajorInsurance,
+              incomeTax: data.incomeTax,
+              workSchedules: data.workSchedules,
+              workDaysSummary: newWorkDaysSummary,
+            }
+          : w
+      )
+    );
+  };
+
+  return { workers, isLoading, removeWorker, updateWorker };
 };
 
 export default useWorkplaceContracts;

@@ -39,7 +39,7 @@ const WorkerManageScreen: React.FC = () => {
     setSelectedWorkplaceId,
   } = useWorkplaceManagement();
 
-  const { workers, isLoading: isWorkersLoading, removeWorker } = useWorkplaceContracts(selectedWorkplaceId);
+  const { workers, isLoading: isWorkersLoading, removeWorker, updateWorker } = useWorkplaceContracts(selectedWorkplaceId);
 
   const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
@@ -75,12 +75,17 @@ const WorkerManageScreen: React.FC = () => {
     );
   };
 
-  const handleUpdate = (
+  const handleUpdate = async (
     contractId: number,
     data: ContractUpdateRequest
   ) => {
-    // TODO: API 연동
-    console.log("update", contractId, data);
+    try {
+      await updateWorker(contractId, data);
+      setExpandedContractId(null);
+      Alert.alert("수정 완료", "근무자 정보가 수정되었습니다.");
+    } catch {
+      Alert.alert("수정 실패", "근무자 정보 수정 중 오류가 발생했습니다.");
+    }
   };
 
   const handleResign = async (contractId: number) => {
