@@ -9,12 +9,12 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
-import type { Workplace } from "../../../api/employer/types";
+import type { WorkplaceDetails } from "../../../api/employer/types";
 
 interface WorkerManageHeaderProps {
-  selectedWorkplace: Workplace;
-  workplaces: Workplace[];
-  onWorkplaceChange: (workplace: Workplace) => void;
+  selectedWorkplace: WorkplaceDetails;
+  workplaces: WorkplaceDetails[];
+  onWorkplaceChange: (workplace: WorkplaceDetails) => void;
   onAddWorker: () => void;
 }
 
@@ -26,7 +26,7 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
 }) => {
   const [workplaceModalVisible, setWorkplaceModalVisible] = useState(false);
 
-  const handleWorkplaceSelect = (workplace: Workplace) => {
+  const handleWorkplaceSelect = (workplace: WorkplaceDetails) => {
     onWorkplaceChange(workplace);
     setWorkplaceModalVisible(false);
   };

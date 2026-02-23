@@ -16,6 +16,7 @@ interface UseWorkplaceManagementProps {
 interface UseWorkplaceManagementReturn {
   // 상태
   workplaces: WorkplaceDetails[];
+  isLoading: boolean;
   selectedWorkplaceId: number | null;
   isAddingWorkplace: boolean;
   isManagingWorkplaces: boolean;
@@ -61,6 +62,7 @@ export function useWorkplaceManagement({
   onWorkplaceChanged,
 }: UseWorkplaceManagementProps = {}): UseWorkplaceManagementReturn {
   const [workplaces, setWorkplaces] = useState<WorkplaceDetails[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<number | null>(null);
   const [isAddingWorkplace, setIsAddingWorkplace] = useState(false);
   const [newWorkplaceName, setNewWorkplaceName] = useState("");
@@ -86,6 +88,8 @@ export function useWorkplaceManagement({
         }
       } catch (error) {
         setWorkplaces([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchWorkplaces();
@@ -272,6 +276,7 @@ export function useWorkplaceManagement({
 
   return {
     workplaces,
+    isLoading,
     selectedWorkplaceId,
     isAddingWorkplace,
     isManagingWorkplaces,

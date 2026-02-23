@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,13 +15,11 @@ import WorkerFilterTabs, {
 } from "../../components/employer/worker-manage/WorkerFilterTabs";
 import WorkerCard from "../../components/employer/worker-manage/WorkerCard";
 import type {
-  Workplace,
+  WorkplaceDetails,
   ContractUpdateRequest,
 } from "../../api/employer/types";
-import {
-  DUMMY_WORKPLACES,
-  DUMMY_WORKERS,
-} from "../../dummyData/employerWorkerManage";
+import { DUMMY_WORKERS } from "../../dummyData/employerWorkerManage";
+import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -33,9 +31,15 @@ const WorkerManageScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
-  const [selectedWorkplace, setSelectedWorkplace] = useState<Workplace>(
-    DUMMY_WORKPLACES[0]
-  );
+  const {
+    workplaces,
+    isLoading: isWorkplacesLoading,
+    selectedWorkplaceId,
+    setSelectedWorkplaceId,
+  } = useWorkplaceManagement();
+
+  const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
+
   const [selectedFilterId, setSelectedFilterId] =
     useState<WorkerFilterId>("all");
   const [expandedContractId, setExpandedContractId] = useState<number | null>(
@@ -46,8 +50,8 @@ const WorkerManageScreen: React.FC = () => {
     navigation.replace(TAB_SCREEN_MAP[tab]);
   };
 
-  const handleWorkplaceChange = (workplace: Workplace) => {
-    setSelectedWorkplace(workplace);
+  const handleWorkplaceChange = (workplace: WorkplaceDetails) => {
+    setSelectedWorkplaceId(workplace.id);
     setSelectedFilterId("all");
     setExpandedContractId(null);
   };
@@ -91,32 +95,40 @@ const WorkerManageScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
       <Header />
-      <WorkerManageHeader
-        selectedWorkplace={selectedWorkplace}
-        workplaces={DUMMY_WORKPLACES}
-        onWorkplaceChange={handleWorkplaceChange}
-        onAddWorker={() => {}}
-      />
-      <WorkerFilterTabs
-        workers={DUMMY_WORKERS}
-        selectedId={selectedFilterId}
-        onSelect={handleFilterSelect}
-      />
-      <FlatList
-        data={filteredWorkers}
-        keyExtractor={(item) => item.contractId.toString()}
-        renderItem={({ item }) => (
-          <WorkerCard
-            worker={item}
-            isExpanded={expandedContractId === item.contractId}
-            onToggle={() => handleCardToggle(item.contractId)}
-            onUpdate={handleUpdate}
-            onResign={handleResign}
+      {isWorkplacesLoading || selectedWorkplace === null ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <>
+          <WorkerManageHeader
+            selectedWorkplace={selectedWorkplace}
+            workplaces={workplaces}
+            onWorkplaceChange={handleWorkplaceChange}
+            onAddWorker={() => {}}
           />
-        )}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+          <WorkerFilterTabs
+            workers={DUMMY_WORKERS}
+            selectedId={selectedFilterId}
+            onSelect={handleFilterSelect}
+          />
+          <FlatList
+            data={filteredWorkers}
+            keyExtractor={(item) => item.contractId.toString()}
+            renderItem={({ item }) => (
+              <WorkerCard
+                worker={item}
+                isExpanded={expandedContractId === item.contractId}
+                onToggle={() => handleCardToggle(item.contractId)}
+                onUpdate={handleUpdate}
+                onResign={handleResign}
+              />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
       <EmployerNavigationBar activeTab="worker" onTabPress={handleTabPress} />
     </SafeAreaView>
   );
@@ -130,6 +142,11 @@ const styles = StyleSheet.create({
   listContent: {
     paddingTop: 12,
     paddingBottom: 16,
+  },
+  loader: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
