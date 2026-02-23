@@ -1,7 +1,7 @@
 // ============ 계약 관련 타입 ============
 
 /** 급여 공제 유형 */
-export type PayrollDeductionType = 'INCOME_TAX_3_3' | 'FOUR_MAJOR_INSURANCES';
+export type PayrollDeductionType = 'FREELANCER' | 'PART_TIME_NONE' | 'PART_TIME_TAX_ONLY' | 'PART_TIME_TAX_AND_INSURANCE';
 
 // 계약 목록 아이템 (GET /api/worker/contracts)
 export interface ContractListItem {
