@@ -14,6 +14,7 @@ import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkR
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
+import SalaryStatementSheet from "../../components/worker/salary/SalaryStatementSheet";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
 import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
@@ -25,6 +26,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+  const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
   const closeDrawer = () => setIsDrawerVisible(false);
   const openDrawer = () => setIsDrawerVisible(true);
 
@@ -165,7 +167,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
         />
         <WorkplaceSalarySummary
           workplaces={workplaces}
-          onPressDetail={() => {}}
+          onPressDetail={() => setIsSalarySheetVisible(true)}
         />
       </ScrollView>
       {/* 마이페이지 드로어 */}
@@ -188,6 +190,13 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
 			>
 				<AccountTermsContent />
 			</BottomSheetModal>
+      {/* 급여명세서 바텀시트 */}
+      <SalaryStatementSheet
+        visible={isSalarySheetVisible}
+        onClose={() => setIsSalarySheetVisible(false)}
+        year={year}
+        month={month + 1}
+      />
       {/* 근무 추가 요청 모달 */}
       <AddWorkRequestModal
         visible={addModalVisible}
