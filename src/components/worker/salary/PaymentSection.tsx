@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Text } from "../../common/Text";
-import { colors } from "../../../constants/colors";
 import { formatCurrency } from "../../../utils/format";
 import SalaryItemRow from "./SalaryItemRow";
+import styles from "./salarySectionStyles";
 import type { SalaryCalculateResponse } from "../../../api/worker/types";
 
 interface PaymentSectionProps {
@@ -11,6 +11,8 @@ interface PaymentSectionProps {
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = ({ salary }) => {
+	const totalGrossPay = salary?.totalGrossPay ?? null;
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title} weight="SemiBold">
@@ -35,37 +37,13 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ salary }) => {
 			<View style={styles.subtotalRow}>
 				<Text style={styles.subtotalText} weight="SemiBold">
 					지급액 계 :{" "}
-					{salary?.totalGrossPay !== undefined
-						? `${formatCurrency(salary.totalGrossPay)}원`
+					{totalGrossPay !== null
+						? `${formatCurrency(totalGrossPay)}원`
 						: "?"}
 				</Text>
 			</View>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		marginTop: 16,
-	},
-	title: {
-		fontSize: 16,
-		color: colors.textPrimary,
-		marginBottom: 8,
-	},
-	divider: {
-		height: 1,
-		backgroundColor: colors.border,
-		marginVertical: 4,
-	},
-	subtotalRow: {
-		alignItems: "flex-end",
-		marginTop: 8,
-	},
-	subtotalText: {
-		fontSize: 14,
-		color: colors.textPrimary,
-	},
-});
 
 export default PaymentSection;
