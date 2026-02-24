@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
 
-const WorkplaceManageScreen: React.FC = () => {
+const EmployerWorkplaceManageScreen: React.FC = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default WorkplaceManageScreen;
+export default EmployerWorkplaceManageScreen;

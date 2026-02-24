@@ -22,7 +22,7 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 	: 로그인된 계정이 고용주(EMPLOYER)로 등록되어 있어
 	  worker 전용 API 호출 시 서버에서 500 에러 발생-> 근로자 계정 필요 */}
 
-const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
+const EmployerWorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [workplaces, setWorkplaces] = useState<ContractListItem[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -195,4 +195,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default WorkplaceManageScreen;
+export default EmployerWorkplaceManageScreen;

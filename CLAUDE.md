@@ -84,7 +84,7 @@ src/
 │   └── workerMonthlyCalendar.ts
 ├── screens/          # 화면 컴포넌트
 │   ├── auth/         # 회원가입 (Step1~5)
-│   ├── employer/     # EmployerHomeScreen, WorkplaceManageScreen
+│   ├── employer/     # EmployerHomeScreen, EmployerWorkplaceManageScreen
 │   ├── onboarding/   # 온보딩 스크린들, WelcomeScreen
 │   └── worker/       # WorkerWeeklyCalendarScreen, WorkerMonthlyCalendarScreen
 │       └── mypage/   # ProfileEdit, WorkplaceManage, SentRequests, AccountSettings, Withdraw

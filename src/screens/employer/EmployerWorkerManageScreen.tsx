@@ -28,7 +28,7 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   transfer: "RemittanceManage",
 };
 
-const WorkerManageScreen: React.FC = () => {
+const EmployerWorkerManageScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkerManageScreen;
+export default EmployerWorkerManageScreen;

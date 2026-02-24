@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
 import WorkerMonthlyCalendarScreen from "../screens/worker/WorkerMonthlyCalendarScreen";
 import ProfileEditScreen from "../screens/worker/mypage/ProfileEditScreen";
-import WorkplaceManageScreen from "../screens/worker/mypage/WorkplaceManageScreen";
+import EmployerWorkplaceManageScreen from "../screens/worker/mypage/EmployerWorkplaceManageScreen";
 import SentRequestsScreen from "../screens/worker/mypage/SentRequestsScreen";
 import WithdrawScreen from "../screens/worker/mypage/WithdrawScreen";
 
@@ -30,7 +30,7 @@ const WorkerStack = () => {
 		       <Stack.Screen name="WorkerHomeMain" component={WorkerWeeklyCalendarScreen} />
 		       <Stack.Screen name="WorkerMonthlyCalendar" component={WorkerMonthlyCalendarScreen} />
 		       <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
-		       <Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
+		       <Stack.Screen name="WorkplaceManage" component={EmployerWorkplaceManageScreen} />
 		       <Stack.Screen name="SentRequests" component={SentRequestsScreen} />
 		       <Stack.Screen name="Withdraw" component={WithdrawScreen} />
 	       </Stack.Navigator>

@@ -7,7 +7,7 @@ import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
 import EmployerStack from "../navigation/EmployerStack";
 import WorkerStack from "../navigation/WorkerStack";
-import WorkplaceManageScreen from "../screens/employer/WorkplaceManageScreen";
+import EmployerWorkplaceManageScreen from "../screens/employer/EmployerWorkplaceManageScreen";
 
 export type RootStackParamList = {
 	Onboarding: undefined;
@@ -66,7 +66,7 @@ const RootNavigator = () => {
 				</Stack.Screen>
 				<Stack.Screen name="EmployerHome" component={EmployerStack} />
 				<Stack.Screen name="WorkerWeeklyCalendar" component={WorkerStack} />
-				<Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
+				<Stack.Screen name="WorkplaceManage" component={EmployerWorkplaceManageScreen} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
