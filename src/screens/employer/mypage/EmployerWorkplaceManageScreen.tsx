@@ -9,8 +9,8 @@ import EmployerNavigationBar, {
 	type EmployerTabName,
 } from "../../../components/layout/EmployerNavigationBar";
 import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
-import { getWorkplaces } from "../../../api/employer";
-import type { WorkplaceListItem } from "../../../api/employer/types";
+import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
+import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
@@ -24,6 +24,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
 	const [workplaces, setWorkplaces] = useState<WorkplaceListItem[]>([]);
+	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +40,18 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 				const res = await getWorkplaces();
 				if (res.success && Array.isArray(res.data)) {
 					setWorkplaces(res.data);
+
+					// 각 사업장의 상세 정보 병렬 조회
+					const details = await Promise.all(
+						res.data.map((w) => getWorkplaceDetail(w.id).catch(() => null))
+					);
+					const map: Record<number, WorkplaceDetail> = {};
+					details.forEach((d) => {
+						if (d?.success && d.data) {
+							map[d.data.id] = d.data;
+						}
+					});
+					setDetailMap(map);
 				} else {
 					setWorkplaces([]);
 					setError(res.error?.message || "사업장 정보를 불러오지 못했습니다.");
@@ -71,18 +84,24 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 					/>
 				) : error ? (
 					<Text style={styles.error}>{error}</Text>
-				) : workplaces.length === 0 ? (
-					<Text style={styles.empty}>등록된 사업장이 없습니다.</Text>
 				) : (
-					workplaces.map((w) => (
-						<EmployerWorkplaceCard
-							key={w.id}
-							name={w.name}
-							businessName={w.businessName}
-							workerCount={w.workerCount ?? 0}
-							colorCode={w.colorCode}
-						/>
-					))
+					<>
+						{workplaces.map((w) => {
+							const detail = detailMap[w.id];
+							return (
+								<EmployerWorkplaceCard
+									key={w.id}
+									name={w.name}
+									businessName={w.businessName}
+									workerCount={w.workerCount ?? 0}
+									colorCode={w.colorCode}
+									businessNumber={detail?.businessNumber}
+									address={detail?.address}
+								/>
+							);
+						})}
+						<Text style={styles.addWorkplace}>근무지 추가</Text>
+					</>
 				)}
 			</ScrollView>
 			<EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
@@ -116,10 +135,11 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		marginTop: 24,
 	},
-	empty: {
-		color: colors.textSecondary,
+	addWorkplace: {
+		color: colors.primary,
 		textAlign: "center",
-		marginTop: 24,
+		marginTop: 16,
+		fontSize: 16,
 	},
 });
 

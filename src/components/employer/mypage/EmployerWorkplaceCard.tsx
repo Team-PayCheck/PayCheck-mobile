@@ -8,6 +8,8 @@ export interface EmployerWorkplaceCardProps {
 	businessName: string;
 	workerCount: number;
 	colorCode?: string;
+	businessNumber?: string;
+	address?: string;
 }
 
 const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
@@ -15,6 +17,8 @@ const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
 	businessName,
 	workerCount,
 	colorCode,
+	businessNumber,
+	address,
 }) => {
 	return (
 		<View style={styles.card}>
@@ -28,6 +32,8 @@ const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
 			</View>
 			<Text style={styles.info}>사업자명: {businessName}</Text>
 			<Text style={styles.info}>직원 수: {workerCount}명</Text>
+			<Text style={styles.info}>사업자번호: {businessNumber ?? "?"}</Text>
+			<Text style={styles.info}>주소: {address ?? "?"}</Text>
 		</View>
 	);
 };
