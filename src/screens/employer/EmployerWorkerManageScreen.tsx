@@ -61,7 +61,6 @@ const EmployerWorkerManageScreen: React.FC = () => {
 
   const handleFilterSelect = (id: WorkerFilterId) => {
     setSelectedFilterId(id);
-    // 특정 근무자 탭 선택 시 해당 카드 자동 펼침
     if (id !== "all") {
       setExpandedContractId(id as number);
     } else {
@@ -101,7 +100,6 @@ const EmployerWorkerManageScreen: React.FC = () => {
     }
   };
 
-  // 필터 적용: "all"이면 전체, 특정 id면 해당 근무자만
   const filteredWorkers =
     selectedFilterId === "all"
       ? workers

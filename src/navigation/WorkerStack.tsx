@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
 import WorkerMonthlyCalendarScreen from "../screens/worker/WorkerMonthlyCalendarScreen";
 import ProfileEditScreen from "../screens/worker/mypage/ProfileEditScreen";
-import EmployerWorkplaceManageScreen from "../screens/worker/mypage/EmployerWorkplaceManageScreen";
+import EmployerWorkplaceManageScreen from "../screens/employer/EmployerWorkplaceManageScreen";
 import SentRequestsScreen from "../screens/worker/mypage/SentRequestsScreen";
 import WithdrawScreen from "../screens/worker/mypage/WithdrawScreen";
 
