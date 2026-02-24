@@ -33,11 +33,16 @@ const Step5CompleteScreen: React.FC = () => {
 				})
 			);
 		} else {
-			// 고용주: WorkplaceManage로 이동
+			// 고용주: EmployerHome → 근무지 관리 화면으로 이동
 			navigation.dispatch(
 				CommonActions.reset({
 					index: 0,
-					routes: [{ name: "WorkplaceManage" }],
+					routes: [{
+						name: "EmployerHome",
+						state: {
+							routes: [{ name: "EmployerWorkplaceManage" }],
+						},
+					}],
 				})
 			);
 		}

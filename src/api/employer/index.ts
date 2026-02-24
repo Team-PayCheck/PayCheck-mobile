@@ -1,4 +1,4 @@
-import { api } from "../axios"
+import { api } from "../axios";
 import type {
   CreateWorkplaceRequest,
   UpdateWorkplaceRequest,
@@ -30,6 +30,11 @@ export const getWorkplace = async (id: number | string) => {
   return data;
 };
 
+export const getWorkplaceDetail = async (id: number | string) => {
+  const { data } = await api.get(`/api/employer/workplaces/${id}`);
+  return data;
+};
+
 export const createWorkplace = async (reqData: CreateWorkplaceRequest) => {
   const { data } = await api.post("/api/employer/workplaces", {
     businessNumber: reqData.businessNumber,
@@ -46,7 +51,6 @@ export const updateWorkplace = async (
   id: number | string,
   reqData: UpdateWorkplaceRequest
 ) => {
-  // 참고: businessNumber는 수정 불가 (API 스펙)
   const { data } = await api.put(`/api/employer/workplaces/${id}`, {
     businessName: reqData.businessName,
     name: reqData.workplaceName,

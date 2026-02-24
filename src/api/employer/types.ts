@@ -11,30 +11,25 @@ export type WorkDay =
   | "토요일"
   | "선택";
 
-/** 근무시간 행 1개 (요일 + 시작/종료 시간 + 휴게시간, UI 전용) */
+/** 근무시간 행 1개 */
 export interface WorkScheduleRow {
-  /** 고유 식별용 key (UI 전용) */
   key: string;
   day: WorkDay;
   startHour: string;
   startMinute: string;
   endHour: string;
   endMinute: string;
-  /** 휴게시간 (분 단위, 기본값 0) */
   breakMinutes: number;
 }
 
-/** 근무자 카드에 표시되는 계약+프로필 정보 (UI 전용, API 데이터 가공 후 사용) */
+/** 근무자 카드에 표시되는 계약+프로필 정보 */
 export interface EmployerWorkerContract {
   contractId: number;
   workerId: number;
   workerName: string;
-  /** 프로필 이미지 URL (없으면 undefined) */
   workerProfileImage?: string;
-  /** 요약 표시용 근무 요일 (예: ["월", "수", "금"]) */
   workDaysSummary: string[];
   hourlyWage: number;
-  /** 매달 N일 */
   paymentDay: number;
   fourMajorInsurance: boolean;
   incomeTax: boolean;
@@ -43,7 +38,7 @@ export interface EmployerWorkerContract {
   isActive: boolean;
 }
 
-/** 계약 정보 수정 요청 파라미터 (UI → API 변환용) */
+/** 계약 정보 수정 요청 파라미터 */
 export interface ContractUpdateRequest {
   hourlyWage: number;
   paymentDay: number;
@@ -175,6 +170,22 @@ export interface Workplace {
   colorCode?: string;
   workerCount?: number;
   isActive?: boolean;
+}
+
+/** 사업장 목록 아이템 (GET /api/employer/workplaces) */
+export type WorkplaceListItem = Workplace;
+
+/** 사업장 상세 (GET /api/employer/workplaces/{id}) */
+export interface WorkplaceDetail {
+  id: number;
+  businessNumber: string;
+  businessName: string;
+  name: string;
+  address: string;
+  colorCode?: string;
+  isLessThanFiveEmployees: boolean;
+  workerCount: number;
+  isActive: boolean;
 }
 
 // ============ 근무 기록 (Work Record) ============
