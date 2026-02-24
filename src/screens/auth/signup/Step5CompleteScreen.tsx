@@ -18,6 +18,7 @@ const Step5CompleteScreen: React.FC = () => {
 	const resetSignUp = useSignUpStore((state) => state.reset);
 
 	const isWorker = userType === "WORKER";
+	const buttonText = isWorker ? "시작하기" : "매장 관리하러 가기";
 
 	const handleStart = () => {
 		// SignUp Store 초기화
@@ -32,11 +33,16 @@ const Step5CompleteScreen: React.FC = () => {
 				})
 			);
 		} else {
-			// 고용주: EmployerHome으로 이동
+			// 고용주: EmployerHome → 근무지 관리 화면으로 이동
 			navigation.dispatch(
 				CommonActions.reset({
 					index: 0,
-					routes: [{ name: "EmployerHome" }],
+					routes: [{
+						name: "EmployerHome",
+						state: {
+							routes: [{ name: "EmployerWorkplaceManage" }],
+						},
+					}],
 				})
 			);
 		}
@@ -48,7 +54,7 @@ const Step5CompleteScreen: React.FC = () => {
 			stepTitle="가입완료"
 			showBackButton={false}
 			contentStyle={styles.content}
-			footer={<PrimaryButton text="시작하기" onPress={handleStart} />}
+			footer={<PrimaryButton text={buttonText} onPress={handleStart} />}
 		>
 			<View style={styles.imageContainer}>
 				<Image
