@@ -3,15 +3,15 @@ import { StyleSheet, View, ActivityIndicator, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Text } from "../../components/common/Text";
-import { colors } from "../../constants/colors";
+import { Text } from "../../../components/common/Text";
+import { colors } from "../../../constants/colors";
 import EmployerNavigationBar, {
 	type EmployerTabName,
-} from "../../components/layout/EmployerNavigationBar";
-import EmployerWorkplaceCard from "../../components/employer/EmployerWorkplaceCard";
-import { getWorkplaces } from "../../api/employer";
-import type { WorkplaceListItem } from "../../api/employer/types";
-import type { EmployerStackParamList } from "../../navigation/EmployerStack";
+} from "../../../components/layout/EmployerNavigationBar";
+import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
+import { getWorkplaces } from "../../../api/employer";
+import type { WorkplaceListItem } from "../../../api/employer/types";
+import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",

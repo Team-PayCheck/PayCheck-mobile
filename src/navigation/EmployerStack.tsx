@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import EmployerHomeScreen from "../screens/employer/EmployerHomeScreen";
 import WorkerManageScreen from "../screens/employer/WorkerManageScreen";
 import RemittanceManageScreen from "../screens/employer/RemittanceManageScreen";
-import EmployerWorkplaceManageScreen from "../screens/employer/EmployerWorkplaceManageScreen";
+import EmployerWorkplaceManageScreen from "../screens/employer/mypage/EmployerWorkplaceManageScreen";
 
 export type EmployerStackParamList = {
   EmployerHomeMain: undefined;

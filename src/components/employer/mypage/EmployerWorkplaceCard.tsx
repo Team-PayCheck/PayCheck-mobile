@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Text } from "../common/Text";
-import { colors } from "../../constants/colors";
+import { Text } from "../../common/Text";
+import { colors } from "../../../constants/colors";
 
 export interface EmployerWorkplaceCardProps {
 	name: string;
