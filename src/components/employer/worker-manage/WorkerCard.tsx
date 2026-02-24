@@ -205,14 +205,15 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
             </View>
           </View>
 
-          {/* 4대보험 / 소득세 토글 */}
+          {/* 4대보험 / 소득세 토글 (읽기 전용) */}
           <View style={styles.toggleDivider} />
           <View style={styles.inlineRow}>
             <View style={styles.toggleItem}>
               <Text style={styles.fieldLabel}>4대보험</Text>
               <Switch
                 value={fourMajorInsurance}
-                onValueChange={setFourMajorInsurance}
+                onValueChange={() => {}}
+                disabled
                 trackColor={{ false: colors.disabled, true: colors.primary }}
                 thumbColor={colors.white}
               />
@@ -221,7 +222,8 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
               <Text style={styles.fieldLabel}>소득세</Text>
               <Switch
                 value={incomeTax}
-                onValueChange={setIncomeTax}
+                onValueChange={() => {}}
+                disabled
                 trackColor={{ false: colors.disabled, true: colors.primary }}
                 thumbColor={colors.white}
               />
