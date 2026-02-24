@@ -21,6 +21,7 @@ import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import { colors } from "../../constants/colors";
 import EmployerTimeline from "../../components/employer/schedule/EmployerTimeline";
 import EmployerWorkerListSection from "../../components/employer/schedule/EmployerWorkerListSection";
+import EmployerAddWorkModal from "../../components/employer/schedule/EmployerAddWorkModal";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
 import type { WorkplaceDetails } from "../../api/employer/types";
@@ -44,6 +45,7 @@ const EmployerHomeScreen: React.FC = () => {
   const [calendarYear, setCalendarYear] = useState(today.getFullYear());
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth()); // 0-indexed
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
+  const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
 
   const {
     workplaces,
@@ -62,7 +64,7 @@ const EmployerHomeScreen: React.FC = () => {
     return `${y}-${m}-${d}`;
   }, [selectedDate]);
 
-  const { workRecords } =
+  const { workRecords, refetch } =
     useEmployerDailyWorkRecords(selectedWorkplaceId, dateStr);
 
   const weekDays = useMemo(() => getWeekDays(selectedDate), [selectedDate]);
@@ -167,12 +169,24 @@ const EmployerHomeScreen: React.FC = () => {
           {/* 근무자 리스트 */}
           <EmployerWorkerListSection
             workRecords={workRecords}
-            onPressAdd={() => {}}
+            onPressAdd={() => setIsAddWorkModalVisible(true)}
           />
         </ScrollView>
       )}
 
       <EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
+
+      {/* 근무 추가 모달 */}
+      {selectedWorkplace && (
+        <EmployerAddWorkModal
+          visible={isAddWorkModalVisible}
+          onClose={() => setIsAddWorkModalVisible(false)}
+          workplaceId={selectedWorkplace.id}
+          workplaceName={selectedWorkplace.name}
+          selectedDate={dateStr}
+          onSuccess={refetch}
+        />
+      )}
 
       {/* 달력 팝업 */}
       <BottomSheetModal
