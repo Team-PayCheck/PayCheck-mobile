@@ -31,7 +31,8 @@ src/
 │   ├── skeleton/     # 로딩 스켈레톤
 │   └── worker/       # 근로자 전용
 │       ├── weeklyCalendar/  # 주간 캘린더 (WorkCard, WorkListSection, 모달 등)
-│       └── monthlyCalendar/ # 월간 캘린더 (MonthlySalarySummary, SelectedDateWorkList 등)
+│       ├── monthlyCalendar/ # 월간 캘린더 (MonthlySalarySummary, SelectedDateWorkList 등)
+│       └── salary/          # 급여명세서 (SalaryStatementSheet, PaymentSection, DeductionSection 등)
 ├── hooks/            # 커스텀 훅
 │   ├── common/       # useOnboardingStatus, useLogoutHandler
 │   ├── employer/
@@ -58,6 +59,7 @@ src/
 ### 근로자 기능
 - 주간 캘린더: 근무 기록 조회, 근무 추가/정정 요청, 과거/미래 근무 카드 색상 구분
 - 월간 캘린더: 월별 근무 기록 조회, 날짜별 근무 상세, 근무지별 급여/송금 현황
+- 급여명세서: 근무지별 급여 상세 (지급/공제 항목), 4대보험/소득세 토글 표시
 - 마이페이지: Drawer 메뉴, 프로필 수정, 근무지 관리, 보낸 요청, 회원탈퇴
 
 ### 인증

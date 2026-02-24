@@ -69,19 +69,19 @@ src/
 │   ├── skeleton/     # 로딩 스켈레톤
 │   └── worker/       # 근로자 전용
 │       ├── weeklyCalendar/  # WorkCard, WorkListSection, WeeklySummary, 모달 등
-│       └── monthlyCalendar/ # MonthlySalarySummary, SelectedDateWorkList, WorkplaceSalaryCard 등
+│       ├── monthlyCalendar/ # MonthlySalarySummary, SelectedDateWorkList, WorkplaceSalaryCard 등
+│       └── salary/          # 급여명세서 (SalaryStatementSheet, PaymentSection, DeductionSection 등)
 ├── hooks/            # 커스텀 훅
 │   ├── common/       # useOnboardingStatus, useLogoutHandler
 │   ├── employer/
-│   └── worker/       # useWorkRecords, useCorrectionRequest, useCorrectionForm, useUserData 등
+│   └── worker/       # useWorkRecords, useCorrectionRequest, useCorrectionForm, useUserData, useSalaryStatement 등
 ├── navigation/       # 네비게이션 설정
 │   ├── RootNavigator.tsx    # 최상위 네비게이터
 │   ├── SignUpNavigator.tsx  # 회원가입 5단계 네비게이터
 │   ├── OnboardingStack.tsx  # 온보딩 PagerView
 │   └── WorkerStack.tsx      # 근로자 스택 네비게이터 (주간/월간 캘린더, 마이페이지 등)
 ├── dummyData/        # 더미 데이터 (개발용)
-│   ├── workerWeeklyCalendar.ts
-│   └── workerMonthlyCalendar.ts
+│   └── workerWeeklyCalendar.ts
 ├── screens/          # 화면 컴포넌트
 │   ├── auth/         # 회원가입 (Step1~5)
 │   ├── employer/     # EmployerHomeScreen, EmployerWorkplaceManageScreen
@@ -184,8 +184,8 @@ src/api/
 ├── user/types.ts      # UserType, UserResponse, UserUpdateRequest, WorkerResponse, WorkerUpdateRequest
 ├── worker/index.ts    # getWorkerInfo, getContracts, getContractDetail, getWorkRecords, getWorkRecordDetail,
 │                      # getCorrectionRequests, getCorrectionRequestDetail, deleteCorrectionRequest,
-│                      # createCorrectionRequest, getSalaryDetail, getPayments
-└── worker/types.ts    # ContractListItem, ContractDetail, CorrectionRequestParams, SalaryDetailResponse, PaymentResponse 등
+│                      # createCorrectionRequest, getSalaryDetail, calculateSalary, getPayments
+└── worker/types.ts    # ContractListItem, ContractDetail, CorrectionRequestParams, SalaryDetailResponse, SalaryCalculateResponse, PaymentResponse 등
 ```
 
 **import 예시:**
@@ -401,6 +401,18 @@ const { workplaces, isLoading, refetch } = usePayments(year, month);
 // workplaces: WorkplaceSalaryItem[] (workplaceName, baseSalary, deduction, maxSalary, status)
 ```
 
+#### useSalaryStatement (`src/hooks/worker/useSalaryStatement.ts`)
+
+급여명세서 바텀시트 데이터 관리. 계약 목록 → 계약 상세 + 급여 계산 병렬 호출로 근무지별 급여명세서 구성.
+
+```typescript
+import useSalaryStatement from "../../hooks/worker/useSalaryStatement";
+
+const { statements, isLoading, selectedIndex, setSelectedIndex, fetchStatements } = useSalaryStatement(year, month);
+// statements: SalaryStatementData[] (contractId, workplaceName, payrollDeductionType, salary)
+// 모달 visible 시 fetchStatements() 호출
+```
+
 #### useWorkplaces (`src/hooks/worker/useWorkplaces.ts`)
 
 근로자의 활성 근무지 목록 조회. 계약 목록 → 상세 조회를 통해 근무지명, 시급 정보를 가공하고 WheelPicker용 items까지 변환.
@@ -556,9 +568,9 @@ extra: {
 - [x] 공통 컴포넌트 추가 (MonthlyCalendar, MonthlyCalendarNav)
 - [x] 근로자 API 추가 (급여 상세 조회, 송금 내역 조회, 근무 기록 상세, 정정요청 목록/상세/취소)
 - [x] 주간캘린더 과거/미래 근무 날짜 카드 색상 구분
+- [x] 급여명세서 바텀시트 (근무지별 급여 상세, 4대보험/소득세 토글, 지급/공제 항목)
 
 ### TODO
-- [ ] 근로자 월간 캘린더 API 연동 (현재 더미 데이터 사용 중)
 - [ ] 고용주 화면 구현
 - [ ] 프로필 정보 수정 기능 (이미지 업로드 포함)
 - [ ] 회원탈퇴 API 연동 (백엔드 개발 필요)
