@@ -12,7 +12,6 @@ import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
 } from "../../components/layout/EmployerNavigationBar";
-import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import NoticeBoard from "../../components/common/NoticeBoard";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
@@ -42,8 +41,6 @@ const EmployerHomeScreen: React.FC = () => {
 
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
-  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
-  const [calendarMonth, setCalendarMonth] = useState(today.getMonth()); // 0-indexed
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
   const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
 
@@ -90,28 +87,8 @@ const EmployerHomeScreen: React.FC = () => {
     setSelectedWorkplaceId(workplace.id);
   };
 
-  const handlePrevMonth = () => {
-    if (calendarMonth === 0) {
-      setCalendarYear((y) => y - 1);
-      setCalendarMonth(11);
-    } else {
-      setCalendarMonth((m) => m - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (calendarMonth === 11) {
-      setCalendarYear((y) => y + 1);
-      setCalendarMonth(0);
-    } else {
-      setCalendarMonth((m) => m + 1);
-    }
-  };
-
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
-    setCalendarYear(date.getFullYear());
-    setCalendarMonth(date.getMonth());
     setIsCalendarModalVisible(false);
   };
 
@@ -121,8 +98,6 @@ const EmployerHomeScreen: React.FC = () => {
   };
 
   const handleOpenCalendar = () => {
-    setCalendarYear(selectedDate.getFullYear());
-    setCalendarMonth(selectedDate.getMonth());
     setIsCalendarModalVisible(true);
   };
 
@@ -139,14 +114,6 @@ const EmployerHomeScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <MonthlyCalendarNav
-            year={calendarYear}
-            month={calendarMonth}
-            onPrevMonth={handlePrevMonth}
-            onNextMonth={handleNextMonth}
-            hideListView
-          />
-
           <WorkerManageHeader
             selectedWorkplace={selectedWorkplace}
             workplaces={workplaces}
@@ -194,16 +161,9 @@ const EmployerHomeScreen: React.FC = () => {
         onClose={() => setIsCalendarModalVisible(false)}
         maxHeight="70%"
       >
-        <MonthlyCalendarNav
-          year={calendarYear}
-          month={calendarMonth}
-          onPrevMonth={handlePrevMonth}
-          onNextMonth={handleNextMonth}
-          hideListView
-        />
         <MonthlyCalendar
-          year={calendarYear}
-          month={calendarMonth}
+          year={selectedDate.getFullYear()}
+          month={selectedDate.getMonth()}
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
         />

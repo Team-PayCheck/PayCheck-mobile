@@ -18,7 +18,6 @@ interface MonthlyCalendarNavProps {
   month: number; // 0-indexed
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  hideListView?: boolean;
 }
 
 const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
@@ -26,7 +25,6 @@ const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
   month,
   onPrevMonth,
   onNextMonth,
-  hideListView = false,
 }) => {
   const navigation = useNavigation<NativeStackNavigationProp<WorkerStackParamList>>();
   const handleWeeklyView = () => {
@@ -47,11 +45,9 @@ const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
         <Ionicons name="chevron-forward-outline" size={22} color={colors.textPrimary} />
       </TouchableOpacity>
       <View style={{ flex: 1 }} />
-      {!hideListView && (
-        <TouchableOpacity style={styles.iconBtn} onPress={handleWeeklyView}>
-          <Feather name="list" size={22} color={colors.textPrimary} />
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.iconBtn} onPress={handleWeeklyView}>
+        <Feather name="list" size={22} color={colors.textPrimary} />
+      </TouchableOpacity>
     </View>
   );
 };
