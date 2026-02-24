@@ -162,11 +162,13 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
             <View style={styles.avatar}>
               <Feather name="user" size={28} color={colors.textMuted} />
             </View>
-            <View>
+            <View style={styles.workerInfoTexts}>
               <Text weight="SemiBold" style={styles.workerName}>
                 {searchedWorker.name}
               </Text>
-              <Text style={styles.workerPhone}>{searchedWorker.phone}</Text>
+              {!!searchedWorker.phone && (
+                <Text style={styles.workerPhone}>{searchedWorker.phone}</Text>
+              )}
             </View>
           </View>
 
@@ -459,6 +461,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundGrey,
     justifyContent: "center",
     alignItems: "center",
+  },
+  workerInfoTexts: {
+    flex: 1,
   },
   workerName: {
     fontSize: 16,
