@@ -20,6 +20,7 @@ import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
+import EmployerTimeline from "../../components/employer/schedule/EmployerTimeline";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
 import type { WorkplaceDetails } from "../../api/employer/types";
@@ -160,10 +161,8 @@ const EmployerHomeScreen: React.FC = () => {
             onPressDay={handleDayPress}
           />
 
-          {/* 타임라인 (다음 단계) */}
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>타임라인 준비 중...</Text>
-          </View>
+          {/* 타임라인 */}
+          <EmployerTimeline workRecords={workRecords} />
 
           {/* 근무자 리스트 (다음 단계) */}
           <View style={styles.placeholder}>
