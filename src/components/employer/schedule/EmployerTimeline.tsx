@@ -31,7 +31,6 @@ const timeToMinutes = (time: string): number => {
   return parseInt(h, 10) * 60 + parseInt(m, 10);
 };
 
-// "HH:mm:ss" 또는 "HH:mm" → "HH:mm"
 const formatTime = (time: string): string => time.slice(0, 5);
 
 const minutesToX = (minutes: number): number =>

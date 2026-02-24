@@ -18,9 +18,9 @@ import NoticeBoard from "../../components/common/NoticeBoard";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
-import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
 import EmployerTimeline from "../../components/employer/schedule/EmployerTimeline";
+import EmployerWorkerListSection from "../../components/employer/schedule/EmployerWorkerListSection";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
 import type { WorkplaceDetails } from "../../api/employer/types";
@@ -164,12 +164,11 @@ const EmployerHomeScreen: React.FC = () => {
           {/* 타임라인 */}
           <EmployerTimeline workRecords={workRecords} />
 
-          {/* 근무자 리스트 (다음 단계) */}
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>
-              근무자 리스트 준비 중... ({workRecords.length}건)
-            </Text>
-          </View>
+          {/* 근무자 리스트 */}
+          <EmployerWorkerListSection
+            workRecords={workRecords}
+            onPressAdd={() => {}}
+          />
         </ScrollView>
       )}
 
@@ -217,17 +216,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
     gap: 24,
-  },
-  placeholder: {
-    height: 100,
-    backgroundColor: colors.backgroundGrey,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  placeholderText: {
-    fontSize: 14,
-    color: colors.textMuted,
   },
 });
 
