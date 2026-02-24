@@ -108,6 +108,7 @@ const mapContractToUI = (contract: Contract): EmployerWorkerContract => {
       startMinute: startM,
       endHour: endH,
       endMinute: endM,
+      breakMinutes: s.breakMinutes ?? 0,
     };
   });
 
@@ -176,6 +177,14 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     setWorkers((prev) => prev.filter((w) => w.contractId !== contractId));
   };
 
+  const addWorker = async (contractId: number): Promise<void> => {
+    const res = await getContract(contractId);
+    const contract = res.data as Contract;
+    if (contract) {
+      setWorkers((prev) => [...prev, mapContractToUI(contract)]);
+    }
+  };
+
   const updateWorker = async (
     contractId: number,
     data: ContractUpdateRequest
@@ -186,6 +195,7 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
         dayOfWeek: KOREAN_TO_DAY_NUMBER[row.day] ?? 1,
         startTime: `${row.startHour}:${row.startMinute}`,
         endTime: `${row.endHour}:${row.endMinute}`,
+        breakMinutes: row.breakMinutes,
       }));
 
     await updateContract(contractId, {
@@ -219,7 +229,7 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     );
   };
 
-  return { workers, isLoading, removeWorker, updateWorker };
+  return { workers, isLoading, removeWorker, updateWorker, addWorker };
 };
 
 export default useWorkplaceContracts;

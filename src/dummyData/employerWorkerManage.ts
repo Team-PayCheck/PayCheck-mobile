@@ -23,6 +23,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "16",
         endMinute: "00",
+        breakMinutes: 0,
       },
       {
         key: "1-2",
@@ -31,6 +32,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "16",
         endMinute: "00",
+        breakMinutes: 0,
       },
     ],
     contractStartDate: "2025-01-01",
@@ -53,6 +55,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "18",
         endMinute: "00",
+        breakMinutes: 0,
       },
       {
         key: "2-2",
@@ -61,6 +64,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "18",
         endMinute: "00",
+        breakMinutes: 0,
       },
     ],
     contractStartDate: "2025-03-15",
@@ -83,6 +87,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "12",
         endMinute: "00",
+        breakMinutes: 0,
       },
       {
         key: "3-2",
@@ -91,6 +96,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "12",
         endMinute: "00",
+        breakMinutes: 0,
       },
       {
         key: "3-3",
@@ -99,6 +105,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "12",
         endMinute: "00",
+        breakMinutes: 0,
       },
     ],
     contractStartDate: "2024-09-01",
@@ -121,6 +128,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "22",
         endMinute: "00",
+        breakMinutes: 0,
       },
       {
         key: "4-2",
@@ -129,6 +137,7 @@ export const DUMMY_WORKERS: EmployerWorkerContract[] = [
         startMinute: "00",
         endHour: "22",
         endMinute: "00",
+        breakMinutes: 0,
       },
     ],
     contractStartDate: "2025-06-01",

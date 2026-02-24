@@ -11,7 +11,7 @@ export type WorkDay =
   | "토요일"
   | "선택";
 
-/** 근무시간 행 1개 (요일 + 시작/종료 시간, UI 전용) */
+/** 근무시간 행 1개 (요일 + 시작/종료 시간 + 휴게시간, UI 전용) */
 export interface WorkScheduleRow {
   /** 고유 식별용 key (UI 전용) */
   key: string;
@@ -20,6 +20,8 @@ export interface WorkScheduleRow {
   startMinute: string;
   endHour: string;
   endMinute: string;
+  /** 휴게시간 (분 단위, 기본값 0) */
+  breakMinutes: number;
 }
 
 /** 근무자 카드에 표시되는 계약+프로필 정보 (UI 전용, API 데이터 가공 후 사용) */
@@ -97,6 +99,7 @@ export interface WorkSchedule {
   dayOfWeek: number; // 1=월요일, 7=일요일
   startTime: string;
   endTime: string;
+  breakMinutes?: number;
 }
 
 export interface CreateContractRequest {
@@ -240,6 +243,7 @@ export interface WorkScheduleItem {
   dayOfWeek: string; // "MONDAY", "TUESDAY", etc.
   startTime: string;
   endTime: string;
+  breakMinutes?: number;
 }
 
 // ============ 급여 (Salary) ============

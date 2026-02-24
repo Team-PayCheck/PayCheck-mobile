@@ -14,6 +14,7 @@ import WorkerFilterTabs, {
   type WorkerFilterId,
 } from "../../components/employer/worker-manage/WorkerFilterTabs";
 import WorkerCard from "../../components/employer/worker-manage/WorkerCard";
+import AddWorkerModal from "../../components/employer/worker-manage/AddWorkerModal";
 import type {
   WorkplaceDetails,
   ContractUpdateRequest,
@@ -39,7 +40,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
     setSelectedWorkplaceId,
   } = useWorkplaceManagement();
 
-  const { workers, isLoading: isWorkersLoading, removeWorker, updateWorker } = useWorkplaceContracts(selectedWorkplaceId);
+  const { workers, isLoading: isWorkersLoading, removeWorker, updateWorker, addWorker } = useWorkplaceContracts(selectedWorkplaceId);
 
   const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
@@ -48,6 +49,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
   const [expandedContractId, setExpandedContractId] = useState<number | null>(
     null
   );
+  const [addWorkerVisible, setAddWorkerVisible] = useState(false);
 
   const handleTabPress = (tab: EmployerTabName) => {
     navigation.replace(TAB_SCREEN_MAP[tab]);
@@ -119,7 +121,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
             selectedWorkplace={selectedWorkplace}
             workplaces={workplaces}
             onWorkplaceChange={handleWorkplaceChange}
-            onAddWorker={() => {}}
+            onAddWorker={() => setAddWorkerVisible(true)}
           />
           <WorkerFilterTabs
             workers={workers}
@@ -144,6 +146,18 @@ const EmployerWorkerManageScreen: React.FC = () => {
         </>
       )}
       <EmployerNavigationBar activeTab="worker" onTabPress={handleTabPress} />
+      {selectedWorkplace && (
+        <AddWorkerModal
+          visible={addWorkerVisible}
+          onClose={() => setAddWorkerVisible(false)}
+          workplaceId={selectedWorkplace.id}
+          workplaceName={selectedWorkplace.name}
+          onSuccess={async (contractId) => {
+            setAddWorkerVisible(false);
+            await addWorker(contractId);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

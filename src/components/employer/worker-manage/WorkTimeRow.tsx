@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import WheelPicker from "../../common/WheelPicker";
-import { HOUR_ITEMS, MINUTE_ITEMS } from "../../../constants/pickerItems";
+import { HOUR_ITEMS, MINUTE_ITEMS, BREAK_ITEMS } from "../../../constants/pickerItems";
 import { colors } from "../../../constants/colors";
 import type { WorkDay, WorkScheduleRow } from "../../../api/employer/types";
 
@@ -19,12 +19,8 @@ const DAY_OPTIONS: WorkDay[] = [
   "토요일",
 ];
 
-type PickerType =
-  | "day"
-  | "startHour"
-  | "startMinute"
-  | "endHour"
-  | "endMinute";
+type TimePickerKey = "startHour" | "startMinute" | "endHour" | "endMinute";
+type PickerType = "day" | "break" | TimePickerKey;
 
 interface WorkTimeRowProps {
   row: WorkScheduleRow;
@@ -81,33 +77,43 @@ const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
       );
     }
 
+    if (activePicker === "break") {
+      return (
+        <View style={styles.wheelPickerContainer}>
+          <Text weight="SemiBold" style={styles.pickerTitle}>
+            휴게시간 (분)
+          </Text>
+          <WheelPicker
+            items={BREAK_ITEMS}
+            selectedValue={row.breakMinutes}
+            onValueChange={(v) => update({ breakMinutes: Number(v) })}
+            width={120}
+          />
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={() => setActivePicker(null)}
+            activeOpacity={0.8}
+          >
+            <Text weight="SemiBold" style={styles.confirmText}>
+              확인
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     const timePickerMap: Record<
-      Exclude<PickerType, "day">,
-      {
-        title: string;
-        items: typeof HOUR_ITEMS;
-        rowKey: "startHour" | "startMinute" | "endHour" | "endMinute";
-      }
+      TimePickerKey,
+      { title: string; items: typeof HOUR_ITEMS; rowKey: TimePickerKey }
     > = {
       startHour: { title: "시작 시", items: HOUR_ITEMS, rowKey: "startHour" },
-      startMinute: {
-        title: "시작 분",
-        items: MINUTE_ITEMS,
-        rowKey: "startMinute",
-      },
+      startMinute: { title: "시작 분", items: MINUTE_ITEMS, rowKey: "startMinute" },
       endHour: { title: "종료 시", items: HOUR_ITEMS, rowKey: "endHour" },
-      endMinute: {
-        title: "종료 분",
-        items: MINUTE_ITEMS,
-        rowKey: "endMinute",
-      },
+      endMinute: { title: "종료 분", items: MINUTE_ITEMS, rowKey: "endMinute" },
     };
 
-    const config = timePickerMap[activePicker as Exclude<PickerType, "day">];
-    const currentValue = parseInt(
-      row[config.rowKey] as string,
-      10
-    );
+    const config = timePickerMap[activePicker as TimePickerKey];
+    const currentValue = parseInt(row[config.rowKey] as string, 10);
 
     return (
       <View style={styles.wheelPickerContainer}>
@@ -137,69 +143,85 @@ const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
 
   return (
     <>
-      <View style={styles.row}>
-        {/* 요일 선택 */}
-        <TouchableOpacity
-          style={styles.dayButton}
-          onPress={() => setActivePicker("day")}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.selectorText}>{row.day}</Text>
-          <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-        </TouchableOpacity>
-
-        {/* 시작 시간 */}
-        <TouchableOpacity
-          style={styles.timeButton}
-          onPress={() => setActivePicker("startHour")}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.selectorText}>{row.startHour}</Text>
-          <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-        </TouchableOpacity>
-        <Text style={styles.colon}>:</Text>
-        <TouchableOpacity
-          style={styles.timeButton}
-          onPress={() => setActivePicker("startMinute")}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.selectorText}>{row.startMinute}</Text>
-          <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-        </TouchableOpacity>
-
-        <Text style={styles.tilde}>~</Text>
-
-        {/* 종료 시간 */}
-        <TouchableOpacity
-          style={styles.timeButton}
-          onPress={() => setActivePicker("endHour")}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.selectorText}>{row.endHour}</Text>
-          <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-        </TouchableOpacity>
-        <Text style={styles.colon}>:</Text>
-        <TouchableOpacity
-          style={styles.timeButton}
-          onPress={() => setActivePicker("endMinute")}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.selectorText}>{row.endMinute}</Text>
-          <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-        </TouchableOpacity>
-
-        {/* 삭제 버튼 */}
-        {showDelete ? (
+      <View style={styles.rowWrapper}>
+        {/* 시간 행: 요일 + 시작/종료 시간 + 삭제 */}
+        <View style={styles.row}>
+          {/* 요일 선택 */}
           <TouchableOpacity
-            onPress={onDelete}
+            style={styles.dayButton}
+            onPress={() => setActivePicker("day")}
             activeOpacity={0.7}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Feather name="minus-circle" size={18} color={colors.red} />
+            <Text style={styles.selectorText}>{row.day}</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
           </TouchableOpacity>
-        ) : (
-          <View style={styles.deletePlaceholder} />
-        )}
+
+          {/* 시작 시간 */}
+          <TouchableOpacity
+            style={styles.timeButton}
+            onPress={() => setActivePicker("startHour")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.selectorText}>{row.startHour}</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <Text style={styles.colon}>:</Text>
+          <TouchableOpacity
+            style={styles.timeButton}
+            onPress={() => setActivePicker("startMinute")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.selectorText}>{row.startMinute}</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <Text style={styles.tilde}>~</Text>
+
+          {/* 종료 시간 */}
+          <TouchableOpacity
+            style={styles.timeButton}
+            onPress={() => setActivePicker("endHour")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.selectorText}>{row.endHour}</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <Text style={styles.colon}>:</Text>
+          <TouchableOpacity
+            style={styles.timeButton}
+            onPress={() => setActivePicker("endMinute")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.selectorText}>{row.endMinute}</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          {/* 삭제 버튼 */}
+          {showDelete ? (
+            <TouchableOpacity
+              onPress={onDelete}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="minus-circle" size={18} color={colors.red} />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.deletePlaceholder} />
+          )}
+        </View>
+
+        {/* 휴게시간 행 */}
+        <View style={styles.breakRow}>
+          <Text style={styles.breakLabel}>휴게시간</Text>
+          <TouchableOpacity
+            style={styles.breakButton}
+            onPress={() => setActivePicker("break")}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.selectorText}>{row.breakMinutes}분</Text>
+            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* 피커 모달 */}
@@ -215,11 +237,35 @@ const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
 };
 
 const styles = StyleSheet.create({
+  rowWrapper: {
+    marginBottom: 12,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    marginBottom: 8,
+    marginBottom: 6,
+  },
+  breakRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingLeft: 4,
+  },
+  breakLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  breakButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    minWidth: 56,
   },
   dayButton: {
     flexDirection: "row",

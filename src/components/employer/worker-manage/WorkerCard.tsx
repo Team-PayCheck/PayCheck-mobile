@@ -78,6 +78,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         startMinute: "00",
         endHour: "00",
         endMinute: "00",
+        breakMinutes: 0,
       },
     ]);
   };
