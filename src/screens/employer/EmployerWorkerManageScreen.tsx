@@ -21,7 +21,7 @@ import type {
 } from "../../api/employer/types";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { deleteContract } from "../../api/employer";
+
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -40,7 +40,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
     setSelectedWorkplaceId,
   } = useWorkplaceManagement();
 
-  const { workers, isLoading: isWorkersLoading, removeWorker, updateWorker, addWorker } = useWorkplaceContracts(selectedWorkplaceId);
+  const { workers, isLoading: isWorkersLoading, resignWorker, updateWorker, addWorker } = useWorkplaceContracts(selectedWorkplaceId);
 
   const selectedWorkplace = workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
@@ -91,8 +91,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
 
   const handleResign = async (contractId: number) => {
     try {
-      await deleteContract(contractId);
-      removeWorker(contractId);
+      await resignWorker(contractId);
       setExpandedContractId(null);
       if (selectedFilterId !== "all") {
         setSelectedFilterId("all");

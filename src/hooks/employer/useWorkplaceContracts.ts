@@ -10,7 +10,7 @@ import type {
   PayrollDeductionType,
   ContractUpdateRequest,
 } from "../../api/employer/types";
-import { getContractsByWorkplace, getContract, updateContract } from "../../api/employer";
+import { getContractsByWorkplace, getContract, updateContract, deleteContract } from "../../api/employer";
 
 // ============ 변환 유틸 ============
 
@@ -173,7 +173,8 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     fetchWorkers();
   }, [workplaceId]);
 
-  const removeWorker = (contractId: number) => {
+  const resignWorker = async (contractId: number): Promise<void> => {
+    await deleteContract(contractId);
     setWorkers((prev) => prev.filter((w) => w.contractId !== contractId));
   };
 
@@ -229,7 +230,7 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
     );
   };
 
-  return { workers, isLoading, removeWorker, updateWorker, addWorker };
+  return { workers, isLoading, resignWorker, updateWorker, addWorker };
 };
 
 export default useWorkplaceContracts;
