@@ -12,6 +12,7 @@ import { Text } from "../../common/Text";
 import WorkTimeRow from "./WorkTimeRow";
 import WorkScheduleCalendarModal from "./WorkScheduleCalendarModal";
 import { colors } from "../../../constants/colors";
+import { formatCurrency } from "../../../utils/format";
 import type { EmployerWorkerContract, WorkScheduleRow, ContractUpdateRequest } from "../../../types/employer/employer.types";
 
 interface WorkerCardProps {
@@ -34,7 +35,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
 }) => {
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [hourlyWage, setHourlyWage] = useState(worker.hourlyWage.toLocaleString());
+  const [hourlyWage, setHourlyWage] = useState(formatCurrency(worker.hourlyWage));
   const [paymentDay, setPaymentDay] = useState(worker.paymentDay.toString());
   const [fourMajorInsurance, setFourMajorInsurance] = useState(worker.fourMajorInsurance);
   const [incomeTax, setIncomeTax] = useState(worker.incomeTax);
@@ -44,7 +45,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   useEffect(() => {
     if (isExpanded) {
       setIsEditing(false);
-      setHourlyWage(worker.hourlyWage.toLocaleString());
+      setHourlyWage(formatCurrency(worker.hourlyWage));
       setPaymentDay(worker.paymentDay.toString());
       setFourMajorInsurance(worker.fourMajorInsurance);
       setIncomeTax(worker.incomeTax);
@@ -54,7 +55,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
 
   // 편집 모드 진입: 최신 worker 데이터로 폼 동기화
   const enterEditMode = () => {
-    setHourlyWage(worker.hourlyWage.toLocaleString());
+    setHourlyWage(formatCurrency(worker.hourlyWage));
     setPaymentDay(worker.paymentDay.toString());
     setFourMajorInsurance(worker.fourMajorInsurance);
     setIncomeTax(worker.incomeTax);
@@ -216,7 +217,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
                     onChangeText={(v) => {
                       const num = v.replace(/[^0-9]/g, "");
                       setHourlyWage(
-                        num ? parseInt(num, 10).toLocaleString() : ""
+                        num ? formatCurrency(parseInt(num, 10)) : ""
                       );
                     }}
                     keyboardType="numeric"
@@ -225,7 +226,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
                   />
                 ) : (
                   <Text style={styles.textInput}>
-                    {worker.hourlyWage.toLocaleString()}
+                    {formatCurrency(worker.hourlyWage)}
                   </Text>
                 )}
                 <Text style={styles.unit}>원</Text>

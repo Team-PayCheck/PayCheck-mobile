@@ -13,6 +13,7 @@ import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceC
 import { getContracts } from "../../../api/worker";
 import type { ContractListItem } from "../../../api/worker/types";
 import { colors } from "../../../constants/colors";
+import { formatCurrency } from "../../../utils/format";
 import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
@@ -72,7 +73,7 @@ const EmployerWorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				key={w.id || idx}
 				name={w.workerName || '-'}
 				joinedAt={w.contractStartDate ? formatDate(w.contractStartDate) : '-'}
-				wage={w.hourlyWage ? `${w.hourlyWage.toLocaleString()}원` : '-'}
+				wage={w.hourlyWage ? `${formatCurrency(w.hourlyWage)}원` : '-'}
 			/>
 		));
 	};
