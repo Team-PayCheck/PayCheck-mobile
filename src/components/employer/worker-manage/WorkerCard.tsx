@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   View,
   TouchableOpacity,
@@ -23,9 +23,6 @@ interface WorkerCardProps {
   onResign: (contractId: number) => void;
 }
 
-let rowKeyCounter = 1000;
-const newRowKey = () => `new-${rowKeyCounter++}`;
-
 const WorkerCard: React.FC<WorkerCardProps> = ({
   worker,
   isExpanded,
@@ -33,6 +30,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   onUpdate,
   onResign,
 }) => {
+  const rowKeyRef = useRef(1000);
+  const newRowKey = () => `new-${++rowKeyRef.current}`;
+
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hourlyWage, setHourlyWage] = useState(formatCurrency(worker.hourlyWage));
@@ -160,11 +160,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     }
   };
 
-  // 하단 버튼: 편집 중 + 변경 없음 → "취소", 그 외 → "근무자 정보 수정"
   const actionButtonLabel = isEditing && !hasChanges ? "취소" : "근무자 정보 수정";
   const isActionButtonActive = isEditing && hasChanges;
 
-  // 읽기 모드 근무 스케줄
   const displaySchedules = isEditing ? workSchedules : worker.workSchedules;
 
   return (

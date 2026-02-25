@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Alert } from "react-native";
 import type { WorkScheduleRow } from "../../types/employer/employer.types";
 import type { SearchedWorker, WorkSchedule } from "../../api/employer/types";
@@ -7,20 +7,18 @@ import { KOREAN_TO_DAY_NUMBER, mapDeductionTypeFromUI } from "../../utils/employ
 import { MIN_HOURLY_WAGE } from "../../constants/wage";
 import { formatCurrency } from "../../utils/format";
 
-let rowKeyCounter = 0;
-const newRowKey = () => `add-${++rowKeyCounter}`;
-
-const DEFAULT_ROW = (): WorkScheduleRow => ({
-  key: newRowKey(),
-  day: "선택",
-  startHour: "10",
-  startMinute: "00",
-  endHour: "16",
-  endMinute: "00",
-  breakMinutes: 0,
-});
-
 const useAddWorker = () => {
+  const rowKeyRef = useRef(0);
+  const newRowKey = () => `add-${++rowKeyRef.current}`;
+  const defaultRow = (): WorkScheduleRow => ({
+    key: newRowKey(),
+    day: "선택",
+    startHour: "10",
+    startMinute: "00",
+    endHour: "16",
+    endMinute: "00",
+    breakMinutes: 0,
+  });
   const [step, setStep] = useState<1 | 2>(1);
   const [workerCode, setWorkerCode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -29,7 +27,7 @@ const useAddWorker = () => {
   const [paymentDay, setPaymentDay] = useState("10");
   const [fourMajorInsurance, setFourMajorInsurance] = useState(false);
   const [incomeTax, setIncomeTax] = useState(false);
-  const [scheduleRows, setScheduleRows] = useState<WorkScheduleRow[]>([DEFAULT_ROW()]);
+  const [scheduleRows, setScheduleRows] = useState<WorkScheduleRow[]>([defaultRow()]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSearch = useCallback(async () => {
@@ -60,7 +58,7 @@ const useAddWorker = () => {
   const goToStep1 = () => setStep(1);
 
   const handleAddRow = () => {
-    setScheduleRows((prev) => [...prev, DEFAULT_ROW()]);
+    setScheduleRows((prev) => [...prev, defaultRow()]);
   };
 
   const handleDeleteRow = (key: string) => {
@@ -131,7 +129,7 @@ const useAddWorker = () => {
     setPaymentDay("10");
     setFourMajorInsurance(false);
     setIncomeTax(false);
-    setScheduleRows([DEFAULT_ROW()]);
+    setScheduleRows([defaultRow()]);
     setIsSubmitting(false);
   };
 
