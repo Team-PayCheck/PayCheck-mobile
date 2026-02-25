@@ -11,7 +11,6 @@ import type {
   GetSalariesParams,
   CreatePaymentRequest,
   CorrectionFilter,
-  UpdateWorkerRequest,
 } from "./types";
 
 // 날짜 포맷 헬퍼
@@ -222,15 +221,3 @@ export const getWorkerByCode = async (workerCode: string) => {
   return data;
 };
 
-export const getWorkerByUserId = async (userId: number | string) => {
-  const { data } = await api.get(`/api/workers/user/${userId}`);
-  return data;
-};
-
-export const updateWorker = async (
-  workerId: number | string,
-  reqData: UpdateWorkerRequest
-) => {
-  const { data } = await api.put(`/api/workers/${workerId}`, reqData);
-  return data;
-};
