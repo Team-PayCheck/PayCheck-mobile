@@ -222,11 +222,6 @@ export const getWorkerByCode = async (workerCode: string) => {
   return data;
 };
 
-export const getWorkerById = async (workerId: number | string) => {
-  const { data } = await api.get(`/api/workers/${workerId}`);
-  return data;
-};
-
 export const getWorkerByUserId = async (userId: number | string) => {
   const { data } = await api.get(`/api/workers/user/${userId}`);
   return data;
