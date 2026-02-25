@@ -14,6 +14,8 @@ import EmployerNavigationBar, {
 	type EmployerTabName,
 } from "../../../components/layout/EmployerNavigationBar";
 import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
+import AddWorkplaceButton from "../../../components/employer/mypage/AddWorkplaceButton";
+import AddWorkplaceModal from "../../../components/employer/mypage/AddWorkplaceModal";
 import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
@@ -30,6 +32,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+	const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
 	const closeDrawer = () => setIsDrawerVisible(false);
 	const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
@@ -47,37 +50,38 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		navigation.replace(TAB_SCREEN_MAP[tab]);
 	};
 
-	useEffect(() => {
-		const fetchWorkplaces = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const res = await getWorkplaces();
-				if (res.success && Array.isArray(res.data)) {
-					setWorkplaces(res.data);
+	const fetchWorkplaces = async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			const res = await getWorkplaces();
+			if (res.success && Array.isArray(res.data)) {
+				setWorkplaces(res.data);
 
-					// 각 사업장의 상세 정보 병렬 조회
-					const details = await Promise.all(
-						res.data.map((w) => getWorkplaceDetail(w.id).catch(() => null))
-					);
-					const map: Record<number, WorkplaceDetail> = {};
-					details.forEach((d) => {
-						if (d?.success && d.data) {
-							map[d.data.id] = d.data;
-						}
-					});
-					setDetailMap(map);
-				} else {
-					setWorkplaces([]);
-					setError(res.error?.message || "사업장 정보를 불러오지 못했습니다.");
-				}
-			} catch (e: any) {
+				// 각 사업장의 상세 정보 병렬 조회
+				const details = await Promise.all(
+					res.data.map((w: WorkplaceListItem) => getWorkplaceDetail(w.id).catch(() => null))
+				);
+				const map: Record<number, WorkplaceDetail> = {};
+				details.forEach((d) => {
+					if (d?.success && d.data) {
+						map[d.data.id] = d.data;
+					}
+				});
+				setDetailMap(map);
+			} else {
 				setWorkplaces([]);
-				setError(e?.message || "사업장 정보를 불러오지 못했습니다.");
-			} finally {
-				setLoading(false);
+				setError(res.error?.message || "사업장 정보를 불러오지 못했습니다.");
 			}
-		};
+		} catch (e: any) {
+			setWorkplaces([]);
+			setError(e?.message || "사업장 정보를 불러오지 못했습니다.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchWorkplaces();
 	}, []);
 
@@ -117,7 +121,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 								/>
 							);
 						})}
-						<Text style={styles.addWorkplace}>근무지 추가</Text>
+						<AddWorkplaceButton onPress={() => setIsAddModalVisible(true)} />
 					</>
 				)}
 			</ScrollView>
@@ -143,6 +147,12 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 			>
 				<AccountTermsContent />
 			</BottomSheetModal>
+
+			<AddWorkplaceModal
+				visible={isAddModalVisible}
+				onClose={() => setIsAddModalVisible(false)}
+				onSuccess={fetchWorkplaces}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -174,12 +184,6 @@ const styles = StyleSheet.create({
 		color: colors.deleteRed,
 		textAlign: "center",
 		marginTop: 24,
-	},
-	addWorkplace: {
-		color: colors.primary,
-		textAlign: "center",
-		marginTop: 16,
-		fontSize: 16,
 	},
 });
 
