@@ -46,7 +46,7 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
 }) => {
   const [showAM, setShowAM] = useState(true);
 
-  const rangeStartMin = showAM ? 0 : 12 * 60; // 분 단위
+  const rangeStartMin = showAM ? 0 : 12 * 60; 
   const rangeEndMin = showAM ? 12 * 60 : 24 * 60;
   const rangeStartHour = showAM ? 0 : 12;
 
@@ -55,15 +55,17 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
     (_, i) => rangeStartHour + i
   );
 
-  /** 특정 요일 인덱스의 가시 범위 내 바 정보를 반환 */
+  /** 요일 인덱스의 바 정보 반환 */
   const getBarsForDay = (dayIndex: number) => {
     return workSchedules
       .filter((row) => DAY_INDEX[row.day] === dayIndex)
       .flatMap((row) => {
         const startMin =
           parseInt(row.startHour, 10) * 60 + parseInt(row.startMinute, 10);
-        const endMin =
+        let endMin =
           parseInt(row.endHour, 10) * 60 + parseInt(row.endMinute, 10);
+
+        if (endMin <= startMin) endMin += 24 * 60;
 
         const clippedStart = Math.max(startMin, rangeStartMin);
         const clippedEnd = Math.min(endMin, rangeEndMin);

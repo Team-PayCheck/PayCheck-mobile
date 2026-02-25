@@ -100,8 +100,10 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
       .flatMap((row) => {
         const startMin =
           parseInt(row.startHour, 10) * 60 + parseInt(row.startMinute, 10);
-        const endMin =
+        let endMin =
           parseInt(row.endHour, 10) * 60 + parseInt(row.endMinute, 10);
+          
+        if (endMin <= startMin) endMin = 24 * 60;
         if (startMin >= endMin) return [];
         const top = (startMin / 60) * HOUR_HEIGHT;
         const height = ((endMin - startMin) / 60) * HOUR_HEIGHT;
@@ -631,6 +633,7 @@ const styles = StyleSheet.create({
     right: 2,
     backgroundColor: colors.lightBlue,
     borderRadius: 3,
+    marginTop: 5,
   },
 
   // ─── 하단 버튼 ───
