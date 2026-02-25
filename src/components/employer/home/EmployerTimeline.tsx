@@ -2,6 +2,8 @@ import React, { useRef, useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
+import { formatTime } from "../../../utils/format";
+import { getWorkStatus, WORK_STATUS_COLOR } from "../../../utils/workRecord";
 import type { WorkRecord } from "../../../api/employer/types";
 
 const HOUR_WIDTH = 64;
@@ -11,28 +13,10 @@ const ROW_GAP = 8;
 const TIME_HEADER_HEIGHT = 30;
 const TIME_LABELS = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
 
-const getBarColor = (record: WorkRecord): string => {
-  const now = new Date();
-  const [startH, startM] = record.startTime.split(":").map(Number);
-  const [endH, endM] = record.endTime.split(":").map(Number);
-
-  const start = new Date(`${record.workDate}T00:00:00`);
-  start.setHours(startH ?? 0, startM ?? 0, 0, 0);
-
-  const end = new Date(`${record.workDate}T00:00:00`);
-  end.setHours(endH ?? 0, endM ?? 0, 0, 0);
-
-  if (now < start) return colors.green;
-  if (now <= end) return colors.primary;
-  return colors.grey;
-};
-
 const timeToMinutes = (time: string): number => {
   const [h = "0", m = "0"] = time.split(":");
   return parseInt(h, 10) * 60 + parseInt(m, 10);
 };
-
-const formatTime = (time: string): string => time.slice(0, 5);
 
 const minutesToX = (minutes: number): number =>
   (minutes / (24 * 60)) * TOTAL_WIDTH;
@@ -122,7 +106,7 @@ const EmployerTimeline: React.FC<EmployerTimelineProps> = ({ workRecords }) => {
               const barLeft = minutesToX(startMin);
               const barWidth = Math.max(minutesToX(endMin - startMin), 48);
               const barTop = ROW_GAP + index * (BAR_HEIGHT + ROW_GAP);
-              const barColor = getBarColor(record);
+              const barColor = WORK_STATUS_COLOR[getWorkStatus(record)];
 
               return (
                 <View

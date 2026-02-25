@@ -3,33 +3,14 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
-import { formatCurrency } from "../../../utils/format";
+import { formatCurrency, formatTime } from "../../../utils/format";
+import { getWorkStatus, WORK_STATUS_COLOR, type WorkStatus } from "../../../utils/workRecord";
 import type { WorkRecord } from "../../../api/employer/types";
 
-const formatTime = (time: string): string => time.slice(0, 5);
-
-type WorkStatus = "scheduled" | "working" | "completed";
-
-const getWorkStatus = (record: WorkRecord): WorkStatus => {
-  const now = new Date();
-  const [startH, startM] = record.startTime.split(":").map(Number);
-  const [endH, endM] = record.endTime.split(":").map(Number);
-
-  const start = new Date(`${record.workDate}T00:00:00`);
-  start.setHours(startH ?? 0, startM ?? 0, 0, 0);
-
-  const end = new Date(`${record.workDate}T00:00:00`);
-  end.setHours(endH ?? 0, endM ?? 0, 0, 0);
-
-  if (now < start) return "scheduled";
-  if (now <= end) return "working";
-  return "completed";
-};
-
 const STATUS_BADGE_STYLE: Record<WorkStatus, object> = {
-  scheduled: { backgroundColor: colors.green },
-  working: { backgroundColor: colors.primary },
-  completed: { backgroundColor: colors.grey },
+  scheduled: { backgroundColor: WORK_STATUS_COLOR.scheduled },
+  working: { backgroundColor: WORK_STATUS_COLOR.working },
+  completed: { backgroundColor: WORK_STATUS_COLOR.completed },
 };
 
 const STATUS_LABEL: Record<WorkStatus, string> = {

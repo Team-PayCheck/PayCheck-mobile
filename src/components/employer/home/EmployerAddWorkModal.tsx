@@ -36,7 +36,7 @@ interface EmployerAddWorkModalProps {
   onClose: () => void;
   workplaceId: number;
   workplaceName: string;
-  selectedDate: string; // "yyyy-MM-dd"
+  selectedDate: string;
   onSuccess: () => void;
 }
 
@@ -218,7 +218,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
         근무 추가하기
       </Text>
 
-      {/* 근무지 (읽기 전용) */}
+      {/* 근무지 */}
       <View style={styles.workplaceRow}>
         <View style={styles.workplaceDisplay}>
           <Text weight="Bold" style={styles.workplaceName}>
@@ -228,7 +228,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
         </View>
       </View>
 
-      {/* 근무자 chip 선택 */}
+      {/* 근무자 선택 */}
       <View style={styles.section}>
         <Text weight="Medium" style={styles.label}>
           근무자 선택
@@ -263,7 +263,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
         )}
       </View>
 
-      {/* 근무지(readonly) + 휴게 시간 */}
+      {/* 근무지 + 휴게 시간 */}
       <View style={styles.rowSection}>
         <View style={styles.halfSection}>
           <Text weight="Medium" style={styles.label}>
