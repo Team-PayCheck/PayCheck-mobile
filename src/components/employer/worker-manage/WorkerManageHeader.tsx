@@ -15,7 +15,7 @@ interface WorkerManageHeaderProps {
   selectedWorkplace: WorkplaceDetails;
   workplaces: WorkplaceDetails[];
   onWorkplaceChange: (workplace: WorkplaceDetails) => void;
-  onAddWorker: () => void;
+  onAddWorker?: () => void;
 }
 
 const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
@@ -33,7 +33,7 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
 
   return (
     <>
-      {/* 근무지 드롭다운 + 근무자 추가 행 */}
+      {/* 근무지 드롭다운 + 근무자 추가(선택) 행 */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={styles.workplaceDropdown}
@@ -46,16 +46,18 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
           <Feather name="chevron-down" size={18} color={colors.textPrimary} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.addWorkerButton}
-          onPress={onAddWorker}
-          activeOpacity={0.7}
-        >
-          <Feather name="plus" size={14} color={colors.primary} />
-          <Text weight="Medium" style={styles.addWorkerText}>
-            근무자 추가
-          </Text>
-        </TouchableOpacity>
+        {onAddWorker && (
+          <TouchableOpacity
+            style={styles.addWorkerButton}
+            onPress={onAddWorker}
+            activeOpacity={0.7}
+          >
+            <Feather name="plus" size={14} color={colors.primary} />
+            <Text weight="Medium" style={styles.addWorkerText}>
+              근무자 추가
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* 근무지 선택 모달 */}
