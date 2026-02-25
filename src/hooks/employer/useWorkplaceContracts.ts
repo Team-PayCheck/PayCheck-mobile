@@ -2,92 +2,21 @@ import { useState, useEffect } from "react";
 import type {
   EmployerWorkerContract,
   WorkScheduleRow,
-  WorkDay,
   Contract,
   ContractWorker,
   WorkScheduleItem,
   WorkSchedule,
-  PayrollDeductionType,
   ContractUpdateRequest,
 } from "../../api/employer/types";
 import { getContractsByWorkplace, getContract, updateContract, deleteContract } from "../../api/employer";
-
-// ============ 변환 유틸 ============
-
-// 문자열 형식: "MONDAY" ~ "SUNDAY"
-const DAY_OF_WEEK_TO_KOREAN: Record<string, WorkDay> = {
-  MONDAY: "월요일",
-  TUESDAY: "화요일",
-  WEDNESDAY: "수요일",
-  THURSDAY: "목요일",
-  FRIDAY: "금요일",
-  SATURDAY: "토요일",
-  SUNDAY: "일요일",
-};
-
-const DAY_OF_WEEK_TO_SUMMARY: Record<string, string> = {
-  MONDAY: "월",
-  TUESDAY: "화",
-  WEDNESDAY: "수",
-  THURSDAY: "목",
-  FRIDAY: "금",
-  SATURDAY: "토",
-  SUNDAY: "일",
-};
-
-// 숫자 형식: 1=월요일 ~ 7=일요일
-const DAY_NUMBER_TO_KOREAN: Record<number, WorkDay> = {
-  1: "월요일", 2: "화요일", 3: "수요일", 4: "목요일",
-  5: "금요일", 6: "토요일", 7: "일요일",
-};
-
-const DAY_NUMBER_TO_SUMMARY: Record<number, string> = {
-  1: "월", 2: "화", 3: "수", 4: "목", 5: "금", 6: "토", 7: "일",
-};
-
-const resolveKoreanDay = (dayOfWeek: string | number): WorkDay => {
-  if (typeof dayOfWeek === "number") {
-    return DAY_NUMBER_TO_KOREAN[dayOfWeek] ?? "선택";
-  }
-  return DAY_OF_WEEK_TO_KOREAN[dayOfWeek.toUpperCase()] ?? "선택";
-};
-
-const resolveSummaryDay = (dayOfWeek: string | number): string => {
-  if (typeof dayOfWeek === "number") {
-    return DAY_NUMBER_TO_SUMMARY[dayOfWeek] ?? "";
-  }
-  return DAY_OF_WEEK_TO_SUMMARY[dayOfWeek.toUpperCase()] ?? "";
-};
-
-/** WorkDay (한국어) → dayOfWeek 숫자 변환 */
-const KOREAN_TO_DAY_NUMBER: Record<string, number> = {
-  월요일: 1, 화요일: 2, 수요일: 3, 목요일: 4,
-  금요일: 5, 토요일: 6, 일요일: 7,
-};
-
-/** fourMajorInsurance / incomeTax → payrollDeductionType 변환 */
-const mapDeductionTypeFromUI = (
-  fourMajorInsurance: boolean,
-  incomeTax: boolean
-): PayrollDeductionType => {
-  if (fourMajorInsurance && incomeTax) return "PART_TIME_TAX_AND_INSURANCE";
-  if (incomeTax) return "PART_TIME_TAX_ONLY";
-  return "PART_TIME_NONE";
-};
-
-/** payrollDeductionType → fourMajorInsurance / incomeTax 변환 */
-const mapDeductionType = (type: PayrollDeductionType) => {
-  switch (type) {
-    case "PART_TIME_TAX_AND_INSURANCE":
-      return { fourMajorInsurance: true, incomeTax: true };
-    case "PART_TIME_TAX_ONLY":
-    case "FREELANCER":
-      return { fourMajorInsurance: false, incomeTax: true };
-    case "PART_TIME_NONE":
-    default:
-      return { fourMajorInsurance: false, incomeTax: false };
-  }
-};
+import {
+  resolveKoreanDay,
+  resolveSummaryDay,
+  toDayOrder,
+  KOREAN_TO_DAY_NUMBER,
+  mapDeductionTypeFromUI,
+  mapDeductionType,
+} from "../../utils/employerSchedule";
 
 /** Contract (API) → EmployerWorkerContract (UI) */
 const mapContractToUI = (contract: Contract): EmployerWorkerContract => {
@@ -98,7 +27,11 @@ const mapContractToUI = (contract: Contract): EmployerWorkerContract => {
     scheduleItems = [];
   }
 
-  const workSchedules: WorkScheduleRow[] = scheduleItems.map((s, idx) => {
+  const sortedItems = [...scheduleItems].sort(
+    (a, b) => toDayOrder(a.dayOfWeek) - toDayOrder(b.dayOfWeek)
+  );
+
+  const workSchedules: WorkScheduleRow[] = sortedItems.map((s, idx) => {
     const [startH = "00", startM = "00"] = s.startTime.split(":");
     const [endH = "00", endM = "00"] = s.endTime.split(":");
     return {
@@ -112,7 +45,7 @@ const mapContractToUI = (contract: Contract): EmployerWorkerContract => {
     };
   });
 
-  const workDaysSummary = scheduleItems
+  const workDaysSummary = sortedItems
     .map((s) => resolveSummaryDay(s.dayOfWeek))
     .filter(Boolean);
 
@@ -209,9 +142,11 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
       ),
     });
 
-    const newWorkDaysSummary = data.workSchedules
+    const sortedSchedules = [...data.workSchedules]
       .filter((row) => row.day !== "선택")
-      .map((row) => row.day.charAt(0));
+      .sort((a, b) => (KOREAN_TO_DAY_NUMBER[a.day] ?? 99) - (KOREAN_TO_DAY_NUMBER[b.day] ?? 99));
+
+    const newWorkDaysSummary = sortedSchedules.map((row) => row.day.charAt(0));
 
     setWorkers((prev) =>
       prev.map((w) =>
@@ -222,7 +157,7 @@ const useWorkplaceContracts = (workplaceId: number | null) => {
               paymentDay: data.paymentDay,
               fourMajorInsurance: data.fourMajorInsurance,
               incomeTax: data.incomeTax,
-              workSchedules: data.workSchedules,
+              workSchedules: sortedSchedules,
               workDaysSummary: newWorkDaysSummary,
             }
           : w

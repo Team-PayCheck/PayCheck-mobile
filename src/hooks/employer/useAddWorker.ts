@@ -4,9 +4,9 @@ import type {
   SearchedWorker,
   WorkScheduleRow,
   WorkSchedule,
-  PayrollDeductionType,
 } from "../../api/employer/types";
 import { getWorkerByCode, createContract } from "../../api/employer";
+import { KOREAN_TO_DAY_NUMBER, mapDeductionTypeFromUI } from "../../utils/employerSchedule";
 
 let rowKeyCounter = 0;
 const newRowKey = () => `add-${++rowKeyCounter}`;
@@ -20,25 +20,6 @@ const DEFAULT_ROW = (): WorkScheduleRow => ({
   endMinute: "00",
   breakMinutes: 0,
 });
-
-const KOREAN_TO_DAY_NUMBER: Record<string, number> = {
-  월요일: 1,
-  화요일: 2,
-  수요일: 3,
-  목요일: 4,
-  금요일: 5,
-  토요일: 6,
-  일요일: 7,
-};
-
-const mapDeductionType = (
-  fourMajorInsurance: boolean,
-  incomeTax: boolean
-): PayrollDeductionType => {
-  if (fourMajorInsurance && incomeTax) return "PART_TIME_TAX_AND_INSURANCE";  // && 추가
-  if (incomeTax) return "PART_TIME_TAX_ONLY";
-  return "PART_TIME_NONE";
-};
 
 const useAddWorker = () => {
   const [step, setStep] = useState<1 | 2>(1);
@@ -133,7 +114,7 @@ const useAddWorker = () => {
         contractStartDate,
         contractEndDate: null,
         paymentDay: day,
-        payrollDeductionType: mapDeductionType(fourMajorInsurance, incomeTax),
+        payrollDeductionType: mapDeductionTypeFromUI(fourMajorInsurance, incomeTax),
       });
       const created = response.data as { id: number };
       return created.id;
