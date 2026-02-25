@@ -219,29 +219,3 @@ export const createPayment = async (reqData: CreatePaymentRequest) => {
   const { data } = await api.post("/api/employer/payments", reqData);
   return data;
 };
-
-// ============ 근로자 정보 조회 (Worker Info) ============
-
-export const getWorkerByCode = async (workerCode: string) => {
-  const { data } = await api.get(`/api/workers/code/${workerCode}`);
-  return data;
-};
-
-export const getWorkerById = async (workerId: number | string) => {
-  const { data } = await api.get(`/api/workers/${workerId}`);
-  return data;
-};
-
-export const getWorkerByUserId = async (userId: number | string) => {
-  const { data } = await api.get(`/api/workers/user/${userId}`);
-  return data;
-};
-
-export const updateWorker = async (
-  workerId: number | string,
-  reqData: UpdateWorkerRequest
-) => {
-  const { data } = await api.put(`/api/workers/${workerId}`, reqData);
-  return data;
-};
-
