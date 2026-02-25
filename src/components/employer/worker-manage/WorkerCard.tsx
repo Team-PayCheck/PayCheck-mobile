@@ -51,7 +51,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       setIncomeTax(worker.incomeTax);
       setWorkSchedules(worker.workSchedules);
     }
-  }, [isExpanded]);
+  }, [isExpanded, worker]);
 
   // 편집 모드 진입: 최신 worker 데이터로 폼 동기화
   const enterEditMode = () => {
