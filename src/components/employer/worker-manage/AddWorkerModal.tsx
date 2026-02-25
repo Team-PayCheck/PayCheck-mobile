@@ -85,7 +85,7 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
       onSuccess(contractId);
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === 400) {
-        const errorCode = (error.response.data as { errorCode?: string })?.errorCode;
+        const errorCode = (error.response.data as { error?: { code?: string } })?.error?.code;
         if (errorCode === "DUPLICATE_CONTRACT") {
           Alert.alert("추가 실패", "이미 해당 사업장에 계약이 존재하는 근로자입니다.");
           return;
