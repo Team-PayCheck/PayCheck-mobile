@@ -109,36 +109,37 @@ const EmployerHomeScreen: React.FC = () => {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <>
           <WorkerManageHeader
             selectedWorkplace={selectedWorkplace}
             workplaces={workplaces}
             onWorkplaceChange={handleWorkplaceChange}
           />
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <NoticeBoard notices={dummyNotices} />
 
-          <NoticeBoard notices={dummyNotices} />
+            <WeeklyDateBar
+              weekTitle={weekTitle}
+              weekDays={weekDays}
+              selectedDate={selectedDate.getDate()}
+              onPressCalendarIcon={handleOpenCalendar}
+              onPressDay={handleDayPress}
+            />
 
-          <WeeklyDateBar
-            weekTitle={weekTitle}
-            weekDays={weekDays}
-            selectedDate={selectedDate.getDate()}
-            onPressCalendarIcon={handleOpenCalendar}
-            onPressDay={handleDayPress}
-          />
+            {/* 타임라인 */}
+            <EmployerTimeline workRecords={workRecords} />
 
-          {/* 타임라인 */}
-          <EmployerTimeline workRecords={workRecords} />
-
-          {/* 근무자 리스트 */}
-          <EmployerWorkerListSection
-            workRecords={workRecords}
-            onPressAdd={() => setIsAddWorkModalVisible(true)}
-          />
-        </ScrollView>
+            {/* 근무자 리스트 */}
+            <EmployerWorkerListSection
+              workRecords={workRecords}
+              onPressAdd={() => setIsAddWorkModalVisible(true)}
+            />
+          </ScrollView>
+        </>
       )}
 
       <EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
