@@ -7,6 +7,7 @@ import type {
 } from "../../api/employer/types";
 import { getWorkerByCode, createContract } from "../../api/employer";
 import { KOREAN_TO_DAY_NUMBER, mapDeductionTypeFromUI } from "../../utils/employerSchedule";
+import { MIN_HOURLY_WAGE } from "../../constants/wage";
 
 let rowKeyCounter = 0;
 const newRowKey = () => `add-${++rowKeyCounter}`;
@@ -26,7 +27,7 @@ const useAddWorker = () => {
   const [workerCode, setWorkerCode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchedWorker, setSearchedWorker] = useState<SearchedWorker | null>(null);
-  const [hourlyWage, setHourlyWage] = useState("10,030");
+  const [hourlyWage, setHourlyWage] = useState(MIN_HOURLY_WAGE.toLocaleString());
   const [paymentDay, setPaymentDay] = useState("10");
   const [fourMajorInsurance, setFourMajorInsurance] = useState(false);
   const [incomeTax, setIncomeTax] = useState(false);
@@ -128,7 +129,7 @@ const useAddWorker = () => {
     setWorkerCode("");
     setIsSearching(false);
     setSearchedWorker(null);
-    setHourlyWage("10,030");
+    setHourlyWage(MIN_HOURLY_WAGE.toLocaleString());
     setPaymentDay("10");
     setFourMajorInsurance(false);
     setIncomeTax(false);
