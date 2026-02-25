@@ -17,6 +17,7 @@ import NoticeBoard from "../../components/common/NoticeBoard";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
+import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import { colors } from "../../constants/colors";
 import EmployerTimeline from "../../components/employer/home/EmployerTimeline";
 import EmployerWorkerListSection from "../../components/employer/home/EmployerWorkerListSection";
@@ -43,6 +44,8 @@ const EmployerHomeScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
   const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
 
   const {
     workplaces,
@@ -66,7 +69,6 @@ const EmployerHomeScreen: React.FC = () => {
 
   const weekDays = useMemo(() => getWeekDays(selectedDate), [selectedDate]);
 
-  // 주 날짜 전체(Date 객체) — onPressDay에서 전체 날짜 복원용
   const weekDates = useMemo(() => {
     const { startDate } = getWeekRange(selectedDate);
     const monday = new Date(startDate + "T00:00:00");
@@ -98,7 +100,27 @@ const EmployerHomeScreen: React.FC = () => {
   };
 
   const handleOpenCalendar = () => {
+    setCalendarYear(selectedDate.getFullYear());
+    setCalendarMonth(selectedDate.getMonth());
     setIsCalendarModalVisible(true);
+  };
+
+  const handlePrevMonth = () => {
+    if (calendarMonth === 0) {
+      setCalendarYear((y) => y - 1);
+      setCalendarMonth(11);
+    } else {
+      setCalendarMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (calendarMonth === 11) {
+      setCalendarYear((y) => y + 1);
+      setCalendarMonth(0);
+    } else {
+      setCalendarMonth((m) => m + 1);
+    }
   };
 
   return (
@@ -162,12 +184,21 @@ const EmployerHomeScreen: React.FC = () => {
         onClose={() => setIsCalendarModalVisible(false)}
         maxHeight="70%"
       >
-        <MonthlyCalendar
-          year={selectedDate.getFullYear()}
-          month={selectedDate.getMonth()}
-          selectedDate={selectedDate}
-          onDateSelect={handleDateSelect}
+        <MonthlyCalendarNav
+          year={calendarYear}
+          month={calendarMonth}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
+          showListButton={false}
         />
+        <View style={{ marginTop: 20 }}>
+          <MonthlyCalendar
+            year={calendarYear}
+            month={calendarMonth}
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+          />
+        </View>
       </BottomSheetModal>
     </SafeAreaView>
   );
