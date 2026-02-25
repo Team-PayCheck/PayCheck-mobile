@@ -33,7 +33,7 @@ const WorkerManageHeader: React.FC<WorkerManageHeaderProps> = ({
 
   return (
     <>
-      {/* 근무지 드롭다운 + 근무자 추가(선택) 행 */}
+      {/* 근무지 드롭다운 + 근무자 추가(옵션) 행 */}
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={styles.workplaceDropdown}

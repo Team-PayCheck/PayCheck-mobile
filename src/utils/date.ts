@@ -17,7 +17,7 @@ export const getWeekLabel = (date: Date): string => {
 	return `이번주(${week}주차)`;
 };
 
-const formatDateStr = (date: Date): string => {
+export const formatDateStr = (date: Date): string => {
 	const y = date.getFullYear();
 	const m = String(date.getMonth() + 1).padStart(2, "0");
 	const d = String(date.getDate()).padStart(2, "0");

@@ -59,7 +59,7 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
 
   return (
     <View style={styles.card}>
-      {/* 접힌 상태 - 항상 표시 */}
+      {/* 접힌 상태 */}
       <TouchableOpacity
         style={styles.cardHeader}
         onPress={() => onPressToggle(record)}
@@ -88,7 +88,7 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
         </View>
       </TouchableOpacity>
 
-      {/* 펼친 상태 - 토글 시 표시 */}
+      {/* 펼친 상태 */}
       {isExpanded && (
         <View style={styles.expandedContent}>
           <View style={styles.detailRow}>

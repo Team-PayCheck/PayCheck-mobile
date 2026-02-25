@@ -26,7 +26,7 @@ import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagem
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import type { WeekDay } from "../../types/worker.types";
-import { getWeekDays, getWeekRange } from "../../utils/date";
+import { getWeekDays, getWeekRange, formatDateStr } from "../../utils/date";
 import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 
@@ -57,12 +57,7 @@ const EmployerHomeScreen: React.FC = () => {
   const selectedWorkplace =
     workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
 
-  const dateStr = useMemo(() => {
-    const y = selectedDate.getFullYear();
-    const m = String(selectedDate.getMonth() + 1).padStart(2, "0");
-    const d = String(selectedDate.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }, [selectedDate]);
+  const dateStr = useMemo(() => formatDateStr(selectedDate), [selectedDate]);
 
   const { workRecords, refetch, removeRecord } =
     useEmployerDailyWorkRecords(selectedWorkplaceId, dateStr);
