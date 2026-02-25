@@ -144,6 +144,13 @@ const EmployerEditWorkModal: React.FC<EmployerEditWorkModalProps> = ({
           <Text style={styles.timeSeparator}>:</Text>
           {renderSelectField("endMinute", styles.timeField)}
         </View>
+        {endHour * 60 + endMinute < startHour * 60 + startMinute && (
+          <View style={styles.nextDayRow}>
+            <View style={styles.nextDayBadge}>
+              <Text weight="SemiBold" style={styles.nextDayText}>익일</Text>
+            </View>
+          </View>
+        )}
       </View>
 
       {/* 휴게 시간 */}
@@ -266,6 +273,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 8,
+  },
+  nextDayRow: {
+    alignItems: "flex-end",
+    marginTop: 4,
+  },
+  nextDayBadge: {
+    backgroundColor: colors.primaryLight,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  nextDayText: {
+    fontSize: 11,
+    color: colors.primary,
   },
 });
 

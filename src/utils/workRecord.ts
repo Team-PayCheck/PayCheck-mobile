@@ -24,3 +24,8 @@ export const WORK_STATUS_COLOR: Record<WorkStatus, string> = {
   working: colors.primary,
   completed: colors.grey,
 };
+
+/** 익일 근무 판단 */
+export const isCrossMidnight = (startTime: string, endTime: string): boolean => {
+  return endTime < startTime;
+};

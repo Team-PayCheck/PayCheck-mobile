@@ -14,7 +14,16 @@ const useWorkRecords = (startDate: string, endDate: string) => {
 		try {
 			setIsLoading(true);
 			const response = await getWorkRecords(startDate, endDate);
-			setWorks(response.data ?? []);
+			const works = (response.data ?? []).map((work: WorkItem) => {
+				if (work.totalWorkMinutes >= 0) return work;
+				// 백엔드에서 익일 근무가 음수로 반환된 경우 보정
+				const [startH, startM] = work.startTime.split(":").map(Number);
+				const [endH, endM] = work.endTime.split(":").map(Number);
+				const totalWorkMinutes =
+					(endH * 60 + endM - (startH * 60 + startM) + 24 * 60) - (work.breakMinutes ?? 0);
+				return { ...work, totalWorkMinutes };
+			});
+			setWorks(works);
 		} catch {
 			setWorks([]);
 		} finally {

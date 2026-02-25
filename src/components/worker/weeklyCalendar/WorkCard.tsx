@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 import { formatCurrency, formatDate } from "../../../utils/format";
+import { isCrossMidnight } from "../../../utils/workRecord";
 import type { WorkItem } from "../../../types/worker.types";
 
 interface WorkCardProps {
@@ -78,7 +79,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 						{work.workplaceName}
 					</Text>
 					<Text weight="Bold" style={styles.dateTime}>
-						{formatDate(work.workDate)} {work.startTime.slice(0, 5)} ~ {work.endTime.slice(0, 5)}
+						{formatDate(work.workDate)} {work.startTime.slice(0, 5)} ~ {isCrossMidnight(work.startTime, work.endTime) ? `익일 ${work.endTime.slice(0, 5)}` : work.endTime.slice(0, 5)}
 					</Text>
 				</View>
 				<View style={styles.headerRight}>

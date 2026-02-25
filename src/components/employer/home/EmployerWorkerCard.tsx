@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 import { formatCurrency, formatTime } from "../../../utils/format";
-import { getWorkStatus, WORK_STATUS_COLOR, type WorkStatus } from "../../../utils/workRecord";
+import { getWorkStatus, WORK_STATUS_COLOR, isCrossMidnight, type WorkStatus } from "../../../utils/workRecord";
 import type { WorkRecord } from "../../../api/employer/types";
 
 const STATUS_BADGE_STYLE: Record<WorkStatus, object> = {
@@ -77,7 +77,7 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
             {record.workerName}
           </Text>
           <Text weight="Bold" style={styles.dateTime}>
-            {formatTime(record.startTime)} ~ {formatTime(record.endTime)}
+            {formatTime(record.startTime)} ~ {isCrossMidnight(record.startTime, record.endTime) ? `익일 ${formatTime(record.endTime)}` : formatTime(record.endTime)}
           </Text>
         </View>
         <View style={styles.headerRight}>
