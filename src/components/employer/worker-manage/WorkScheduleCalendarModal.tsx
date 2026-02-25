@@ -4,21 +4,17 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
 import type { WorkScheduleRow } from "../../../types/employer/employer.types";
 
-const HOUR_HEIGHT = 50; // px per hour
+const HOUR_HEIGHT = 50; 
 const TIME_LABEL_WIDTH = 52;
 const HOURS_IN_RANGE = 12;
 const TOTAL_GRID_HEIGHT = HOUR_HEIGHT * HOURS_IN_RANGE;
-const SCREEN_WIDTH = Dimensions.get("window").width;
-// 양쪽 패딩 24*2 (BottomSheetModal paddingHorizontal) 제외
-const GRID_WIDTH = SCREEN_WIDTH - 48 - TIME_LABEL_WIDTH;
-const COL_WIDTH = GRID_WIDTH / 7;
 
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const DAY_INDEX: Record<string, number> = {
@@ -44,6 +40,10 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
   workerName,
   workSchedules,
 }) => {
+  const { width } = useWindowDimensions();
+  const GRID_WIDTH = width - 48 - TIME_LABEL_WIDTH;
+  const COL_WIDTH = GRID_WIDTH / 7;
+
   const [showAM, setShowAM] = useState(true);
 
   const rangeStartMin = showAM ? 0 : 12 * 60; 

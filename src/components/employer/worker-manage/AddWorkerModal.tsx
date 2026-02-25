@@ -7,8 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
-  Dimensions,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import { isAxiosError } from "axios";
 import { Feather } from "@expo/vector-icons";
@@ -23,9 +23,6 @@ const HOUR_HEIGHT = 30;
 const TIME_LABEL_WIDTH = 52;
 const HOURS_IN_DAY = 24;
 const TOTAL_GRID_HEIGHT = HOUR_HEIGHT * HOURS_IN_DAY;
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const GRID_WIDTH = SCREEN_WIDTH - 48 - TIME_LABEL_WIDTH;
-const COL_WIDTH = GRID_WIDTH / 7;
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const DAY_INDEX: Record<string, number> = {
   일요일: 0,
@@ -52,6 +49,9 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
   workplaceName,
   onSuccess,
 }) => {
+  const { width } = useWindowDimensions();
+  const GRID_WIDTH = width - 48 - TIME_LABEL_WIDTH;
+  const COL_WIDTH = GRID_WIDTH / 7;
   const {
     step,
     workerCode,
