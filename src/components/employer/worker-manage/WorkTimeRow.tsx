@@ -6,7 +6,7 @@ import BottomSheetModal from "../../common/BottomSheetModal";
 import WheelPicker from "../../common/WheelPicker";
 import { HOUR_ITEMS, MINUTE_ITEMS, BREAK_ITEMS } from "../../../constants/pickerItems";
 import { colors } from "../../../constants/colors";
-import type { WorkDay, WorkScheduleRow } from "../../../api/employer/types";
+import type { WorkDay, WorkScheduleRow } from "../../../types/employer/employer.types";
 
 const DAY_OPTIONS: WorkDay[] = [
   "선택",

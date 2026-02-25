@@ -15,10 +15,8 @@ import WorkerFilterTabs, {
 } from "../../components/employer/worker-manage/WorkerFilterTabs";
 import WorkerCard from "../../components/employer/worker-manage/WorkerCard";
 import AddWorkerModal from "../../components/employer/worker-manage/AddWorkerModal";
-import type {
-  WorkplaceDetails,
-  ContractUpdateRequest,
-} from "../../api/employer/types";
+import type { ContractUpdateRequest } from "../../types/employer/employer.types";
+import type { WorkplaceDetails } from "../../api/employer/types";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
 

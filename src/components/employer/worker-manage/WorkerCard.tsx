@@ -12,11 +12,7 @@ import { Text } from "../../common/Text";
 import WorkTimeRow from "./WorkTimeRow";
 import WorkScheduleCalendarModal from "./WorkScheduleCalendarModal";
 import { colors } from "../../../constants/colors";
-import type {
-  EmployerWorkerContract,
-  WorkScheduleRow,
-  ContractUpdateRequest,
-} from "../../../api/employer/types";
+import type { EmployerWorkerContract, WorkScheduleRow, ContractUpdateRequest } from "../../../types/employer/employer.types";
 
 interface WorkerCardProps {
   worker: EmployerWorkerContract;

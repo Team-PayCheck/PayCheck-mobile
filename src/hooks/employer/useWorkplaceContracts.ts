@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
+import type { EmployerWorkerContract, WorkScheduleRow, ContractUpdateRequest } from "../../types/employer/employer.types";
 import type {
-  EmployerWorkerContract,
-  WorkScheduleRow,
   Contract,
   ContractWorker,
   WorkScheduleItem,
   WorkSchedule,
-  ContractUpdateRequest,
 } from "../../api/employer/types";
 import { getContractsByWorkplace, getContract, updateContract, deleteContract } from "../../api/employer";
 import {

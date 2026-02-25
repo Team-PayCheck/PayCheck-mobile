@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, TouchableOpacity, StyleSheet, View } from "react-native";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
-import type { EmployerWorkerContract } from "../../../api/employer/types";
+import type { EmployerWorkerContract } from "../../../types/employer/employer.types";
 
 /** "all" = 전체 탭, 그 외는 contractId */
 export type WorkerFilterId = "all" | number;

@@ -1,10 +1,7 @@
 import { useState, useCallback } from "react";
 import { Alert } from "react-native";
-import type {
-  SearchedWorker,
-  WorkScheduleRow,
-  WorkSchedule,
-} from "../../api/employer/types";
+import type { WorkScheduleRow } from "../../types/employer/employer.types";
+import type { SearchedWorker, WorkSchedule } from "../../api/employer/types";
 import { getWorkerByCode, createContract } from "../../api/employer";
 import { KOREAN_TO_DAY_NUMBER, mapDeductionTypeFromUI } from "../../utils/employerSchedule";
 import { MIN_HOURLY_WAGE } from "../../constants/wage";

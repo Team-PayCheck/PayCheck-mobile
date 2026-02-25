@@ -1,4 +1,5 @@
-import type { WorkDay, PayrollDeductionType } from "../api/employer/types";
+import type { WorkDay } from "../types/employer/employer.types";
+import type { PayrollDeductionType } from "../api/employer/types";
 
 // ── 요일 변환 맵 ──────────────────────────────────────────────
 

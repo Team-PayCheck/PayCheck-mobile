@@ -9,7 +9,7 @@ import {
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
-import type { WorkScheduleRow } from "../../../api/employer/types";
+import type { WorkScheduleRow } from "../../../types/employer/employer.types";
 
 const HOUR_HEIGHT = 50; // px per hour
 const TIME_LABEL_WIDTH = 52;
