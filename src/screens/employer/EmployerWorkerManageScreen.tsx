@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, FlatList, ActivityIndicator, View, Alert } from "react-native";
+import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -108,7 +109,15 @@ const EmployerWorkerManageScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
       <Header />
-      {isWorkplacesLoading || isWorkersLoading || selectedWorkplace === null ? (
+      {isWorkplacesLoading ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : workplaces.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>등록된 근무지가 없습니다.</Text>
+        </View>
+      ) : isWorkersLoading || selectedWorkplace === null ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -172,6 +181,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    fontSize: 15,
+    color: colors.textMuted,
   },
 });
 
