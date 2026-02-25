@@ -10,6 +10,7 @@ import {
   Dimensions,
   Alert,
 } from "react-native";
+import { isAxiosError } from "axios";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
@@ -85,11 +86,18 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
   const handleConfirmSubmit = async () => {
     try {
       const contractId = await handleSubmit(workplaceId);
+      Alert.alert("추가 성공", "근무자가 추가되었습니다.");
       reset();
       onSuccess(contractId);
     } catch (error) {
-      const e = error as Error;
-      Alert.alert("추가 실패", e.message || "근무자 추가 중 오류가 발생했습니다.");
+      if (isAxiosError(error) && error.response?.status === 400) {
+        const errorCode = (error.response.data as { errorCode?: string })?.errorCode;
+        if (errorCode === "DUPLICATE_CONTRACT") {
+          Alert.alert("추가 실패", "이미 해당 사업장에 계약이 존재하는 근로자입니다.");
+          return;
+        }
+      }
+      Alert.alert("추가 실패", "근무자 추가가 실패하였습니다.");
     }
   };
 
