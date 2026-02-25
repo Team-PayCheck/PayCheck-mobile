@@ -214,10 +214,4 @@ export const createPayment = async (reqData: CreatePaymentRequest) => {
   return data;
 };
 
-// ============ 근로자 정보 조회 (Worker Info) ============
-
-export const getWorkerByCode = async (workerCode: string) => {
-  const { data } = await api.get(`/api/workers/code/${workerCode}`);
-  return data;
-};
 
