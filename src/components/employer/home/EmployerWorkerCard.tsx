@@ -8,7 +8,9 @@ import type { WorkRecord } from "../../../api/employer/types";
 
 const formatTime = (time: string): string => time.slice(0, 5);
 
-const isCurrentlyWorking = (record: WorkRecord): boolean => {
+type WorkStatus = "scheduled" | "working" | "completed";
+
+const getWorkStatus = (record: WorkRecord): WorkStatus => {
   const now = new Date();
   const [startH, startM] = record.startTime.split(":").map(Number);
   const [endH, endM] = record.endTime.split(":").map(Number);
@@ -19,46 +21,31 @@ const isCurrentlyWorking = (record: WorkRecord): boolean => {
   const end = new Date(`${record.workDate}T00:00:00`);
   end.setHours(endH ?? 0, endM ?? 0, 0, 0);
 
-  return now >= start && now <= end;
+  if (now < start) return "scheduled";
+  if (now <= end) return "working";
+  return "completed";
+};
+
+const STATUS_BADGE_STYLE: Record<WorkStatus, object> = {
+  scheduled: { backgroundColor: colors.green },
+  working: { backgroundColor: colors.primary },
+  completed: { backgroundColor: colors.grey },
+};
+
+const STATUS_LABEL: Record<WorkStatus, string> = {
+  scheduled: "근무예정",
+  working: "근무중",
+  completed: "근무완료",
 };
 
 const StatusBadge: React.FC<{ record: WorkRecord }> = ({ record }) => {
-  const working = record.status === "SCHEDULED" && isCurrentlyWorking(record);
-  const isScheduled = record.status === "SCHEDULED" && !working;
-
-  const badgeStyle = working
-    ? styles.statusWorking
-    : isScheduled
-      ? styles.statusScheduled
-      : record.status === "PENDING_APPROVAL"
-        ? styles.statusPending
-        : record.status === "REJECTED"
-          ? styles.statusRejected
-          : styles.statusCompleted;
-
-  const textStyle = working
-    ? styles.statusTextWorking
-    : isScheduled
-      ? styles.statusTextScheduled
-      : record.status === "PENDING_APPROVAL"
-        ? styles.statusTextPending
-        : record.status === "REJECTED"
-          ? styles.statusTextRejected
-          : styles.statusTextCompleted;
-
-  const label = working
-    ? "근무중"
-    : isScheduled
-      ? "근무예정"
-      : record.status === "PENDING_APPROVAL"
-        ? "승인대기"
-        : record.status === "REJECTED"
-          ? "거절됨"
-          : "근무완료";
+  const status = getWorkStatus(record);
+  const badgeStyle = STATUS_BADGE_STYLE[status];
+  const label = STATUS_LABEL[status];
 
   return (
     <View style={[styles.statusBadge, badgeStyle]}>
-      <Text weight="SemiBold" style={[styles.statusText, textStyle]}>
+      <Text weight="SemiBold" style={styles.statusText}>
         {label}
       </Text>
     </View>
@@ -195,38 +182,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 10,
   },
-  statusWorking: {
-    backgroundColor: colors.primary,
-  },
-  statusScheduled: {
-    backgroundColor: colors.green,
-  },
-  statusCompleted: {
-    backgroundColor: colors.grey,
-  },
-  statusPending: {
-    backgroundColor: "#FFF3E0",
-  },
-  statusRejected: {
-    backgroundColor: "#FFEBEE",
-  },
   statusText: {
     fontSize: 11,
-  },
-  statusTextWorking: {
     color: colors.white,
-  },
-  statusTextScheduled: {
-    color: colors.white,
-  },
-  statusTextCompleted: {
-    color: colors.textSecondary,
-  },
-  statusTextPending: {
-    color: "#F57C00",
-  },
-  statusTextRejected: {
-    color: colors.red,
   },
   expandedContent: {
     marginTop: 16,
