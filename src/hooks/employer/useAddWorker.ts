@@ -1,55 +1,34 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Alert } from "react-native";
-import type {
-  SearchedWorker,
-  WorkScheduleRow,
-  WorkSchedule,
-  PayrollDeductionType,
-} from "../../api/employer/types";
-import { getWorkerByCode, createContract } from "../../api/employer";
-
-let rowKeyCounter = 0;
-const newRowKey = () => `add-${++rowKeyCounter}`;
-
-const DEFAULT_ROW = (): WorkScheduleRow => ({
-  key: newRowKey(),
-  day: "선택",
-  startHour: "10",
-  startMinute: "00",
-  endHour: "16",
-  endMinute: "00",
-  breakMinutes: 0,
-});
-
-const KOREAN_TO_DAY_NUMBER: Record<string, number> = {
-  월요일: 1,
-  화요일: 2,
-  수요일: 3,
-  목요일: 4,
-  금요일: 5,
-  토요일: 6,
-  일요일: 7,
-};
-
-const mapDeductionType = (
-  fourMajorInsurance: boolean,
-  incomeTax: boolean
-): PayrollDeductionType => {
-  if (fourMajorInsurance) return "PART_TIME_TAX_AND_INSURANCE";
-  if (incomeTax) return "PART_TIME_TAX_ONLY";
-  return "PART_TIME_NONE";
-};
+import type { WorkScheduleRow } from "../../types/employer/employer.types";
+import type { SearchedWorker, WorkSchedule } from "../../api/employer/types";
+import { getWorkerByCode } from "../../api/worker";
+import { createContract } from "../../api/employer";
+import { KOREAN_TO_DAY_NUMBER, mapDeductionTypeFromUI } from "../../utils/employerSchedule";
+import { MIN_HOURLY_WAGE } from "../../constants/wage";
+import { formatCurrency } from "../../utils/format";
 
 const useAddWorker = () => {
+  const rowKeyRef = useRef(0);
+  const newRowKey = () => `add-${++rowKeyRef.current}`;
+  const defaultRow = (): WorkScheduleRow => ({
+    key: newRowKey(),
+    day: "선택",
+    startHour: "10",
+    startMinute: "00",
+    endHour: "16",
+    endMinute: "00",
+    breakMinutes: 0,
+  });
   const [step, setStep] = useState<1 | 2>(1);
   const [workerCode, setWorkerCode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchedWorker, setSearchedWorker] = useState<SearchedWorker | null>(null);
-  const [hourlyWage, setHourlyWage] = useState("10,030");
+  const [hourlyWage, setHourlyWage] = useState(formatCurrency(MIN_HOURLY_WAGE));
   const [paymentDay, setPaymentDay] = useState("10");
   const [fourMajorInsurance, setFourMajorInsurance] = useState(false);
   const [incomeTax, setIncomeTax] = useState(false);
-  const [scheduleRows, setScheduleRows] = useState<WorkScheduleRow[]>([DEFAULT_ROW()]);
+  const [scheduleRows, setScheduleRows] = useState<WorkScheduleRow[]>([defaultRow()]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSearch = useCallback(async () => {
@@ -80,7 +59,7 @@ const useAddWorker = () => {
   const goToStep1 = () => setStep(1);
 
   const handleAddRow = () => {
-    setScheduleRows((prev) => [...prev, DEFAULT_ROW()]);
+    setScheduleRows((prev) => [...prev, defaultRow()]);
   };
 
   const handleDeleteRow = (key: string) => {
@@ -133,7 +112,7 @@ const useAddWorker = () => {
         contractStartDate,
         contractEndDate: null,
         paymentDay: day,
-        payrollDeductionType: mapDeductionType(fourMajorInsurance, incomeTax),
+        payrollDeductionType: mapDeductionTypeFromUI(fourMajorInsurance, incomeTax),
       });
       const created = response.data as { id: number };
       return created.id;
@@ -147,11 +126,11 @@ const useAddWorker = () => {
     setWorkerCode("");
     setIsSearching(false);
     setSearchedWorker(null);
-    setHourlyWage("10,030");
+    setHourlyWage(formatCurrency(MIN_HOURLY_WAGE));
     setPaymentDay("10");
     setFourMajorInsurance(false);
     setIncomeTax(false);
-    setScheduleRows([DEFAULT_ROW()]);
+    setScheduleRows([defaultRow()]);
     setIsSubmitting(false);
   };
 

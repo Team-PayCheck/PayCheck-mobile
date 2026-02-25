@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   View,
   TouchableOpacity,
@@ -12,11 +12,8 @@ import { Text } from "../../common/Text";
 import WorkTimeRow from "./WorkTimeRow";
 import WorkScheduleCalendarModal from "./WorkScheduleCalendarModal";
 import { colors } from "../../../constants/colors";
-import type {
-  EmployerWorkerContract,
-  WorkScheduleRow,
-  ContractUpdateRequest,
-} from "../../../api/employer/types";
+import { formatCurrency } from "../../../utils/format";
+import type { EmployerWorkerContract, WorkScheduleRow, ContractUpdateRequest } from "../../../types/employer/employer.types";
 
 interface WorkerCardProps {
   worker: EmployerWorkerContract;
@@ -26,9 +23,6 @@ interface WorkerCardProps {
   onResign: (contractId: number) => void;
 }
 
-let rowKeyCounter = 1000;
-const newRowKey = () => `new-${rowKeyCounter++}`;
-
 const WorkerCard: React.FC<WorkerCardProps> = ({
   worker,
   isExpanded,
@@ -36,31 +30,62 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   onUpdate,
   onResign,
 }) => {
-  const [calendarVisible, setCalendarVisible] = useState(false);
-  const [hourlyWage, setHourlyWage] = useState(
-    worker.hourlyWage.toLocaleString()
-  );
-  const [paymentDay, setPaymentDay] = useState(
-    worker.paymentDay.toString()
-  );
-  const [fourMajorInsurance, setFourMajorInsurance] = useState(
-    worker.fourMajorInsurance
-  );
-  const [incomeTax, setIncomeTax] = useState(worker.incomeTax);
-  const [workSchedules, setWorkSchedules] = useState<WorkScheduleRow[]>(
-    worker.workSchedules
-  );
+  const rowKeyRef = useRef(1000);
+  const newRowKey = () => `new-${++rowKeyRef.current}`;
 
-  // 카드가 열릴 때마다 폼 초기화
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hourlyWage, setHourlyWage] = useState(formatCurrency(worker.hourlyWage));
+  const [paymentDay, setPaymentDay] = useState(worker.paymentDay.toString());
+  const [fourMajorInsurance, setFourMajorInsurance] = useState(worker.fourMajorInsurance);
+  const [incomeTax, setIncomeTax] = useState(worker.incomeTax);
+  const [workSchedules, setWorkSchedules] = useState<WorkScheduleRow[]>(worker.workSchedules);
+
+  // 카드가 열릴 때마다 폼 초기화 + 편집 모드 해제
   useEffect(() => {
     if (isExpanded) {
-      setHourlyWage(worker.hourlyWage.toLocaleString());
+      setIsEditing(false);
+      setHourlyWage(formatCurrency(worker.hourlyWage));
       setPaymentDay(worker.paymentDay.toString());
       setFourMajorInsurance(worker.fourMajorInsurance);
       setIncomeTax(worker.incomeTax);
       setWorkSchedules(worker.workSchedules);
     }
-  }, [isExpanded]);
+  }, [isExpanded, worker]);
+
+  // 편집 모드 진입: 최신 worker 데이터로 폼 동기화
+  const enterEditMode = () => {
+    setHourlyWage(formatCurrency(worker.hourlyWage));
+    setPaymentDay(worker.paymentDay.toString());
+    setFourMajorInsurance(worker.fourMajorInsurance);
+    setIncomeTax(worker.incomeTax);
+    setWorkSchedules(worker.workSchedules);
+    setIsEditing(true);
+  };
+
+  // 변경 사항 여부
+  const hasChanges = useMemo(() => {
+    if (!isEditing) return false;
+    const wageNum = parseInt(hourlyWage.replace(/,/g, ""), 10);
+    const dayNum = parseInt(paymentDay, 10);
+    if (!isNaN(wageNum) && wageNum !== worker.hourlyWage) return true;
+    if (!isNaN(dayNum) && dayNum !== worker.paymentDay) return true;
+    if (fourMajorInsurance !== worker.fourMajorInsurance) return true;
+    if (incomeTax !== worker.incomeTax) return true;
+    if (workSchedules.length !== worker.workSchedules.length) return true;
+    return workSchedules.some((row, i) => {
+      const orig = worker.workSchedules[i];
+      return (
+        !orig ||
+        row.day !== orig.day ||
+        row.startHour !== orig.startHour ||
+        row.startMinute !== orig.startMinute ||
+        row.endHour !== orig.endHour ||
+        row.endMinute !== orig.endMinute ||
+        row.breakMinutes !== orig.breakMinutes
+      );
+    });
+  }, [isEditing, hourlyWage, paymentDay, fourMajorInsurance, incomeTax, workSchedules, worker]);
 
   const handleScheduleChange = (index: number, updated: WorkScheduleRow) => {
     setWorkSchedules((prev) =>
@@ -107,6 +132,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       incomeTax,
       workSchedules,
     });
+    setIsEditing(false);
   };
 
   const handleResign = () => {
@@ -124,6 +150,21 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     );
   };
 
+  const handleActionButton = () => {
+    if (!isEditing) {
+      enterEditMode();
+    } else if (hasChanges) {
+      handleUpdate();
+    } else {
+      setIsEditing(false);
+    }
+  };
+
+  const actionButtonLabel = isEditing && !hasChanges ? "취소" : "근무자 정보 수정";
+  const isActionButtonActive = isEditing && hasChanges;
+
+  const displaySchedules = isEditing ? workSchedules : worker.workSchedules;
+
   return (
     <View style={styles.card}>
       {/* ── 접힌 상태 헤더 ── */}
@@ -132,14 +173,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         onPress={onToggle}
         activeOpacity={0.7}
       >
-        {/* 아바타 */}
         <View style={styles.avatar}>
           <Text weight="Bold" style={styles.avatarText}>
             {worker.workerName.charAt(0)}
           </Text>
         </View>
 
-        {/* 이름 + 근무 스케줄 */}
         <View style={styles.headerInfo}>
           <Text weight="Bold" style={styles.workerName}>
             {worker.workerName}
@@ -156,13 +195,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         />
       </TouchableOpacity>
 
-      {/* ── 펼친 상태 폼 ── */}
+      {/* ── 펼친 상태 ── */}
       {isExpanded && (
         <View style={styles.form}>
 
-          {/* 근무자 정보 수정 타이틀 */}
           <Text weight="SemiBold" style={styles.formTitle}>
-            근무자 정보 수정
+            {isEditing ? "근무자 정보 수정" : "근무자 정보"}
           </Text>
 
           {/* 시급 / 급여지급일 */}
@@ -170,19 +208,25 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
             <View style={styles.inlineField}>
               <Text style={styles.fieldLabel}>시급</Text>
               <View style={styles.inputWithUnit}>
-                <TextInput
-                  style={styles.textInput}
-                  value={hourlyWage}
-                  onChangeText={(v) => {
-                    const num = v.replace(/[^0-9]/g, "");
-                    setHourlyWage(
-                      num ? parseInt(num, 10).toLocaleString() : ""
-                    );
-                  }}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor={colors.textDisabled}
-                />
+                {isEditing ? (
+                  <TextInput
+                    style={styles.textInput}
+                    value={hourlyWage}
+                    onChangeText={(v) => {
+                      const num = v.replace(/[^0-9]/g, "");
+                      setHourlyWage(
+                        num ? formatCurrency(parseInt(num, 10)) : ""
+                      );
+                    }}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    placeholderTextColor={colors.textDisabled}
+                  />
+                ) : (
+                  <Text style={styles.textInput}>
+                    {formatCurrency(worker.hourlyWage)}
+                  </Text>
+                )}
                 <Text style={styles.unit}>원</Text>
               </View>
             </View>
@@ -191,27 +235,33 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
               <Text style={styles.fieldLabel}>급여지급일</Text>
               <View style={styles.inputWithUnit}>
                 <Text style={styles.prefix}>매달</Text>
-                <TextInput
-                  style={[styles.textInput, styles.textInputNarrow]}
-                  value={paymentDay}
-                  onChangeText={setPaymentDay}
-                  keyboardType="numeric"
-                  maxLength={2}
-                  placeholder="1"
-                  placeholderTextColor={colors.textDisabled}
-                />
+                {isEditing ? (
+                  <TextInput
+                    style={[styles.textInput, styles.textInputNarrow]}
+                    value={paymentDay}
+                    onChangeText={setPaymentDay}
+                    keyboardType="numeric"
+                    maxLength={2}
+                    placeholder="1"
+                    placeholderTextColor={colors.textDisabled}
+                  />
+                ) : (
+                  <Text style={[styles.textInput, styles.textInputNarrow, styles.textCenter]}>
+                    {worker.paymentDay}
+                  </Text>
+                )}
                 <Text style={styles.unit}>일</Text>
               </View>
             </View>
           </View>
 
-          {/* 4대보험 / 소득세 토글 (읽기 전용) */}
+          {/* 4대보험 / 소득세 토글 */}
           <View style={styles.toggleDivider} />
           <View style={styles.inlineRow}>
             <View style={styles.toggleItem}>
               <Text style={styles.fieldLabel}>4대보험</Text>
               <Switch
-                value={fourMajorInsurance}
+                value={worker.fourMajorInsurance}
                 onValueChange={() => {}}
                 disabled
                 trackColor={{ false: colors.disabled, true: colors.primary }}
@@ -221,7 +271,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
             <View style={styles.toggleItem}>
               <Text style={styles.fieldLabel}>소득세</Text>
               <Switch
-                value={incomeTax}
+                value={worker.incomeTax}
                 onValueChange={() => {}}
                 disabled
                 trackColor={{ false: colors.disabled, true: colors.primary }}
@@ -246,27 +296,30 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
             </TouchableOpacity>
           </View>
 
-          {workSchedules.map((row, index) => (
+          {displaySchedules.map((row, index) => (
             <WorkTimeRow
               key={row.key}
               row={row}
               onChange={(updated) => handleScheduleChange(index, updated)}
               onDelete={() => handleDeleteSchedule(index)}
-              showDelete={workSchedules.length > 1}
+              showDelete={isEditing && workSchedules.length > 1}
+              readOnly={!isEditing}
             />
           ))}
 
           {/* 근무 시간 추가 */}
-          <TouchableOpacity
-            style={styles.addScheduleButton}
-            onPress={handleAddSchedule}
-            activeOpacity={0.7}
-          >
-            <Feather name="plus" size={14} color={colors.primary} />
-            <Text weight="Medium" style={styles.addScheduleText}>
-              근무 시간 추가
-            </Text>
-          </TouchableOpacity>
+          {isEditing && (
+            <TouchableOpacity
+              style={styles.addScheduleButton}
+              onPress={handleAddSchedule}
+              activeOpacity={0.7}
+            >
+              <Feather name="plus" size={14} color={colors.primary} />
+              <Text weight="Medium" style={styles.addScheduleText}>
+                근무 시간 추가
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {/* 하단 액션 버튼 */}
           <View style={styles.actionRow}>
@@ -280,13 +333,24 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.updateButton}
-              onPress={handleUpdate}
+              style={[
+                styles.updateButton,
+                isActionButtonActive && styles.updateButtonActive,
+              ]}
+              onPress={handleActionButton}
               activeOpacity={0.8}
             >
-              <Feather name="edit-2" size={14} color={colors.textPrimary} />
-              <Text weight="SemiBold" style={styles.updateText}>
-                근무자 정보 수정
+              {!isEditing && (
+                <Feather name="edit-2" size={14} color={colors.textPrimary} />
+              )}
+              <Text
+                weight="SemiBold"
+                style={[
+                  styles.updateText,
+                  isActionButtonActive && styles.updateTextActive,
+                ]}
+              >
+                {actionButtonLabel}
               </Text>
             </TouchableOpacity>
           </View>
@@ -297,7 +361,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         visible={calendarVisible}
         onClose={() => setCalendarVisible(false)}
         workerName={worker.workerName}
-        workSchedules={workSchedules}
+        workSchedules={displaySchedules}
       />
     </View>
   );
@@ -389,6 +453,9 @@ const styles = StyleSheet.create({
     width: 32,
     textAlign: "center",
   },
+  textCenter: {
+    textAlign: "center",
+  },
   prefix: {
     fontSize: 13,
     color: colors.textSecondary,
@@ -464,9 +531,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 5,
   },
+  updateButtonActive: {
+    backgroundColor: colors.green,
+    borderColor: colors.green,
+  },
   updateText: {
     fontSize: 13,
     color: colors.textPrimary,
+  },
+  updateTextActive: {
+    color: colors.white,
   },
 });
 

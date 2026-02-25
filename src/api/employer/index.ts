@@ -244,3 +244,4 @@ export const updateWorker = async (
   const { data } = await api.put(`/api/workers/${workerId}`, reqData);
   return data;
 };
+

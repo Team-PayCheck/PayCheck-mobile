@@ -74,6 +74,21 @@ export const logout = async (): Promise<void> => {
 };
 
 /**
+ * Dev 로그인 (개발 환경 전용)
+ */
+export const devLogin = async (
+	userId: number,
+	name: string,
+	userType: string
+): Promise<ApiResponse<AuthSuccessData>> => {
+	const { data } = await api.post<ApiResponse<AuthSuccessData>>(
+		"/api/auth/dev/login",
+		{ userId, name, userType }
+	);
+	return data;
+};
+
+/**
  * 회원 탈퇴
  */
 export const deleteMyAccount = async () => {

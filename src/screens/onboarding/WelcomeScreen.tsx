@@ -10,7 +10,7 @@ import {
 import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
-import { kakaoLoginWithToken } from "../../api/auth";
+import { kakaoLoginWithToken, devLogin } from "../../api/auth";
 import { useAuthStore } from "../../stores/authStore";
 import type { LoginError } from "../../api/auth/types";
 import { colors } from "../../constants/colors";
@@ -84,6 +84,26 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 		}
 	};
 
+	const handleDevLogin = async () => {
+		setIsLoading(true);
+		try {
+			const result = await devLogin(1, "박지성", "EMPLOYER");
+
+			if (result.success && result.data?.accessToken) {
+				authLogin(result.data.accessToken, {
+					userType: result.data.userType,
+					userId: result.data.userId,
+					name: result.data.name,
+				});
+				onLoginSuccess?.(result.data.userType);
+			}
+		} catch (error) {
+			Alert.alert("Dev 로그인 실패", "서버 연결을 확인해주세요.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
@@ -124,11 +144,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 						{__DEV__ && (
 							<TouchableOpacity
 								style={styles.devButton}
-								onPress={() => onSignUpNeeded?.("dev_test_token")}
+								onPress={handleDevLogin}
 								activeOpacity={0.7}
 							>
 								<Text weight="Medium" style={styles.devButtonText}>
-									[DEV] 회원가입 테스트
+									[Dev] 로그인
 								</Text>
 							</TouchableOpacity>
 						)}

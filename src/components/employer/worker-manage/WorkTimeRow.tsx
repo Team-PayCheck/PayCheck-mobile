@@ -6,7 +6,7 @@ import BottomSheetModal from "../../common/BottomSheetModal";
 import WheelPicker from "../../common/WheelPicker";
 import { HOUR_ITEMS, MINUTE_ITEMS, BREAK_ITEMS } from "../../../constants/pickerItems";
 import { colors } from "../../../constants/colors";
-import type { WorkDay, WorkScheduleRow } from "../../../api/employer/types";
+import type { WorkDay, WorkScheduleRow } from "../../../types/employer/employer.types";
 
 const DAY_OPTIONS: WorkDay[] = [
   "선택",
@@ -27,6 +27,7 @@ interface WorkTimeRowProps {
   onChange: (updated: WorkScheduleRow) => void;
   onDelete: () => void;
   showDelete: boolean;
+  readOnly?: boolean;
 }
 
 const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
@@ -34,6 +35,7 @@ const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
   onChange,
   onDelete,
   showDelete,
+  readOnly = false,
 }) => {
   const [activePicker, setActivePicker] = useState<PickerType | null>(null);
 
@@ -144,94 +146,135 @@ const WorkTimeRow: React.FC<WorkTimeRowProps> = ({
   return (
     <>
       <View style={styles.rowWrapper}>
-        {/* 시간 행: 요일 + 시작/종료 시간 + 삭제 */}
+        {/* 시간 행 */}
         <View style={styles.row}>
-          {/* 요일 선택 */}
-          <TouchableOpacity
-            style={styles.dayButton}
-            onPress={() => setActivePicker("day")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.day}</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {/* 요일 */}
+          {readOnly ? (
+            <View style={[styles.dayButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.day}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.dayButton}
+              onPress={() => setActivePicker("day")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.day}</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
 
-          {/* 시작 시간 */}
-          <TouchableOpacity
-            style={styles.timeButton}
-            onPress={() => setActivePicker("startHour")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.startHour}</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {/* 시작 시 */}
+          {readOnly ? (
+            <View style={[styles.timeButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.startHour}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => setActivePicker("startHour")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.startHour}</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
           <Text style={styles.colon}>:</Text>
-          <TouchableOpacity
-            style={styles.timeButton}
-            onPress={() => setActivePicker("startMinute")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.startMinute}</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {/* 시작 분 */}
+          {readOnly ? (
+            <View style={[styles.timeButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.startMinute}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => setActivePicker("startMinute")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.startMinute}</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
 
           <Text style={styles.tilde}>~</Text>
 
-          {/* 종료 시간 */}
-          <TouchableOpacity
-            style={styles.timeButton}
-            onPress={() => setActivePicker("endHour")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.endHour}</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {/* 종료 시 */}
+          {readOnly ? (
+            <View style={[styles.timeButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.endHour}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => setActivePicker("endHour")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.endHour}</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
           <Text style={styles.colon}>:</Text>
-          <TouchableOpacity
-            style={styles.timeButton}
-            onPress={() => setActivePicker("endMinute")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.endMinute}</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {/* 종료 분 */}
+          {readOnly ? (
+            <View style={[styles.timeButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.endMinute}</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => setActivePicker("endMinute")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.endMinute}</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
 
           {/* 삭제 버튼 */}
-          {showDelete ? (
-            <TouchableOpacity
-              onPress={onDelete}
-              activeOpacity={0.7}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Feather name="minus-circle" size={18} color={colors.red} />
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.deletePlaceholder} />
+          {!readOnly && (
+            showDelete ? (
+              <TouchableOpacity
+                onPress={onDelete}
+                activeOpacity={0.7}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name="minus-circle" size={18} color={colors.red} />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.deletePlaceholder} />
+            )
           )}
         </View>
 
-        {/* 휴게시간 행 */}
+        {/* 휴게시간 */}
         <View style={styles.breakRow}>
           <Text style={styles.breakLabel}>휴게시간</Text>
-          <TouchableOpacity
-            style={styles.breakButton}
-            onPress={() => setActivePicker("break")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectorText}>{row.breakMinutes}분</Text>
-            <Feather name="chevron-down" size={12} color={colors.textSecondary} />
-          </TouchableOpacity>
+          {readOnly ? (
+            <View style={[styles.breakButton, styles.selectorReadOnly]}>
+              <Text style={styles.selectorText}>{row.breakMinutes}분</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.breakButton}
+              onPress={() => setActivePicker("break")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.selectorText}>{row.breakMinutes}분</Text>
+              <Feather name="chevron-down" size={12} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* 피커 모달 */}
-      <BottomSheetModal
-        visible={activePicker !== null}
-        onClose={() => setActivePicker(null)}
-        maxHeight="60%"
-      >
-        {renderPickerContent()}
-      </BottomSheetModal>
+      {!readOnly && (
+        <BottomSheetModal
+          visible={activePicker !== null}
+          onClose={() => setActivePicker(null)}
+          maxHeight="60%"
+        >
+          {renderPickerContent()}
+        </BottomSheetModal>
+      )}
     </>
   );
 };
@@ -290,6 +333,10 @@ const styles = StyleSheet.create({
     minWidth: 42,
     justifyContent: "center",
   },
+  selectorReadOnly: {
+    borderColor: "transparent",
+    backgroundColor: colors.backgroundGrey,
+  },
   selectorText: {
     fontSize: 13,
     color: colors.textPrimary,
@@ -306,7 +353,6 @@ const styles = StyleSheet.create({
   deletePlaceholder: {
     width: 18,
   },
-  // 피커 모달 내부
   pickerTitle: {
     fontSize: 16,
     color: colors.textPrimary,
