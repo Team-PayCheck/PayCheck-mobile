@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Text } from "../../components/common/Text";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
@@ -59,7 +60,7 @@ const EmployerHomeScreen: React.FC = () => {
 
   const dateStr = useMemo(() => formatDateStr(selectedDate), [selectedDate]);
 
-  const { workRecords, refetch, removeRecord } =
+  const { workRecords, isLoading: isWorkRecordsLoading, refetch, removeRecord } =
     useEmployerDailyWorkRecords(selectedWorkplaceId, dateStr);
 
   const weekDays = useMemo(() => getWeekDays(selectedDate), [selectedDate]);
@@ -121,9 +122,13 @@ const EmployerHomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Header />
-      {isWorkplacesLoading || selectedWorkplace === null ? (
+      {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : selectedWorkplace === null ? (
+        <View style={styles.loader}>
+          <Text style={styles.emptyWorkplaceText}>등록된 근무지가 없습니다</Text>
         </View>
       ) : (
         <>
@@ -147,16 +152,22 @@ const EmployerHomeScreen: React.FC = () => {
               onPressDay={handleDayPress}
             />
 
-            {/* 타임라인 */}
-            <EmployerTimeline workRecords={workRecords} />
-
-            {/* 근무자 리스트 */}
-            <EmployerWorkerListSection
-              workRecords={workRecords}
-              onPressAdd={() => setIsAddWorkModalVisible(true)}
-              onDeleteItem={removeRecord}
-              onRefetch={refetch}
-            />
+            {/* 타임라인 + 근무자 리스트 */}
+            {isWorkRecordsLoading ? (
+              <View style={styles.recordsLoader}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            ) : (
+              <>
+                <EmployerTimeline workRecords={workRecords} />
+                <EmployerWorkerListSection
+                  workRecords={workRecords}
+                  onPressAdd={() => setIsAddWorkModalVisible(true)}
+                  onDeleteItem={removeRecord}
+                  onRefetch={refetch}
+                />
+              </>
+            )}
           </ScrollView>
         </>
       )}
@@ -219,6 +230,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
     gap: 24,
+  },
+  emptyWorkplaceText: {
+    fontSize: 15,
+    color: colors.textMuted,
+  },
+  recordsLoader: {
+    paddingVertical: 48,
+    alignItems: "center",
   },
 });
 
