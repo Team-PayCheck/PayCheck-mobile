@@ -248,6 +248,7 @@ const styles = StyleSheet.create({
     right: 3,
     backgroundColor: colors.lightBlue,
     borderRadius: 4,
+    marginTop: 6,
   },
 });
 
