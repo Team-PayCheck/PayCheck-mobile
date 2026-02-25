@@ -10,22 +10,15 @@ import { Text } from "../../common/Text";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
 import type { WorkScheduleRow } from "../../../types/employer/employer.types";
+import {
+  SCHEDULE_DAYS,
+  SCHEDULE_TIME_LABEL_WIDTH,
+  getScheduleBarsForDay,
+} from "../../../utils/employerSchedule";
 
-const HOUR_HEIGHT = 50; 
-const TIME_LABEL_WIDTH = 52;
+const HOUR_HEIGHT = 50;
 const HOURS_IN_RANGE = 12;
 const TOTAL_GRID_HEIGHT = HOUR_HEIGHT * HOURS_IN_RANGE;
-
-const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const DAY_INDEX: Record<string, number> = {
-  일요일: 0,
-  월요일: 1,
-  화요일: 2,
-  수요일: 3,
-  목요일: 4,
-  금요일: 5,
-  토요일: 6,
-};
 
 interface WorkScheduleCalendarModalProps {
   visible: boolean;
@@ -41,7 +34,7 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
   workSchedules,
 }) => {
   const { width } = useWindowDimensions();
-  const GRID_WIDTH = width - 48 - TIME_LABEL_WIDTH;
+  const GRID_WIDTH = width - 48 - SCHEDULE_TIME_LABEL_WIDTH;
   const COL_WIDTH = GRID_WIDTH / 7;
 
   const [showAM, setShowAM] = useState(true);
@@ -54,28 +47,6 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
     { length: HOURS_IN_RANGE },
     (_, i) => rangeStartHour + i
   );
-
-  /** 요일 인덱스의 바 정보 반환 */
-  const getBarsForDay = (dayIndex: number) => {
-    return workSchedules
-      .filter((row) => DAY_INDEX[row.day] === dayIndex)
-      .flatMap((row) => {
-        const startMin =
-          parseInt(row.startHour, 10) * 60 + parseInt(row.startMinute, 10);
-        let endMin =
-          parseInt(row.endHour, 10) * 60 + parseInt(row.endMinute, 10);
-
-        if (endMin <= startMin) endMin += 24 * 60;
-
-        const clippedStart = Math.max(startMin, rangeStartMin);
-        const clippedEnd = Math.min(endMin, rangeEndMin);
-        if (clippedStart >= clippedEnd) return [];
-
-        const top = ((clippedStart - rangeStartMin) / 60) * HOUR_HEIGHT;
-        const height = ((clippedEnd - clippedStart) / 60) * HOUR_HEIGHT;
-        return [{ top, height, key: row.key }];
-      });
-  };
 
   return (
     <BottomSheetModal visible={visible} onClose={onClose} maxHeight="88%">
@@ -113,8 +84,8 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
 
       {/* 요일 컬럼 헤더 */}
       <View style={styles.dayHeaderRow}>
-        <View style={{ width: TIME_LABEL_WIDTH }} />
-        {DAYS.map((day) => (
+        <View style={{ width: SCHEDULE_TIME_LABEL_WIDTH }} />
+        {SCHEDULE_DAYS.map((day) => (
           <View key={day} style={[styles.dayHeaderCell, { width: COL_WIDTH }]}>
             <Text style={styles.dayHeaderText}>{day}</Text>
           </View>
@@ -144,15 +115,15 @@ const WorkScheduleCalendarModal: React.FC<WorkScheduleCalendarModalProps> = ({
           <View
             style={[
               styles.columnsContainer,
-              { left: TIME_LABEL_WIDTH, height: TOTAL_GRID_HEIGHT },
+              { left: SCHEDULE_TIME_LABEL_WIDTH, height: TOTAL_GRID_HEIGHT },
             ]}
           >
-            {DAYS.map((_, dayIndex) => (
+            {SCHEDULE_DAYS.map((_, dayIndex) => (
               <View
                 key={dayIndex}
                 style={[styles.dayColumn, { width: COL_WIDTH }]}
               >
-                {getBarsForDay(dayIndex).map((bar) => (
+                {getScheduleBarsForDay(workSchedules, dayIndex, HOUR_HEIGHT, rangeStartMin, rangeEndMin).map((bar) => (
                   <View
                     key={bar.key}
                     style={[
@@ -223,7 +194,7 @@ const styles = StyleSheet.create({
     height: HOUR_HEIGHT,
   },
   hourLabel: {
-    width: TIME_LABEL_WIDTH,
+    width: SCHEDULE_TIME_LABEL_WIDTH,
     fontSize: 11,
     color: colors.textMuted,
     paddingTop: 2,

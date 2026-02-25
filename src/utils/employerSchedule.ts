@@ -1,9 +1,9 @@
-import type { WorkDay } from "../types/employer/employer.types";
+import type { WorkDay, WorkScheduleRow } from "../types/employer/employer.types";
 import type { PayrollDeductionType } from "../api/employer/types";
 
 // ── 요일 변환 맵 ──────────────────────────────────────────────
 
-// 영문 문자열 형식: "MONDAY" ~ "SUNDAY"
+// 영문 문자열 형식
 export const DAY_OF_WEEK_TO_KOREAN: Record<string, WorkDay> = {
   MONDAY: "월요일",
   TUESDAY: "화요일",
@@ -94,4 +94,56 @@ export const mapDeductionType = (type: PayrollDeductionType) => {
     default:
       return { fourMajorInsurance: false, incomeTax: false };
   }
+};
+
+// ── 스케줄 차트 공통 상수/함수 ────────────────────────────────
+
+/** 요일 헤더 표시용 (일~토, 0-인덱스) */
+export const SCHEDULE_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+/** 한국어 요일 → 차트 컬럼 인덱스 (0=일 ~ 6=토) */
+export const SCHEDULE_DAY_INDEX: Record<string, number> = {
+  일요일: 0, 월요일: 1, 화요일: 2, 수요일: 3,
+  목요일: 4, 금요일: 5, 토요일: 6,
+};
+
+/** 시간 레이블 영역 너비 */
+export const SCHEDULE_TIME_LABEL_WIDTH = 52;
+
+export interface ScheduleBar {
+  top: number;
+  height: number;
+  key: string;
+}
+
+/**
+ * 특정 요일의 스케줄 바 위치/높이 계산
+ * @param rows 근무 스케줄 행 목록
+ * @param dayIndex 0=일 ~ 6=토
+ * @param hourHeight 시간당 픽셀 높이
+ * @param rangeStartMin 표시 범위 시작(분), 기본 0
+ * @param rangeEndMin 표시 범위 끝(분), 기본 24*60
+ */
+export const getScheduleBarsForDay = (
+  rows: WorkScheduleRow[],
+  dayIndex: number,
+  hourHeight: number,
+  rangeStartMin = 0,
+  rangeEndMin = 24 * 60
+): ScheduleBar[] => {
+  return rows
+    .filter((row) => SCHEDULE_DAY_INDEX[row.day] === dayIndex)
+    .flatMap((row) => {
+      const startMin =
+        parseInt(row.startHour, 10) * 60 + parseInt(row.startMinute, 10);
+      let endMin =
+        parseInt(row.endHour, 10) * 60 + parseInt(row.endMinute, 10);
+      if (endMin <= startMin) endMin += 24 * 60;
+      const clippedStart = Math.max(startMin, rangeStartMin);
+      const clippedEnd = Math.min(endMin, rangeEndMin);
+      if (clippedStart >= clippedEnd) return [];
+      const top = ((clippedStart - rangeStartMin) / 60) * hourHeight;
+      const height = ((clippedEnd - clippedStart) / 60) * hourHeight;
+      return [{ top, height, key: row.key }];
+    });
 };

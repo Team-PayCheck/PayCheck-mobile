@@ -17,22 +17,16 @@ import BottomSheetModal from "../../common/BottomSheetModal";
 import WorkTimeRow from "./WorkTimeRow";
 import { colors } from "../../../constants/colors";
 import useAddWorker from "../../../hooks/employer/useAddWorker";
+import {
+  SCHEDULE_DAYS,
+  SCHEDULE_TIME_LABEL_WIDTH,
+  getScheduleBarsForDay,
+} from "../../../utils/employerSchedule";
 
 // ─── 스케줄 차트 상수 ───
 const HOUR_HEIGHT = 30;
-const TIME_LABEL_WIDTH = 52;
 const HOURS_IN_DAY = 24;
 const TOTAL_GRID_HEIGHT = HOUR_HEIGHT * HOURS_IN_DAY;
-const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const DAY_INDEX: Record<string, number> = {
-  일요일: 0,
-  월요일: 1,
-  화요일: 2,
-  수요일: 3,
-  목요일: 4,
-  금요일: 5,
-  토요일: 6,
-};
 
 interface AddWorkerModalProps {
   visible: boolean;
@@ -50,7 +44,7 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
   onSuccess,
 }) => {
   const { width } = useWindowDimensions();
-  const GRID_WIDTH = width - 48 - TIME_LABEL_WIDTH;
+  const GRID_WIDTH = width - 48 - SCHEDULE_TIME_LABEL_WIDTH;
   const COL_WIDTH = GRID_WIDTH / 7;
   const {
     step,
@@ -99,24 +93,6 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
       }
       Alert.alert("추가 실패", "근무자 추가가 실패하였습니다.");
     }
-  };
-
-  // 요일별 시간 바 계산
-  const getBarsForDay = (dayIndex: number) => {
-    return scheduleRows
-      .filter((row) => DAY_INDEX[row.day] === dayIndex)
-      .flatMap((row) => {
-        const startMin =
-          parseInt(row.startHour, 10) * 60 + parseInt(row.startMinute, 10);
-        let endMin =
-          parseInt(row.endHour, 10) * 60 + parseInt(row.endMinute, 10);
-          
-        if (endMin <= startMin) endMin = 24 * 60;
-        if (startMin >= endMin) return [];
-        const top = (startMin / 60) * HOUR_HEIGHT;
-        const height = ((endMin - startMin) / 60) * HOUR_HEIGHT;
-        return [{ top, height, key: row.key }];
-      });
   };
 
   // ─── Step 1: 근무자 검색 + 기본정보 + 근무조건 ───
@@ -312,8 +288,8 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
 
       {/* 요일 헤더 */}
       <View style={styles.dayHeaderRow}>
-        <View style={{ width: TIME_LABEL_WIDTH }} />
-        {DAYS.map((day) => (
+        <View style={{ width: SCHEDULE_TIME_LABEL_WIDTH }} />
+        {SCHEDULE_DAYS.map((day) => (
           <View key={day} style={[styles.dayHeaderCell, { width: COL_WIDTH }]}>
             <Text style={styles.dayHeaderText}>{day}</Text>
           </View>
@@ -344,15 +320,15 @@ const AddWorkerModal: React.FC<AddWorkerModalProps> = ({
           <View
             style={[
               styles.columnsContainer,
-              { left: TIME_LABEL_WIDTH, height: TOTAL_GRID_HEIGHT },
+              { left: SCHEDULE_TIME_LABEL_WIDTH, height: TOTAL_GRID_HEIGHT },
             ]}
           >
-            {DAYS.map((_, dayIndex) => (
+            {SCHEDULE_DAYS.map((_, dayIndex) => (
               <View
                 key={dayIndex}
                 style={[styles.dayColumn, { width: COL_WIDTH }]}
               >
-                {getBarsForDay(dayIndex).map((bar) => (
+                {getScheduleBarsForDay(scheduleRows, dayIndex, HOUR_HEIGHT).map((bar) => (
                   <View
                     key={bar.key}
                     style={[
@@ -615,7 +591,7 @@ const styles = StyleSheet.create({
     height: HOUR_HEIGHT,
   },
   hourLabel: {
-    width: TIME_LABEL_WIDTH,
+    width: SCHEDULE_TIME_LABEL_WIDTH,
     fontSize: 10,
     color: colors.textMuted,
     paddingTop: 2,
