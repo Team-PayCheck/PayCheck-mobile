@@ -1,24 +1,333 @@
-// ============ 사업장(근무지) 관련 타입 ============
+// ============ API Request 타입 ============
+
+// ============ 근무지 (Workplace) ============
+export interface CreateWorkplaceRequest {
+  businessNumber: string;      // 사업자 등록번호 (형식: 000-00-00000)
+  businessName: string;        // 사업장 상호명
+  workplaceName: string;       // 지점명 또는 별칭
+  address: string;
+  colorCode?: string;          // 앱 내 캘린더 구분용 색상 (Hex Code)
+  isLessThanFiveEmployees?: boolean;  // 5인 미만 사업장 여부
+}
+
+export interface UpdateWorkplaceRequest {
+  businessName?: string;
+  workplaceName?: string;
+  address?: string;
+  colorCode?: string;
+  isLessThanFiveEmployees?: boolean;
+  // 참고: businessNumber는 수정 불가
+}
+
+// ============ 근무 기록 (Work Record) ============
+export interface CreateWorkRecordRequest {
+  contractId: number;
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  breakMinutes?: number;
+  memo?: string;
+}
+
+export interface UpdateWorkRecordRequest {
+  startTime?: string;
+  endTime?: string;
+  breakMinutes?: number;
+  memo?: string;
+}
+
+export interface CreateWorkRecordsBatchRequest {
+  records: CreateWorkRecordRequest[];
+}
+
+// ============ 계약 (Contract) ============
+export interface WorkSchedule {
+  dayOfWeek: number; // 1=월요일, 7=일요일
+  startTime: string;
+  endTime: string;
+  breakMinutes?: number;
+}
+
+export interface CreateContractRequest {
+  workerCode: string;
+  hourlyWage: number;
+  workSchedules: WorkSchedule[];
+  contractStartDate: string;
+  contractEndDate?: string | null;
+  paymentDay: number;
+  payrollDeductionType: PayrollDeductionType;
+}
+
+export interface UpdateContractRequest {
+  hourlyWage?: number;
+  workSchedules?: WorkSchedule[];
+  paymentDay?: number;
+  payrollDeductionType?: PayrollDeductionType;
+}
+
+/**
+ * 급여 공제 유형
+ * - FREELANCER: 프리랜서 (3.3% 공제 - 소득세 3% + 지방소득세 0.3%)
+ * - PART_TIME_NONE: 비정규직 공제 없음 (세금 X, 보험료 X)
+ * - PART_TIME_TAX_ONLY: 비정규직 세금만 공제 (소득세 + 지방소득세)
+ * - PART_TIME_TAX_AND_INSURANCE: 비정규직 전체 공제 (4대보험 + 소득세)
+ */
+export type PayrollDeductionType =
+  | "FREELANCER"
+  | "PART_TIME_NONE"
+  | "PART_TIME_TAX_ONLY"
+  | "PART_TIME_TAX_AND_INSURANCE";
+
+// ============ 급여 (Salary) ============
+export interface CalculateSalaryRequest {
+  contractId: number;
+  year: number;
+  month: number;
+}
+
+export interface GetSalariesParams {
+  workplaceId?: number;
+  year?: number;
+  month?: number;
+}
+
+// ============ 송금 (Payment) ============
+export interface CreatePaymentRequest {
+  salaryId: number;
+  amount: number;
+  memo?: string;
+}
+
+// ============ 정정 요청 (Correction Request) ============
+export type CorrectionFilter = "ALL" | "CREATE" | "UPDATE" | "DELETE";
+
+// ============ 근로자 (Worker) ============
+export interface UpdateWorkerRequest {
+  name?: string;
+  phone?: string;
+  bankName?: string;
+  accountNumber?: string;
+}
+
+// ============ API Response 타입 ============
+
+// ============ 근무지 (Workplace) ============
+
+// GET /api/employer/workplaces - 사업장 목록 조회
+export interface Workplace {
+  id: number;
+  businessName: string;
+  name: string;
+  colorCode?: string;
+  workerCount?: number;
+  isActive?: boolean;
+}
 
 /** 사업장 목록 아이템 (GET /api/employer/workplaces) */
-export interface WorkplaceListItem {
-	id: number;
-	businessName: string;
-	name: string;
-	colorCode?: string;
-	workerCount?: number;
-	isActive?: boolean;
-}
+export type WorkplaceListItem = Workplace;
 
 /** 사업장 상세 (GET /api/employer/workplaces/{id}) */
 export interface WorkplaceDetail {
-	id: number;
-	businessNumber: string;
-	businessName: string;
-	name: string;
-	address: string;
-	colorCode?: string;
-	isLessThanFiveEmployees: boolean;
-	workerCount: number;
-	isActive: boolean;
+  id: number;
+  businessNumber: string;
+  businessName: string;
+  name: string;
+  address: string;
+  colorCode?: string;
+  isLessThanFiveEmployees: boolean;
+  workerCount: number;
+  isActive: boolean;
+}
+
+// ============ 근무 기록 (Work Record) ============
+
+// GET /api/employer/work-records - 근무 기록 목록 조회
+export interface WorkRecord {
+  id: number;
+  contractId: number;
+  workerName: string;
+  workplaceName: string;
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  breakMinutes: number;
+  hourlyWage: number;
+  status: WorkRecordStatus;
+}
+
+// GET /api/employer/work-records/{id} - 근무 기록 상세 조회
+export interface WorkRecordDetail extends WorkRecord {
+  workerCode: string;
+  totalWorkMinutes: number;
+  isModified: boolean;
+  memo?: string;
+}
+
+export type WorkRecordStatus =
+  | "SCHEDULED"
+  | "COMPLETED"
+  | "PENDING_APPROVAL"
+  | "REJECTED";
+
+// ============ 계약 (Contract) ============
+
+// GET /api/employer/workplaces/{workplaceId}/workers - 사업장별 근로자(계약) 목록
+export interface ContractWorker {
+  id: number;
+  workerName: string;
+  workerCode: string;
+  workerPhone: string;
+  hourlyWage: number;
+  contractStartDate: string;
+  contractEndDate: string | null;
+  isActive: boolean;
+}
+
+// GET /api/employer/contracts/{id} - 계약 상세 조회
+export interface Contract {
+  id: number;
+  workplaceId: number;
+  workplaceName: string;
+  workerId: number;
+  workerName: string;
+  workerCode: string;
+  workerPhone: string;
+  hourlyWage: number;
+  workSchedules: string; // JSON 문자열
+  contractStartDate: string;
+  contractEndDate: string | null;
+  paymentDay: number;
+  isActive: boolean;
+  payrollDeductionType: PayrollDeductionType;
+}
+
+export interface WorkScheduleItem {
+  dayOfWeek: string; // "MONDAY", "TUESDAY", etc.
+  startTime: string;
+  endTime: string;
+  breakMinutes?: number;
+}
+
+// ============ 급여 (Salary) ============
+
+// GET /api/employer/salaries/year-month - 사업장별 급여 목록 조회
+export interface SalaryListItem {
+  id: number;
+  contractId: number;
+  workerName: string;
+  year: number;
+  month: number;
+  totalGrossPay: number;
+  netPay: number;
+  paymentDueDate: string;
+}
+
+// GET /api/employer/salaries/{id} - 급여 상세 조회
+export interface SalaryDetail {
+  id: number;
+  contractId: number;
+  workerId: number;
+  workerName: string;
+  workplaceId: number;
+  workplaceName: string;
+  year: number;
+  month: number;
+  totalWorkHours: number;
+  basePay: number;
+  overtimePay: number;
+  nightPay: number;
+  holidayPay: number;
+  totalGrossPay: number;
+  fourMajorInsurance: number;
+  incomeTax: number;
+  localIncomeTax: number;
+  totalDeduction: number;
+  netPay: number;
+  paymentDueDate: string;
+}
+
+// ============ 정정 요청 (Correction Request) ============
+
+// GET /api/employer/workplaces/{workplaceId}/pending-approvals - 승인 대기 요청 목록
+export interface CorrectionRequestListItem {
+  id: number;
+  type: CorrectionRequestType;
+  workRecordId: number | null;
+  workDate: string;
+  originalStartTime: string | null;
+  originalEndTime: string | null;
+  requestedStartTime: string;
+  requestedEndTime: string;
+  status: CorrectionRequestStatus;
+  requester: {
+    id: number;
+    name: string;
+  };
+  workplaceName: string;
+  createdAt: string;
+}
+
+// GET /api/employer/correction-requests/{id} - 정정 요청 상세 조회
+export interface CorrectionRequestDetail {
+  id: number;
+  type: CorrectionRequestType;
+  workRecordId: number | null;
+  contractId: number;
+  originalWorkDate: string | null;
+  originalStartTime: string | null;
+  originalEndTime: string | null;
+  requestedWorkDate: string;
+  requestedStartTime: string;
+  requestedEndTime: string;
+  requestedBreakMinutes: number;
+  requestedMemo: string;
+  status: CorrectionRequestStatus;
+  requester: {
+    id: number;
+    name: string;
+  };
+  reviewedAt: string | null;
+  createdAt: string;
+}
+
+export type CorrectionRequestType = "CREATE" | "UPDATE" | "DELETE";
+export type CorrectionRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+// ============ 근로자 (Worker) ============
+
+// GET /api/workers/code/{workerCode} - 근로자 코드로 조회
+export interface Worker {
+  id: number;
+  userId: number;
+  name: string;
+  phone: string;
+  workerCode: string;
+  accountNumber?: string;
+  bankName?: string;
+}
+
+// ============ 근무지 관리 UI 타입 ============
+
+/** 근무지 관리 화면에서 사용하는 근무지 상세 정보 */
+export interface WorkplaceDetails {
+  id: number;
+  businessName?: string;
+  name: string;
+  colorCode?: string;
+  workerCount?: number;
+  isActive?: boolean;
+  address?: string;
+  businessNumber?: string;
+  isSmallBusiness?: boolean;
+}
+
+/** 근무자 추가 시 코드로 조회한 근무자 정보 */
+export interface SearchedWorker {
+  id: number;
+  name: string;
+  phone: string;
+  workerCode: string;
+  bankName?: string;
+  accountNumber?: string;
+  kakaoPayLink?: string;
 }

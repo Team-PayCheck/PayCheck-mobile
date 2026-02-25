@@ -13,6 +13,7 @@ import WorkplaceCard from "../../../components/mypage/workplaceManage/WorkplaceC
 import { getContracts } from "../../../api/worker";
 import type { ContractListItem } from "../../../api/worker/types";
 import { colors } from "../../../constants/colors";
+import { formatCurrency } from "../../../utils/format";
 import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 
@@ -22,7 +23,7 @@ type Props = NativeStackScreenProps<WorkerStackParamList, "WorkplaceManage">;
 	: 로그인된 계정이 고용주(EMPLOYER)로 등록되어 있어
 	  worker 전용 API 호출 시 서버에서 500 에러 발생-> 근로자 계정 필요 */}
 
-const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
+const EmployerWorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	const [workplaces, setWorkplaces] = useState<ContractListItem[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -72,7 +73,7 @@ const WorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				key={w.id || idx}
 				name={w.workerName || '-'}
 				joinedAt={w.contractStartDate ? formatDate(w.contractStartDate) : '-'}
-				wage={w.hourlyWage ? `${w.hourlyWage.toLocaleString()}원` : '-'}
+				wage={w.hourlyWage ? `${formatCurrency(w.hourlyWage)}원` : '-'}
 			/>
 		));
 	};
@@ -195,4 +196,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default WorkplaceManageScreen;
+export default EmployerWorkplaceManageScreen;

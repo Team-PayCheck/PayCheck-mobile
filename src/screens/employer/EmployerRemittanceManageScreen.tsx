@@ -16,7 +16,7 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   transfer: "RemittanceManage",
 };
 
-const WorkerManageScreen: React.FC = () => {
+const EmployerRemittanceManageScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
@@ -28,10 +28,10 @@ const WorkerManageScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.content}>
         <Text weight="Bold" style={styles.title}>
-          직원관리
+          송금관리
         </Text>
       </View>
-      <EmployerNavigationBar activeTab="worker" onTabPress={handleTabPress} />
+      <EmployerNavigationBar activeTab="transfer" onTabPress={handleTabPress} />
     </SafeAreaView>
   );
 };
@@ -52,4 +52,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkerManageScreen;
+export default EmployerRemittanceManageScreen;
