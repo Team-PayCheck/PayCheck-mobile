@@ -25,11 +25,6 @@ export const getWorkplaces = async () => {
   return data;
 };
 
-export const getWorkplace = async (id: number | string) => {
-  const { data } = await api.get(`/api/employer/workplaces/${id}`);
-  return data;
-};
-
 export const getWorkplaceDetail = async (id: number | string) => {
   const { data } = await api.get(`/api/employer/workplaces/${id}`);
   return data;
