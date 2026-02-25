@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
@@ -56,13 +56,26 @@ interface EmployerWorkerCardProps {
   record: WorkRecord;
   isExpanded: boolean;
   onPressToggle: (record: WorkRecord) => void;
+  onDelete: (id: number) => void;
 }
 
 const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
   record,
   isExpanded,
   onPressToggle,
+  onDelete,
 }) => {
+  const handleDelete = () => {
+    Alert.alert(
+      "근무 삭제",
+      `${record.workerName}의 근무 기록을 삭제하시겠습니까?`,
+      [
+        { text: "취소", style: "cancel" },
+        { text: "삭제", style: "destructive", onPress: () => onDelete(record.id) },
+      ]
+    );
+  };
+
   return (
     <View style={styles.card}>
       {/* 접힌 상태 - 항상 표시 */}
@@ -126,6 +139,15 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
               </View>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+            activeOpacity={0.8}
+          >
+            <Feather name="trash-2" size={14} color={colors.deleteRed} />
+            <Text weight="SemiBold" style={styles.deleteButtonText}>근무 삭제</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -213,6 +235,20 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  deleteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.deleteRed,
+  },
+  deleteButtonText: {
+    fontSize: 13,
+    color: colors.deleteRed,
   },
 });
 

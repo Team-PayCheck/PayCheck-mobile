@@ -4,7 +4,7 @@ import { getWorkRecords } from "../../api/employer";
 
 const useEmployerDailyWorkRecords = (
   workplaceId: number | null,
-  date: string // "yyyy-MM-dd"
+  date: string
 ) => {
   const [workRecords, setWorkRecords] = useState<WorkRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,11 @@ const useEmployerDailyWorkRecords = (
     fetchWorkRecords();
   }, [fetchWorkRecords]);
 
-  return { workRecords, isLoading, refetch: fetchWorkRecords };
+  const removeRecord = useCallback((id: number) => {
+    setWorkRecords((prev) => prev.filter((r) => r.id !== id));
+  }, []);
+
+  return { workRecords, isLoading, refetch: fetchWorkRecords, removeRecord };
 };
 
 export default useEmployerDailyWorkRecords;

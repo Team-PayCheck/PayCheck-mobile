@@ -64,7 +64,7 @@ const EmployerHomeScreen: React.FC = () => {
     return `${y}-${m}-${d}`;
   }, [selectedDate]);
 
-  const { workRecords, refetch } =
+  const { workRecords, refetch, removeRecord } =
     useEmployerDailyWorkRecords(selectedWorkplaceId, dateStr);
 
   const weekDays = useMemo(() => getWeekDays(selectedDate), [selectedDate]);
@@ -159,6 +159,8 @@ const EmployerHomeScreen: React.FC = () => {
             <EmployerWorkerListSection
               workRecords={workRecords}
               onPressAdd={() => setIsAddWorkModalVisible(true)}
+              onDeleteItem={removeRecord}
+              onRefetch={refetch}
             />
           </ScrollView>
         </>
