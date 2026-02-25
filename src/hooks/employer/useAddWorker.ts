@@ -35,7 +35,7 @@ const mapDeductionType = (
   fourMajorInsurance: boolean,
   incomeTax: boolean
 ): PayrollDeductionType => {
-  if (fourMajorInsurance) return "PART_TIME_TAX_AND_INSURANCE";
+  if (fourMajorInsurance && incomeTax) return "PART_TIME_TAX_AND_INSURANCE";  // && 추가
   if (incomeTax) return "PART_TIME_TAX_ONLY";
   return "PART_TIME_NONE";
 };
