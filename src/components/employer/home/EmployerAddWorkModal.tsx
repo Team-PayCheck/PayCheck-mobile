@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { isAxiosError } from "axios";
 import { Feather } from "@expo/vector-icons";
 import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
@@ -183,8 +184,11 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
       });
       onSuccess();
       onClose();
-    } catch {
-      Alert.alert("실패", "근무 추가에 실패했습니다.");
+    } catch (error) {
+      const message = isAxiosError(error)
+        ? (error.response?.data?.error?.message ?? "근무 추가에 실패했습니다.")
+        : "근무 추가에 실패했습니다.";
+      Alert.alert("추가 실패", message);
     } finally {
       setIsSubmitting(false);
     }
