@@ -5,7 +5,7 @@ import { colors } from "../../../constants/colors";
 
 interface ProfileCardProps {
 	name: string;
-	code: string;
+	code?: string;
 	imageUri?: string;
 }
 
@@ -21,7 +21,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ name, code, imageUri }) => {
 			       style={styles.profileImage}
 		       />
 		       <Text weight="SemiBold" style={styles.name}>{name}</Text>
-		       <Text weight="SemiBold" style={styles.code}>{code}</Text>
+		       {code ? <Text weight="SemiBold" style={styles.code}>{code}</Text> : null}
 	       </View>
        );
 };

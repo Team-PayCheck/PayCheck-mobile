@@ -5,6 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
+import Header from "../../../components/layout/Header";
+import HomeBackButton from "../../../components/common/HomeBackButton";
+import EmployerMyPageDrawer from "../../../components/employer/mypage/EmployerMyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import EmployerNavigationBar, {
 	type EmployerTabName,
 } from "../../../components/layout/EmployerNavigationBar";
@@ -12,6 +17,7 @@ import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerW
 import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",
@@ -22,6 +28,15 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerWorkplaceManageScreen: React.FC = () => {
 	const navigation =
 		useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+
+	const closeDrawer = () => setIsDrawerVisible(false);
+	const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
+		closeDrawer();
+		navigation.navigate(route);
+	};
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	const [workplaces, setWorkplaces] = useState<WorkplaceListItem[]>([]);
 	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
@@ -68,10 +83,12 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top"]}>
+			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
 			>
+				<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "EmployerHomeMain" }] })} />
 				<Text weight="ExtraBold" style={styles.title}>
 					근무지 관리
 				</Text>
@@ -105,6 +122,27 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 				)}
 			</ScrollView>
 			<EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
+
+			<EmployerMyPageDrawer
+				visible={isDrawerVisible}
+				onClose={closeDrawer}
+				onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
+				onPressWorkplaceManage={() => closeDrawer()}
+				onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
+				onPressAccountSettings={() => {
+					setIsDrawerVisible(false);
+					setTimeout(() => setIsAccountSheetVisible(true), 220);
+				}}
+				onPressLogout={handleLogout}
+				onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
+			/>
+
+			<BottomSheetModal
+				visible={isAccountSheetVisible}
+				onClose={() => setIsAccountSheetVisible(false)}
+			>
+				<AccountTermsContent />
+			</BottomSheetModal>
 		</SafeAreaView>
 	);
 };
@@ -118,14 +156,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollContent: {
-		paddingTop: 20,
+		paddingTop: 10,
 		paddingHorizontal: 20,
 		paddingBottom: 40,
 	},
 	title: {
+		marginTop: 4,
 		fontSize: 24,
 		color: colors.textPrimary,
-		marginBottom: 20,
+		lineHeight: 52,
+		marginBottom: 12,
 	},
 	loading: {
 		marginTop: 32,
