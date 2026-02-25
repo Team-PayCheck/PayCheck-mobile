@@ -38,6 +38,7 @@ interface EmployerWorkerCardProps {
   isExpanded: boolean;
   onPressToggle: (record: WorkRecord) => void;
   onDelete: (id: number) => void;
+  onEdit: (record: WorkRecord) => void;
 }
 
 const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
@@ -45,6 +46,7 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
   isExpanded,
   onPressToggle,
   onDelete,
+  onEdit,
 }) => {
   const handleDelete = () => {
     Alert.alert(
@@ -121,14 +123,24 @@ const EmployerWorkerCard: React.FC<EmployerWorkerCardProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDelete}
-            activeOpacity={0.8}
-          >
-            <Feather name="trash-2" size={14} color={colors.deleteRed} />
-            <Text weight="SemiBold" style={styles.deleteButtonText}>근무 삭제</Text>
-          </TouchableOpacity>
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
+              onPress={() => onEdit(record)}
+              activeOpacity={0.8}
+            >
+              <Feather name="edit-2" size={14} color={colors.primary} />
+              <Text weight="SemiBold" style={styles.editButtonText}>근무 수정</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.deleteButton]}
+              onPress={handleDelete}
+              activeOpacity={0.8}
+            >
+              <Feather name="trash-2" size={14} color={colors.deleteRed} />
+              <Text weight="SemiBold" style={styles.deleteButtonText}>근무 삭제</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -217,7 +229,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
   },
-  deleteButton: {
+  actionRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  actionButton: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -225,6 +242,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
+  },
+  editButton: {
+    borderColor: colors.primary,
+  },
+  editButtonText: {
+    fontSize: 13,
+    color: colors.primary,
+  },
+  deleteButton: {
     borderColor: colors.deleteRed,
   },
   deleteButtonText: {

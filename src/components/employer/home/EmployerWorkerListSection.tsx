@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { isAxiosError } from "axios";
 import { Text } from "../../common/Text";
 import EmployerWorkerCard from "./EmployerWorkerCard";
+import EmployerEditWorkModal from "./EmployerEditWorkModal";
 import { colors } from "../../../constants/colors";
 import { deleteWorkRecord } from "../../../api/employer";
 import type { WorkRecord } from "../../../api/employer/types";
@@ -21,6 +22,7 @@ const EmployerWorkerListSection: React.FC<EmployerWorkerListSectionProps> = ({
   onRefetch,
 }) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [editingRecord, setEditingRecord] = useState<WorkRecord | null>(null);
 
   const handleToggle = (record: WorkRecord) => {
     setExpandedId((prev) => (prev === record.id ? null : record.id));
@@ -28,7 +30,7 @@ const EmployerWorkerListSection: React.FC<EmployerWorkerListSectionProps> = ({
 
   const handleDelete = async (id: number) => {
     setExpandedId(null);
-    onDeleteItem(id); 
+    onDeleteItem(id);
     try {
       await deleteWorkRecord(id);
     } catch (error) {
@@ -38,6 +40,16 @@ const EmployerWorkerListSection: React.FC<EmployerWorkerListSectionProps> = ({
         : "삭제에 실패했습니다.";
       Alert.alert("삭제 실패", message);
     }
+  };
+
+  const handleEdit = (record: WorkRecord) => {
+    setExpandedId(null);
+    setEditingRecord(record);
+  };
+
+  const handleEditSuccess = () => {
+    setEditingRecord(null);
+    onRefetch();
   };
 
   return (
@@ -72,10 +84,18 @@ const EmployerWorkerListSection: React.FC<EmployerWorkerListSectionProps> = ({
               isExpanded={expandedId === record.id}
               onPressToggle={handleToggle}
               onDelete={handleDelete}
+              onEdit={handleEdit}
             />
           ))}
         </View>
       )}
+
+      <EmployerEditWorkModal
+        visible={editingRecord !== null}
+        onClose={() => setEditingRecord(null)}
+        record={editingRecord}
+        onSuccess={handleEditSuccess}
+      />
     </View>
   );
 };
