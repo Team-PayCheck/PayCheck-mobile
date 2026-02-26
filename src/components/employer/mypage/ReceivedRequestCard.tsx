@@ -4,76 +4,65 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 import type {
-  CorrectionRequestResponse,
-  CorrectionRequestData,
-} from "../../../api/worker/types";
+  CorrectionRequestListItem,
+  CorrectionRequestDetail,
+} from "../../../api/employer/types";
 
-interface SentRequestCardProps {
-  request: CorrectionRequestResponse;
+interface ReceivedRequestCardProps {
+  request: CorrectionRequestListItem;
   expanded: boolean;
   onToggle: () => void;
-  detail: CorrectionRequestData | null;
+  detail: CorrectionRequestDetail | null;
   isDetailLoading: boolean;
-  onDelete?: (id: number) => void;
-  isDeleting?: boolean;
+  onApprove?: (id: number) => void;
+  onReject?: (id: number) => void;
+  isProcessing?: boolean;
 }
 
-/** type 한글 라벨 */
 const TYPE_LABEL: Record<string, string> = {
   CREATE: "추가",
   UPDATE: "수정",
   DELETE: "삭제",
 };
 
-/** status 한글 라벨 + 스타일 키 */
 const STATUS_CONFIG: Record<string, { label: string; style: "pending" | "approved" | "rejected" }> = {
   PENDING: { label: "대기", style: "pending" },
   APPROVED: { label: "승인", style: "approved" },
   REJECTED: { label: "거절", style: "rejected" },
 };
 
-/** "HH:mm" or "HH:mm:ss" → { hour, min } */
 const parseTime = (time: string | null) => {
   if (!time) return { hour: "--", min: "--" };
   const [h, m] = time.split(":");
   return { hour: h, min: m };
 };
 
-/** "2026-02-18" → "2/18" */
 const formatShortDate = (date: string) => {
   const d = new Date(date);
   return `${d.getMonth() + 1}/${d.getDate()}`;
 };
 
-/** "2026-02-18" → "2026.02.18" */
 const formatFullDate = (date: string) => date.replace(/-/g, ".");
 
-const SentRequestCard: React.FC<SentRequestCardProps> = ({
+const ReceivedRequestCard: React.FC<ReceivedRequestCardProps> = ({
   request,
   expanded,
   onToggle,
   detail,
   isDetailLoading,
-  onDelete,
-  isDeleting,
+  onApprove,
+  onReject,
+  isProcessing,
 }) => {
   const statusConfig = STATUS_CONFIG[request.status] ?? { label: request.status, style: "pending" };
   const typeLabel = TYPE_LABEL[request.type] ?? request.type;
   const reqStart = parseTime(request.requestedStartTime);
   const reqEnd = parseTime(request.requestedEndTime);
-
-  const handleDelete = () => {
-    Alert.alert("요청 취소", "이 요청을 취소하시겠습니까?", [
-      { text: "아니오", style: "cancel" },
-      { text: "취소하기", style: "destructive", onPress: () => onDelete?.(request.id) },
-    ]);
-  };
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -85,7 +74,7 @@ const SentRequestCard: React.FC<SentRequestCardProps> = ({
               <Text weight="Bold" style={styles.typeBadgeText}>{typeLabel}</Text>
             </View>
             <View style={styles.infoCol}>
-              <Text weight="Medium" style={styles.workplaceName}>{request.workplaceName}</Text>
+              <Text weight="Medium" style={styles.requesterName}>{request.requester.name}</Text>
               <Text weight="Bold" style={styles.timeText}>
                 {formatShortDate(request.workDate)} {reqStart.hour}:{reqStart.min} ~ {reqEnd.hour}:{reqEnd.min}
               </Text>
@@ -116,6 +105,14 @@ const SentRequestCard: React.FC<SentRequestCardProps> = ({
                   <Text style={styles.detailLabel}>요청 유형</Text>
                   <View style={styles.detailValueBox}>
                     <Text style={styles.detailValueText}>근무 {typeLabel} 요청</Text>
+                  </View>
+                </View>
+
+                {/* 요청자 */}
+                <View>
+                  <Text style={styles.detailLabel}>요청자</Text>
+                  <View style={styles.detailValueBox}>
+                    <Text style={styles.detailValueText}>{detail.requester.name}</Text>
                   </View>
                 </View>
 
@@ -207,12 +204,27 @@ const SentRequestCard: React.FC<SentRequestCardProps> = ({
                   </View>
                 )}
 
-                {/* 삭제 버튼 (PENDING만) */}
-                {request.status === "PENDING" && onDelete && (
-                  <View style={styles.detailActionRow}>
-                    <TouchableOpacity onPress={handleDelete} disabled={isDeleting} activeOpacity={0.7}>
-                      <Text weight="Medium" style={styles.detailDelete}>
-                        {isDeleting ? "취소 중..." : "요청 취소"}
+                {/* 승인/거절 버튼 (PENDING만) */}
+                {request.status === "PENDING" && (
+                  <View style={styles.actionRow}>
+                    <TouchableOpacity
+                      style={styles.rejectButton}
+                      onPress={() => onReject?.(request.id)}
+                      disabled={isProcessing}
+                      activeOpacity={0.7}
+                    >
+                      <Text weight="SemiBold" style={styles.rejectButtonText}>
+                        {isProcessing ? "처리 중..." : "거절"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.approveButton}
+                      onPress={() => onApprove?.(request.id)}
+                      disabled={isProcessing}
+                      activeOpacity={0.7}
+                    >
+                      <Text weight="SemiBold" style={styles.approveButtonText}>
+                        {isProcessing ? "처리 중..." : "승인"}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -269,7 +281,7 @@ const styles = StyleSheet.create({
   infoCol: {
     flex: 1,
   },
-  workplaceName: {
+  requesterName: {
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 2,
@@ -312,8 +324,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 13,
   },
-
-  // 상세
   detailBox: {
     marginTop: 18,
     marginBottom: 20,
@@ -371,15 +381,34 @@ const styles = StyleSheet.create({
   detailTilde: {
     marginHorizontal: 6,
   },
-  detailActionRow: {
+  actionRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
+    gap: 10,
     marginTop: 4,
   },
-  detailDelete: {
-    color: colors.deleteRed,
+  rejectButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: colors.backgroundGrey,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  rejectButtonText: {
     fontSize: 14,
+    color: colors.textSecondary,
+  },
+  approveButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: colors.primary,
+  },
+  approveButtonText: {
+    fontSize: 14,
+    color: colors.white,
   },
 }) as any;
 
-export default SentRequestCard;
+export default ReceivedRequestCard;
