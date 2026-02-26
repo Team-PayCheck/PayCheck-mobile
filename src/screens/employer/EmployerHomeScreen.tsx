@@ -142,6 +142,7 @@ const EmployerHomeScreen: React.FC = () => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {/* TODO: 공지 게시판 API 연동 후 dummyNotices 교체 */}
             <NoticeBoard notices={dummyNotices} />
 
             <WeeklyDateBar
