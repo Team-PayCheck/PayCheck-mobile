@@ -69,7 +69,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
 
 interface MonthlyCalendarProps {
   year: number;
-  month: number; // 0-indexed
+  month: number;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
   workDots?: {
@@ -82,7 +82,6 @@ interface MonthlyCalendarProps {
 
 const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
-// 월간 캘린더 전체: 요일 헤더, 날짜 셀 그리드
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   year,
   month,
@@ -90,7 +89,6 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   onDateSelect,
   workDots,
 }) => {
-  // 캘린더 셀 2차원 배열 생성 (이전/다음달 포함)
   const firstDay = new Date(year, month, 1).getDay();
   const lastDate = new Date(year, month + 1, 0).getDate();
   const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -172,7 +170,6 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                 date.getMonth() === selectedDate.getMonth() &&
                 date.getDate() === selectedDate.getDate();
               const isWeekend = j === 0 || j === 6;
-              // YYYY-MM-DD 포맷 키
               const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
               // workDots에서 해당 날짜 정보 조회
               const dotInfo = type === 'current' ? workDots?.[dateKey] : undefined;
@@ -237,11 +234,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   selectedDate: {
-    backgroundColor: colors.lightBlue, // 선택한 날: 하늘색
+    backgroundColor: colors.lightBlue,
     color: colors.white,
   },
   todayCircle: {
-    backgroundColor: colors.primary, // 오늘: 파란색
+    backgroundColor: colors.primary, 
     color: colors.white,
   },
   dotRow: {

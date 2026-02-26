@@ -356,7 +356,6 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
           </View>
         </View>
       )}
-
       {/* 근무 달력 모달 */}
       <WorkScheduleCalendarModal
         visible={calendarVisible}

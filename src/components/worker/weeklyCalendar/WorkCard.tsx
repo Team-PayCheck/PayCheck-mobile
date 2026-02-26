@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 import { formatCurrency, formatDate } from "../../../utils/format";
+import { isCrossMidnight } from "../../../utils/workRecord";
 import type { WorkItem } from "../../../types/worker.types";
 
 interface WorkCardProps {
@@ -13,8 +14,7 @@ interface WorkCardProps {
 	onPressCorrectionRequest?: (work: WorkItem) => void;
 }
 
-const isCurrentlyWorking = (work: WorkItem): boolean => {
-	const now = new Date();
+const getShiftTimes = (work: WorkItem) => {
 	const [startH, startM] = work.startTime.split(":").map(Number);
 	const [endH, endM] = work.endTime.split(":").map(Number);
 
@@ -24,12 +24,20 @@ const isCurrentlyWorking = (work: WorkItem): boolean => {
 	const end = new Date(`${work.workDate}T00:00:00`);
 	end.setHours(endH, endM, 0, 0);
 
-	return now >= start && now <= end;
+	if (end <= start) end.setDate(end.getDate() + 1);
+
+	return { start, end };
 };
 
 const StatusBadge: React.FC<{ work: WorkItem }> = ({ work }) => {
-	const working = work.status === "SCHEDULED" && isCurrentlyWorking(work);
-	const isScheduled = work.status === "SCHEDULED" && !working;
+	const now = new Date();
+	const { start, end } = getShiftTimes(work);
+
+	const beforeStart = now < start;
+	const working = !beforeStart && now <= end && work.status === "SCHEDULED";
+	// beforeStart가 true면 status에 관계없이 근무예정으로 처리
+	// 백엔드에서 익일근무 status를 COMPLETED로 잘못 반환하는 버그 보정
+	const isScheduled = beforeStart || (work.status === "SCHEDULED" && !working);
 
 	const badgeStyle = working
 		? styles.statusWorking
@@ -78,7 +86,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 						{work.workplaceName}
 					</Text>
 					<Text weight="Bold" style={styles.dateTime}>
-						{formatDate(work.workDate)} {work.startTime.slice(0, 5)} ~ {work.endTime.slice(0, 5)}
+						{formatDate(work.workDate)} {work.startTime.slice(0, 5)} ~ {isCrossMidnight(work.startTime, work.endTime) ? `익일 ${work.endTime.slice(0, 5)}` : work.endTime.slice(0, 5)}
 					</Text>
 				</View>
 				<View style={styles.headerRight}>

@@ -11,6 +11,7 @@ import type {
   GetSalariesParams,
   CreatePaymentRequest,
   CorrectionFilter,
+  UpdateWorkerRequest,
 } from "./types";
 
 // 날짜 포맷 헬퍼
@@ -213,5 +214,3 @@ export const createPayment = async (reqData: CreatePaymentRequest) => {
   const { data } = await api.post("/api/employer/payments", reqData);
   return data;
 };
-
-
