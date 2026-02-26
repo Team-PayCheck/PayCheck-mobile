@@ -13,6 +13,7 @@ import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 import { createWorkplace } from "../../../api/employer";
+import { searchAddress, type KakaoAddress } from "../../../api/kakao";
 
 interface AddWorkplaceModalProps {
 	visible: boolean;
@@ -26,23 +27,61 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	onSuccess,
 }) => {
 	const [workplaceName, setWorkplaceName] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
 	const [zipCode, setZipCode] = useState("");
 	const [address, setAddress] = useState("");
 	const [businessNumber, setBusinessNumber] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const [isSearching, setIsSearching] = useState(false);
+	const [searchResults, setSearchResults] = useState<KakaoAddress[]>([]);
+	const [showResults, setShowResults] = useState(false);
 
 	const isValid = workplaceName.trim() !== "" && address.trim() !== "" && businessNumber.trim() !== "";
 
 	const resetForm = () => {
 		setWorkplaceName("");
+		setSearchQuery("");
 		setZipCode("");
 		setAddress("");
 		setBusinessNumber("");
+		setSearchResults([]);
+		setShowResults(false);
 	};
 
 	const handleClose = () => {
 		resetForm();
 		onClose();
+	};
+
+	const handleSearch = async () => {
+		const query = searchQuery.trim();
+		if (!query) {
+			Alert.alert("검색어 입력", "주소를 입력해주세요.");
+			return;
+		}
+
+		setIsSearching(true);
+		try {
+			const results = await searchAddress(query);
+			if (results.length === 0) {
+				Alert.alert("검색 결과 없음", "검색 결과가 없습니다. 다른 주소를 입력해주세요.");
+				setShowResults(false);
+			} else {
+				setSearchResults(results);
+				setShowResults(true);
+			}
+		} catch {
+			Alert.alert("검색 실패", "주소 검색 중 오류가 발생했습니다.");
+		} finally {
+			setIsSearching(false);
+		}
+	};
+
+	const handleSelectAddress = (item: KakaoAddress) => {
+		setZipCode(item.zoneNo);
+		setAddress(item.addressName);
+		setShowResults(false);
+		setSearchQuery("");
 	};
 
 	const handleSubmit = async () => {
@@ -96,36 +135,71 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 				<View style={styles.fieldGroup}>
 					<Text weight="Medium" style={styles.label}>근무지 주소</Text>
 
-					{/* 우편번호 */}
-					<Text style={styles.subLabel}>우편번호</Text>
+					{/* 주소 검색 */}
+					<Text style={styles.subLabel}>주소 검색</Text>
 					<View style={styles.inputRow}>
 						<TextInput
 							style={[styles.input, styles.inputFlex]}
-							value={zipCode}
-							onChangeText={setZipCode}
-							placeholder="우편번호"
+							value={searchQuery}
+							onChangeText={setSearchQuery}
+							placeholder="도로명 또는 지번 주소 입력"
 							placeholderTextColor={colors.textDisabled}
-							keyboardType="number-pad"
+							returnKeyType="search"
+							onSubmitEditing={handleSearch}
 						/>
-						<TouchableOpacity style={styles.searchButton} activeOpacity={0.7}>
-							<Text weight="SemiBold" style={styles.searchButtonText}>검색</Text>
+						<TouchableOpacity
+							style={styles.searchButton}
+							activeOpacity={0.7}
+							onPress={handleSearch}
+							disabled={isSearching}
+						>
+							{isSearching ? (
+								<ActivityIndicator size="small" color={colors.textPrimary} />
+							) : (
+								<Text weight="SemiBold" style={styles.searchButtonText}>검색</Text>
+							)}
 						</TouchableOpacity>
 					</View>
 
-					{/* 주소지 */}
+					{/* 검색 결과 목록 */}
+					{showResults && searchResults.length > 0 && (
+						<View style={styles.resultList}>
+							{searchResults.map((item, index) => (
+								<TouchableOpacity
+									key={`${item.zoneNo}-${index}`}
+									style={[
+										styles.resultItem,
+										index < searchResults.length - 1 && styles.resultItemBorder,
+									]}
+									activeOpacity={0.7}
+									onPress={() => handleSelectAddress(item)}
+								>
+									<Text style={styles.resultZoneNo}>{item.zoneNo}</Text>
+									<Text style={styles.resultAddress}>{item.addressName}</Text>
+								</TouchableOpacity>
+							))}
+						</View>
+					)}
+
+					{/* 우편번호 (읽기 전용) */}
+					<Text style={styles.subLabel}>우편번호</Text>
+					<TextInput
+						style={[styles.input, styles.readonlyInput]}
+						value={zipCode}
+						placeholder="검색으로 자동 입력"
+						placeholderTextColor={colors.textDisabled}
+						editable={false}
+					/>
+
+					{/* 주소지 (읽기 전용) */}
 					<Text style={styles.subLabel}>주소지</Text>
-					<View style={styles.inputRow}>
-						<TextInput
-							style={[styles.input, styles.inputFlex]}
-							value={address}
-							onChangeText={setAddress}
-							placeholder="주소를 입력하세요"
-							placeholderTextColor={colors.textDisabled}
-						/>
-						<TouchableOpacity style={styles.searchButton} activeOpacity={0.7}>
-							<Text weight="SemiBold" style={styles.searchButtonText}>검색</Text>
-						</TouchableOpacity>
-					</View>
+					<TextInput
+						style={[styles.input, styles.readonlyInput]}
+						value={address}
+						placeholder="검색으로 자동 입력"
+						placeholderTextColor={colors.textDisabled}
+						editable={false}
+					/>
 				</View>
 
 				{/* 사업자 등록 번호 */}
@@ -191,6 +265,10 @@ const styles = StyleSheet.create({
 	inputFlex: {
 		flex: 1,
 	},
+	readonlyInput: {
+		backgroundColor: colors.backgroundGrey,
+		color: colors.textSecondary,
+	},
 	inputRow: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -204,8 +282,34 @@ const styles = StyleSheet.create({
 		borderColor: colors.border,
 		alignItems: "center",
 		justifyContent: "center",
+		minWidth: 56,
 	},
 	searchButtonText: {
+		fontSize: 14,
+		color: colors.textPrimary,
+	},
+	resultList: {
+		marginTop: 8,
+		borderWidth: 1,
+		borderColor: colors.border,
+		borderRadius: 10,
+		backgroundColor: colors.white,
+		maxHeight: 200,
+	},
+	resultItem: {
+		paddingVertical: 12,
+		paddingHorizontal: 14,
+	},
+	resultItemBorder: {
+		borderBottomWidth: 1,
+		borderBottomColor: colors.borderLight,
+	},
+	resultZoneNo: {
+		fontSize: 12,
+		color: colors.textSecondary,
+		marginBottom: 2,
+	},
+	resultAddress: {
 		fontSize: 14,
 		color: colors.textPrimary,
 	},

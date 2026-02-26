@@ -40,6 +40,7 @@ const config: ExpoConfig = {
     backendApiUrl: process.env.EXPO_PUBLIC_BACKEND_API_URL || 'http://localhost:3000',
     appEnv: process.env.EXPO_PUBLIC_APP_ENV || 'development',
     kakaoAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY || '',
+    kakaoRestApiKey: process.env.KAKAO_REST_API_KEY || '',
   },
   runtimeVersion: {
     policy: 'appVersion',
