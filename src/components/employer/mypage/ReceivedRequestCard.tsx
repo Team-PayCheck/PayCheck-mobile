@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.green,
   },
   status_rejected: {
-    backgroundColor: colors.grey,
+    backgroundColor: colors.red,
   },
   statusText_pending: {
     color: colors.white,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   statusText_rejected: {
-    color: colors.textSecondary,
+    color: colors.white,
     fontSize: 13,
   },
   detailBox: {

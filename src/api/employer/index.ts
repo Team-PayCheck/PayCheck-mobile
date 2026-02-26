@@ -204,14 +204,14 @@ export const getPendingApprovals = async (
 };
 
 /**
- * 사업장별 정정요청 목록 조회 (페이징)
+ * 사업장별 정정요청 목록 조회
  * GET /api/employer/workplaces/{workplaceId}/correction-requests
  */
 export const getCorrectionRequests = async (
 	workplaceId: number,
-	params?: { status?: CorrectionRequestStatus; page?: number; size?: number; sort?: string }
-): Promise<ApiResponse<CorrectionRequestPage>> => {
-	const { data } = await api.get<ApiResponse<CorrectionRequestPage>>(
+	params?: { status?: CorrectionRequestStatus }
+): Promise<ApiResponse<CorrectionRequestListItem[]>> => {
+	const { data } = await api.get<ApiResponse<CorrectionRequestListItem[]>>(
 		`/api/employer/workplaces/${workplaceId}/correction-requests`,
 		{ params }
 	);

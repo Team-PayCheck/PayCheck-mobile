@@ -2,11 +2,11 @@
  * 받은 근무 요청(정정요청) 관리 훅.
  * - 사업장 목록 조회 + 선택
  * - 상태 필터(전체/대기/승인/거절)
- * - 페이징된 정정요청 목록 조회
+ * - 정정요청 목록 조회 + 클라이언트 페이징
  * - 카드 토글 시 상세 정보 lazy loading
  * - 승인/거절 처리
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import {
 	getWorkplaces,
@@ -65,10 +65,9 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 	const [statusFilter, setStatusFilterRaw] = useState<CorrectionRequestStatus | null>(null);
 
 	// === 목록 ===
-	const [requests, setRequests] = useState<CorrectionRequestListItem[]>([]);
+	const [allRequests, setAllRequests] = useState<CorrectionRequestListItem[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPage, setCurrentPageRaw] = useState(0);
-	const [totalPages, setTotalPages] = useState(0);
 
 	// === 상세 ===
 	const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -77,6 +76,13 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 
 	// === 승인/거절 ===
 	const [isProcessing, setIsProcessing] = useState(false);
+
+	// 클라이언트 페이징 계산
+	const totalPages = useMemo(() => Math.ceil(allRequests.length / PAGE_SIZE), [allRequests]);
+	const requests = useMemo(() => {
+		const start = currentPage * PAGE_SIZE;
+		return allRequests.slice(start, start + PAGE_SIZE);
+	}, [allRequests, currentPage]);
 
 	// 사업장 목록 조회
 	useEffect(() => {
@@ -105,25 +111,20 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 		try {
 			const response = await getCorrectionRequests(selectedWorkplaceId, {
 				status: statusFilter ?? undefined,
-				page: currentPage,
-				size: PAGE_SIZE,
-				sort: "createdAt,desc",
 			});
 			if (response.success && response.data) {
-				setRequests(response.data.content ?? []);
-				setTotalPages(response.data.totalPages ?? 0);
+				const data = Array.isArray(response.data) ? response.data : [];
+				setAllRequests(data);
 			} else {
-				setRequests([]);
-				setTotalPages(0);
+				setAllRequests([]);
 			}
 		} catch {
 			console.warn("정정요청 목록 조회 실패");
-			setRequests([]);
-			setTotalPages(0);
+			setAllRequests([]);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [selectedWorkplaceId, statusFilter, currentPage]);
+	}, [selectedWorkplaceId, statusFilter]);
 
 	useEffect(() => {
 		fetchRequests();
