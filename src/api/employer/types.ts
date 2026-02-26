@@ -293,6 +293,18 @@ export interface CorrectionRequestDetail {
 export type CorrectionRequestType = "CREATE" | "UPDATE" | "DELETE";
 export type CorrectionRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
 
+// 페이징 응답 (GET /api/employer/workplaces/{workplaceId}/correction-requests)
+export interface CorrectionRequestPage {
+  content: CorrectionRequestListItem[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 // ============ 근로자 (Worker) ============
 
 // GET /api/workers/code/{workerCode} - 근로자 코드로 조회
