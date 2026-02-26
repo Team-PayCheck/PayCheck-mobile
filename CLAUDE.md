@@ -127,6 +127,10 @@ Welcome (카카오 로그인)
 4. **터치**: 클릭 이벤트 → 터치 이벤트 (Pressable, TouchableOpacity)
 5. **레이아웃**: flexbox 기반 (React Native 기본)
 
+### UI 작업 규칙
+
+- **새 컴포넌트를 만들기 전에 반드시 `src/components/` 하위에 재사용 가능한 기존 컴포넌트가 있는지 확인한다.** 특히 `common/`, `mypage/`, `worker/salary/` 폴더를 우선 확인.
+
 ### 코드 컨벤션
 
 - 컴포넌트: PascalCase (`MonthlyCalendar.tsx`)

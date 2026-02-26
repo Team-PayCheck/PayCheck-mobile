@@ -1,3 +1,6 @@
+/**
+ * 마이페이지 서브 화면에서 홈으로 돌아가는 뒤로가기 버튼.
+ */
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

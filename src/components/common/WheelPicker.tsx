@@ -1,3 +1,6 @@
+/**
+ * iOS 스타일 드럼 롤 피커. 시간, 날짜, 휴게시간 선택 등에 사용한다.
+ */
 import React, { useRef, useCallback, useEffect } from "react";
 import {
 	View,

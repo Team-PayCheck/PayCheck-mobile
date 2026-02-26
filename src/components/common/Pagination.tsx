@@ -1,3 +1,6 @@
+/**
+ * 페이지네이션 컴포넌트. 0-based 페이지, 6페이지 이상 시 ellipsis 표시.
+ */
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Text } from "./Text";

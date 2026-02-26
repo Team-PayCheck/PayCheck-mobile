@@ -1,3 +1,6 @@
+/**
+ * 월간 캘린더 그리드. 날짜별 근무 건수 dot 표시, 오늘/선택 날짜 하이라이트.
+ */
 import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Text } from "../common/Text";
