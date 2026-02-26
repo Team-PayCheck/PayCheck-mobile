@@ -14,23 +14,14 @@ import { Text } from "../../common/Text";
 import WheelPicker from "../../common/WheelPicker";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import { colors } from "../../../constants/colors";
-import {
-  HOUR_ITEMS,
-  MINUTE_ITEMS,
-  BREAK_ITEMS,
-  getDateItems,
-} from "../../../constants/pickerItems";
+import { getDateItems } from "../../../constants/pickerItems";
+import { useWorkTimePicker, workModalSharedStyles } from "../../../hooks/employer/useWorkTimePicker";
+import type { TimePickerTarget } from "../../../hooks/employer/useWorkTimePicker";
 import { getContractsByWorkplace, createWorkRecord } from "../../../api/employer";
 import type { ContractWorker } from "../../../api/employer/types";
 
-type PickerTarget =
-  | "date"
-  | "startHour"
-  | "startMinute"
-  | "endHour"
-  | "endMinute"
-  | "breakMinutes"
-  | null;
+// Add 모달은 날짜 선택이 추가로 필요하므로 "date" 타겟 포함
+type AddPickerTarget = "date" | TimePickerTarget;
 
 interface EmployerAddWorkModalProps {
   visible: boolean;
@@ -58,13 +49,20 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
   // 폼 상태
   const [selectedContractId, setSelectedContractId] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState(parsedDate.getDate());
-  const [startHour, setStartHour] = useState(9);
-  const [startMinute, setStartMinute] = useState(0);
-  const [endHour, setEndHour] = useState(18);
-  const [endMinute, setEndMinute] = useState(0);
-  const [breakMinutes, setBreakMinutes] = useState(0);
-  const [activePicker, setActivePicker] = useState<PickerTarget>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 날짜 피커는 Add 모달 전용으로 별도 관리
+  const [addActivePicker, setAddActivePicker] = useState<AddPickerTarget>(null);
+
+  const {
+    startHour, startMinute, endHour, endMinute, breakMinutes,
+    isNextDay,
+    handlePickerChange: handleTimePickerChange,
+    getPickerConfig: getTimePickerConfig,
+    getDisplayValue,
+    resetTime,
+    setActivePicker: setTimeActivePicker,
+  } = useWorkTimePicker();
 
   const dateItems = useMemo(() => getDateItems(parsedDate), [parsedDate]);
 
@@ -74,13 +72,9 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
     // 폼 초기화
     const d = new Date(selectedDate + "T00:00:00");
     setSelectedDay(d.getDate());
-    setStartHour(9);
-    setStartMinute(0);
-    setEndHour(18);
-    setEndMinute(0);
-    setBreakMinutes(0);
+    resetTime();
     setSelectedContractId(null);
-    setActivePicker(null);
+    setAddActivePicker(null);
 
     // 근무자 목록 조회
     const fetchWorkers = async () => {
@@ -98,68 +92,33 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
     fetchWorkers();
   }, [visible, workplaceId, selectedDate]);
 
-  const togglePicker = (target: PickerTarget) => {
-    setActivePicker((prev) => (prev === target ? null : target));
+  const togglePicker = (target: AddPickerTarget) => {
+    setAddActivePicker((prev) => (prev === target ? null : target));
+    // 훅의 activePicker도 동기화 (WheelPicker 렌더링용)
+    setTimeActivePicker(target !== "date" ? target : null);
   };
 
   const handlePickerChange = (value: string | number) => {
-    switch (activePicker) {
-      case "date":
-        setSelectedDay(value as number);
-        break;
-      case "startHour":
-        setStartHour(value as number);
-        break;
-      case "startMinute":
-        setStartMinute(value as number);
-        break;
-      case "endHour":
-        setEndHour(value as number);
-        break;
-      case "endMinute":
-        setEndMinute(value as number);
-        break;
-      case "breakMinutes":
-        setBreakMinutes(value as number);
-        break;
+    if (addActivePicker === "date") {
+      setSelectedDay(value as number);
+      return;
     }
+    handleTimePickerChange(value);
   };
 
   const getPickerConfig = () => {
-    switch (activePicker) {
-      case "date":
-        return { items: dateItems, selectedValue: selectedDay, width: 120 };
-      case "startHour":
-        return { items: HOUR_ITEMS, selectedValue: startHour, width: 80 };
-      case "startMinute":
-        return { items: MINUTE_ITEMS, selectedValue: startMinute, width: 80 };
-      case "endHour":
-        return { items: HOUR_ITEMS, selectedValue: endHour, width: 80 };
-      case "endMinute":
-        return { items: MINUTE_ITEMS, selectedValue: endMinute, width: 80 };
-      case "breakMinutes":
-        return { items: BREAK_ITEMS, selectedValue: breakMinutes, width: 80 };
-      default:
-        return { items: [], selectedValue: 0, width: 80 };
+    if (addActivePicker === "date") {
+      return { items: dateItems, selectedValue: selectedDay, width: 120 };
     }
+    return getTimePickerConfig();
   };
 
-  const getDisplayValue = (target: Exclude<PickerTarget, null>): string => {
-    const month = parsedDate.getMonth() + 1;
-    switch (target) {
-      case "date":
-        return `${month}/${selectedDay}`;
-      case "startHour":
-        return String(startHour).padStart(2, "0");
-      case "startMinute":
-        return String(startMinute).padStart(2, "0");
-      case "endHour":
-        return String(endHour).padStart(2, "0");
-      case "endMinute":
-        return String(endMinute).padStart(2, "0");
-      case "breakMinutes":
-        return String(breakMinutes);
+  const getAddDisplayValue = (target: Exclude<AddPickerTarget, null>): string => {
+    if (target === "date") {
+      const month = parsedDate.getMonth() + 1;
+      return `${month}/${selectedDay}`;
     }
+    return getDisplayValue(target);
   };
 
   const handleSubmit = async () => {
@@ -196,21 +155,18 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
 
   const pickerConfig = getPickerConfig();
 
-  const renderSelectField = (
-    target: Exclude<PickerTarget, null>,
-    style?: object
-  ) => (
+  const renderSelectField = (target: Exclude<AddPickerTarget, null>, style?: object) => (
     <TouchableOpacity
       style={[
-        styles.selectField,
-        activePicker === target && styles.selectFieldActive,
+        workModalSharedStyles.selectField,
+        addActivePicker === target && workModalSharedStyles.selectFieldActive,
         style,
       ]}
       onPress={() => togglePicker(target)}
       activeOpacity={0.7}
     >
-      <Text weight="Medium" style={styles.selectText}>
-        {getDisplayValue(target)}
+      <Text weight="Medium" style={workModalSharedStyles.selectText}>
+        {getAddDisplayValue(target)}
       </Text>
       <Feather name="chevron-down" size={14} color={colors.textMuted} />
     </TouchableOpacity>
@@ -233,8 +189,8 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
       </View>
 
       {/* 근무자 선택 */}
-      <View style={styles.section}>
-        <Text weight="Medium" style={styles.label}>
+      <View style={workModalSharedStyles.section}>
+        <Text weight="Medium" style={workModalSharedStyles.label}>
           근무자 선택
         </Text>
         {isWorkersLoading ? (
@@ -270,7 +226,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
       {/* 근무지 + 휴게 시간 */}
       <View style={styles.rowSection}>
         <View style={styles.halfSection}>
-          <Text weight="Medium" style={styles.label}>
+          <Text weight="Medium" style={workModalSharedStyles.label}>
             근무지
           </Text>
           <View style={styles.readonlyField}>
@@ -280,12 +236,12 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
           </View>
         </View>
         <View style={styles.halfSection}>
-          <Text weight="Medium" style={styles.label}>
+          <Text weight="Medium" style={workModalSharedStyles.label}>
             휴게 시간
           </Text>
-          <View style={styles.unitRow}>
-            {renderSelectField("breakMinutes", styles.smallField)}
-            <Text weight="Medium" style={styles.unitText}>
+          <View style={workModalSharedStyles.unitRow}>
+            {renderSelectField("breakMinutes", workModalSharedStyles.smallField)}
+            <Text weight="Medium" style={workModalSharedStyles.unitText}>
               분
             </Text>
           </View>
@@ -293,33 +249,33 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
       </View>
 
       {/* 근무 시간 */}
-      <View style={styles.section}>
-        <Text weight="Medium" style={styles.label}>
+      <View style={workModalSharedStyles.section}>
+        <Text weight="Medium" style={workModalSharedStyles.label}>
           근무 시간
         </Text>
-        <View style={styles.timeRow}>
+        <View style={workModalSharedStyles.timeRow}>
           {renderSelectField("date", { flex: 0, minWidth: 70 })}
-          {renderSelectField("startHour", styles.timeField)}
-          <Text style={styles.timeSeparator}>:</Text>
-          {renderSelectField("startMinute", styles.timeField)}
-          <Text weight="Medium" style={styles.timeTilde}>~</Text>
-          {renderSelectField("endHour", styles.timeField)}
-          <Text style={styles.timeSeparator}>:</Text>
-          {renderSelectField("endMinute", styles.timeField)}
+          {renderSelectField("startHour", workModalSharedStyles.timeField)}
+          <Text style={workModalSharedStyles.timeSeparator}>:</Text>
+          {renderSelectField("startMinute", workModalSharedStyles.timeField)}
+          <Text weight="Medium" style={workModalSharedStyles.timeTilde}>~</Text>
+          {renderSelectField("endHour", workModalSharedStyles.timeField)}
+          <Text style={workModalSharedStyles.timeSeparator}>:</Text>
+          {renderSelectField("endMinute", workModalSharedStyles.timeField)}
         </View>
-        {endHour * 60 + endMinute < startHour * 60 + startMinute && (
-          <View style={styles.nextDayRow}>
-            <View style={styles.nextDayBadge}>
-              <Text weight="SemiBold" style={styles.nextDayText}>익일</Text>
+        {isNextDay && (
+          <View style={workModalSharedStyles.nextDayRow}>
+            <View style={workModalSharedStyles.nextDayBadge}>
+              <Text weight="SemiBold" style={workModalSharedStyles.nextDayText}>익일</Text>
             </View>
           </View>
         )}
       </View>
 
       {/* WheelPicker 영역 */}
-      {activePicker && pickerConfig.items.length > 0 && (
-        <View style={styles.pickerArea}>
-          <View style={styles.pickerWrapper}>
+      {addActivePicker && pickerConfig.items.length > 0 && (
+        <View style={workModalSharedStyles.pickerArea}>
+          <View style={workModalSharedStyles.pickerWrapper}>
             <WheelPicker
               items={pickerConfig.items}
               selectedValue={pickerConfig.selectedValue}
@@ -331,7 +287,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
       )}
 
       {/* 추가하기 버튼 */}
-      <View style={styles.submitRow}>
+      <View style={workModalSharedStyles.submitRow}>
         <PrimaryButton
           text="추가하기"
           onPress={handleSubmit}
@@ -361,14 +317,6 @@ const styles = StyleSheet.create({
   workplaceName: {
     fontSize: 18,
     color: colors.textPrimary,
-  },
-  section: {
-    marginBottom: 20,
-    gap: 8,
-  },
-  label: {
-    fontSize: 13,
-    color: colors.textSecondary,
   },
   chipRow: {
     gap: 8,
@@ -411,85 +359,6 @@ const styles = StyleSheet.create({
   readonlyText: {
     fontSize: 14,
     color: colors.textMuted,
-  },
-  unitRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  smallField: {
-    flex: 0,
-    minWidth: 52,
-  },
-  unitText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  timeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  timeField: {
-    flex: 0,
-    minWidth: 48,
-    paddingHorizontal: 8,
-  },
-  timeSeparator: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  timeTilde: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginHorizontal: 4,
-  },
-  selectField: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 6,
-  },
-  selectFieldActive: {
-    borderColor: colors.primary,
-  },
-  selectText: {
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  pickerArea: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: 12,
-    marginBottom: 12,
-  },
-  pickerWrapper: {
-    alignItems: "center",
-  },
-  submitRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 8,
-  },
-  nextDayRow: {
-    alignItems: "flex-end",
-    marginTop: 4,
-  },
-  nextDayBadge: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-  },
-  nextDayText: {
-    fontSize: 11,
-    color: colors.primary,
   },
 });
 

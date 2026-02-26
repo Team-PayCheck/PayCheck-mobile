@@ -32,6 +32,8 @@ const EmployerTimeline: React.FC<EmployerTimelineProps> = ({ workRecords }) => {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const currentX = minutesToX(currentMinutes);
 
+  // 타임라인 최초 진입 시 현재 시간 위치로 1회만 스크롤
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const scrollX = Math.max(0, currentX - 100);
     const timer = setTimeout(

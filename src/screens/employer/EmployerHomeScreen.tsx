@@ -41,7 +41,7 @@ const EmployerHomeScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
   const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
@@ -142,6 +142,7 @@ const EmployerHomeScreen: React.FC = () => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {/* TODO: 공지 게시판 API 연동 후 dummyNotices 교체 */}
             <NoticeBoard notices={dummyNotices} />
 
             <WeeklyDateBar

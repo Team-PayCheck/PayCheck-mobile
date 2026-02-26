@@ -131,6 +131,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
           month={month}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
+          onListPress={() => navigation.replace("WorkerHomeMain")}
         />
         <View style={styles.dashedLine} />
         {/* 월간 캘린더 */}
