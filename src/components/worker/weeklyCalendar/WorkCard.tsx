@@ -35,6 +35,8 @@ const StatusBadge: React.FC<{ work: WorkItem }> = ({ work }) => {
 
 	const beforeStart = now < start;
 	const working = !beforeStart && now <= end && work.status === "SCHEDULED";
+	// beforeStart가 true면 status에 관계없이 근무예정으로 처리
+	// 백엔드에서 익일근무 status를 COMPLETED로 잘못 반환하는 버그 보정
 	const isScheduled = beforeStart || (work.status === "SCHEDULED" && !working);
 
 	const badgeStyle = working
