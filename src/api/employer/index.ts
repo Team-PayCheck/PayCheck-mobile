@@ -191,8 +191,8 @@ export const deleteContract = async (
 // ============ 근무 기록 (Work Record) ============
 
 /**
- * 사업장별 근무 기록 조회
- * GET /api/employer/workplaces/{workplaceId}/work-records
+ * 사업장별 근무 기록 조회 (캘린더)
+ * GET /api/employer/work-records?workplaceId={}&startDate={}&endDate={}
  */
 export const getWorkRecords = async (
 	workplaceId: number | string,
@@ -200,8 +200,8 @@ export const getWorkRecords = async (
 	endDate: string
 ) => {
 	const { data } = await api.get(
-		`/api/employer/workplaces/${workplaceId}/work-records`,
-		{ params: { startDate, endDate } }
+		"/api/employer/work-records",
+		{ params: { workplaceId, startDate, endDate } }
 	);
 	return data;
 };
