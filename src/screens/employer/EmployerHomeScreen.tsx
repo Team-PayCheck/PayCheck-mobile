@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
@@ -19,12 +20,14 @@ import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
-import { colors } from "../../constants/colors";
 import EmployerTimeline from "../../components/employer/home/EmployerTimeline";
 import EmployerWorkerListSection from "../../components/employer/home/EmployerWorkerListSection";
 import EmployerAddWorkModal from "../../components/employer/home/EmployerAddWorkModal";
+import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
+import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import type { WeekDay } from "../../types/worker.types";
 import { getWeekDays, getWeekRange, formatDateStr } from "../../utils/date";
@@ -40,6 +43,17 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerHomeScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+
+  // Drawer 상태
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+
+  const closeDrawer = () => setIsDrawerVisible(false);
+  const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
+    closeDrawer();
+    navigation.navigate(route);
+  };
+  const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
@@ -121,7 +135,7 @@ const EmployerHomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <Header />
+      <Header onPressLeft={() => setIsDrawerVisible(true)} />
       {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -208,6 +222,29 @@ const EmployerHomeScreen: React.FC = () => {
             onDateSelect={handleDateSelect}
           />
         </View>
+      </BottomSheetModal>
+
+      {/* 마이페이지 Drawer */}
+      <EmployerMyPageDrawer
+        visible={isDrawerVisible}
+        onClose={closeDrawer}
+        onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
+        onPressWorkplaceManage={() => navigateFromDrawer("EmployerWorkplaceManage")}
+        onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
+        onPressAccountSettings={() => {
+          setIsDrawerVisible(false);
+          setTimeout(() => setIsAccountSheetVisible(true), 220);
+        }}
+        onPressLogout={handleLogout}
+        onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
+      />
+
+      {/* 계정 이용/이용동의 바텀시트 */}
+      <BottomSheetModal
+        visible={isAccountSheetVisible}
+        onClose={() => setIsAccountSheetVisible(false)}
+      >
+        <AccountTermsContent />
       </BottomSheetModal>
     </SafeAreaView>
   );

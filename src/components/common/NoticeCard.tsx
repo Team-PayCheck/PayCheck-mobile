@@ -1,3 +1,6 @@
+/**
+ * 공지사항 개별 카드. 아이콘, 카테고리, 제목, 작성자, 시간을 표시한다.
+ */
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

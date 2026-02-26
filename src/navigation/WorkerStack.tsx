@@ -2,10 +2,10 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WorkerWeeklyCalendarScreen from "../screens/worker/WorkerWeeklyCalendarScreen";
 import WorkerMonthlyCalendarScreen from "../screens/worker/WorkerMonthlyCalendarScreen";
-import ProfileEditScreen from "../screens/worker/mypage/ProfileEditScreen";
-import SentRequestsScreen from "../screens/worker/mypage/SentRequestsScreen";
-import WithdrawScreen from "../screens/worker/mypage/WithdrawScreen";
-import WorkplaceManageScreen from "../screens/worker/mypage/WorkplaceManageScreen";
+import ProfileEditScreen from "../screens/worker/mypage/WorkerProfileEditScreen";
+import SentRequestsScreen from "../screens/worker/mypage/WorkerSentRequestsScreen";
+import WithdrawScreen from "../screens/worker/mypage/WorkerWithdrawScreen";
+import WorkplaceManageScreen from "../screens/worker/mypage/WorkerWorkplaceManageScreen";
 
 export type WorkerStackParamList = {
 	WorkerHomeMain: undefined;

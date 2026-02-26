@@ -1,3 +1,6 @@
+/**
+ * 앱 전역에서 사용하는 기본 버튼. 활성/비활성 상태를 지원한다.
+ */
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "./Text";

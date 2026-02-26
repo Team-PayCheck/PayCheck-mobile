@@ -5,13 +5,21 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
+import Header from "../../../components/layout/Header";
+import HomeBackButton from "../../../components/common/HomeBackButton";
+import EmployerMyPageDrawer from "../../../components/employer/mypage/EmployerMyPageDrawer";
+import BottomSheetModal from "../../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import EmployerNavigationBar, {
 	type EmployerTabName,
 } from "../../../components/layout/EmployerNavigationBar";
 import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
+import AddWorkplaceButton from "../../../components/employer/mypage/AddWorkplaceButton";
+import AddWorkplaceModal from "../../../components/employer/mypage/AddWorkplaceModal";
 import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
+import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",
@@ -22,6 +30,16 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerWorkplaceManageScreen: React.FC = () => {
 	const navigation =
 		useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+	const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+	const closeDrawer = () => setIsDrawerVisible(false);
+	const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
+		closeDrawer();
+		navigation.navigate(route);
+	};
+	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	const [workplaces, setWorkplaces] = useState<WorkplaceListItem[]>([]);
 	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
@@ -32,46 +50,49 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		navigation.replace(TAB_SCREEN_MAP[tab]);
 	};
 
-	useEffect(() => {
-		const fetchWorkplaces = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const res = await getWorkplaces();
-				if (res.success && Array.isArray(res.data)) {
-					setWorkplaces(res.data);
+	const fetchWorkplaces = async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			const res = await getWorkplaces();
+			if (res.success && Array.isArray(res.data)) {
+				setWorkplaces(res.data);
 
-					// 각 사업장의 상세 정보 병렬 조회
-					const details = await Promise.all(
-						res.data.map((w) => getWorkplaceDetail(w.id).catch(() => null))
-					);
-					const map: Record<number, WorkplaceDetail> = {};
-					details.forEach((d) => {
-						if (d?.success && d.data) {
-							map[d.data.id] = d.data;
-						}
-					});
-					setDetailMap(map);
-				} else {
-					setWorkplaces([]);
-					setError(res.error?.message || "사업장 정보를 불러오지 못했습니다.");
-				}
-			} catch (e: any) {
+				// 각 사업장의 상세 정보 병렬 조회
+				const details = await Promise.all(
+					res.data.map((w: WorkplaceListItem) => getWorkplaceDetail(w.id).catch(() => null))
+				);
+				const map: Record<number, WorkplaceDetail> = {};
+				details.forEach((d) => {
+					if (d?.success && d.data) {
+						map[d.data.id] = d.data;
+					}
+				});
+				setDetailMap(map);
+			} else {
 				setWorkplaces([]);
-				setError(e?.message || "사업장 정보를 불러오지 못했습니다.");
-			} finally {
-				setLoading(false);
+				setError(res.error?.message || "사업장 정보를 불러오지 못했습니다.");
 			}
-		};
+		} catch (e: any) {
+			setWorkplaces([]);
+			setError(e?.message || "사업장 정보를 불러오지 못했습니다.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchWorkplaces();
 	}, []);
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top"]}>
+			<Header onPressLeft={() => setIsDrawerVisible(true)} />
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
 			>
+				<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "EmployerHomeMain" }] })} />
 				<Text weight="ExtraBold" style={styles.title}>
 					근무지 관리
 				</Text>
@@ -100,11 +121,38 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 								/>
 							);
 						})}
-						<Text style={styles.addWorkplace}>근무지 추가</Text>
+						<AddWorkplaceButton onPress={() => setIsAddModalVisible(true)} />
 					</>
 				)}
 			</ScrollView>
 			<EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
+
+			<EmployerMyPageDrawer
+				visible={isDrawerVisible}
+				onClose={closeDrawer}
+				onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
+				onPressWorkplaceManage={() => closeDrawer()}
+				onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
+				onPressAccountSettings={() => {
+					setIsDrawerVisible(false);
+					setTimeout(() => setIsAccountSheetVisible(true), 220);
+				}}
+				onPressLogout={handleLogout}
+				onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
+			/>
+
+			<BottomSheetModal
+				visible={isAccountSheetVisible}
+				onClose={() => setIsAccountSheetVisible(false)}
+			>
+				<AccountTermsContent />
+			</BottomSheetModal>
+
+			<AddWorkplaceModal
+				visible={isAddModalVisible}
+				onClose={() => setIsAddModalVisible(false)}
+				onSuccess={fetchWorkplaces}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -118,14 +166,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollContent: {
-		paddingTop: 20,
+		paddingTop: 10,
 		paddingHorizontal: 20,
 		paddingBottom: 40,
 	},
 	title: {
+		marginTop: 4,
 		fontSize: 24,
 		color: colors.textPrimary,
-		marginBottom: 20,
+		lineHeight: 52,
+		marginBottom: 12,
 	},
 	loading: {
 		marginTop: 32,
@@ -134,12 +184,6 @@ const styles = StyleSheet.create({
 		color: colors.deleteRed,
 		textAlign: "center",
 		marginTop: 24,
-	},
-	addWorkplace: {
-		color: colors.primary,
-		textAlign: "center",
-		marginTop: 16,
-		fontSize: 16,
 	},
 });
 
