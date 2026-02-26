@@ -24,11 +24,11 @@ export interface WorkItem {
 	status: WorkStatus;
 	isModified: boolean;
 	memo: string | null;
+	hourlyWage: number | null;
 	baseSalary: number | null;
 	nightSalary: number | null;
 	holidaySalary: number | null;
 	totalSalary: number | null;
-	salary?: number | null;
 }
 
 export interface WeekDay {
