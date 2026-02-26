@@ -13,6 +13,8 @@ export const getWorkStatus = (record: WorkRecord): WorkStatus => {
 
   const end = new Date(`${record.workDate}T00:00:00`);
   end.setHours(endH ?? 0, endM ?? 0, 0, 0);
+  
+  if (end <= start) end.setDate(end.getDate() + 1);
 
   if (now < start) return "scheduled";
   if (now <= end) return "working";
