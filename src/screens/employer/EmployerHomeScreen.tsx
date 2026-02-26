@@ -41,7 +41,7 @@ const EmployerHomeScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
   const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
