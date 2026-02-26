@@ -4,9 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../constants/colors";
 import { Text } from "../common/Text";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { WorkerStackParamList } from "../../navigation/WorkerStack";
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
@@ -15,10 +12,11 @@ const monthNames = [
 
 interface MonthlyCalendarNavProps {
   year: number;
-  month: number; 
+  month: number;
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  showListButton?: boolean; 
+  showListButton?: boolean;
+  onListPress?: () => void;
 }
 
 const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
@@ -27,11 +25,8 @@ const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
   onPrevMonth,
   onNextMonth,
   showListButton = true,
+  onListPress,
 }) => {
-  const navigation = useNavigation<NativeStackNavigationProp<WorkerStackParamList>>();
-  const handleWeeklyView = () => {
-    navigation.replace("WorkerHomeMain");
-  };
   return (
     <View style={styles.monthNavRow}>
       <TouchableOpacity onPress={onPrevMonth} style={styles.iconBtn}>
@@ -48,7 +43,7 @@ const MonthlyCalendarNav: React.FC<MonthlyCalendarNavProps> = ({
       </TouchableOpacity>
       <View style={{ flex: 1 }} />
       {showListButton && (
-        <TouchableOpacity style={styles.iconBtn} onPress={handleWeeklyView}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onListPress}>
           <Feather name="list" size={22} color={colors.textPrimary} />
         </TouchableOpacity>
       )}
