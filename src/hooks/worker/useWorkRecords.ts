@@ -20,7 +20,7 @@ const useWorkRecords = (startDate: string, endDate: string) => {
 				const [startH, startM] = work.startTime.split(":").map(Number);
 				const [endH, endM] = work.endTime.split(":").map(Number);
 				const totalWorkMinutes =
-					(endH * 60 + endM - (startH * 60 + startM) + 24 * 60) - (work.breakMinutes ?? 0);
+					((endH * 60 + endM - (startH * 60 + startM) + 24 * 60) % (24 * 60)) - (work.breakMinutes ?? 0);
 				return { ...work, totalWorkMinutes };
 			});
 			setWorks(works);
