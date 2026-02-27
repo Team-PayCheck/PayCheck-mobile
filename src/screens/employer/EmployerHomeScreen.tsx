@@ -27,7 +27,7 @@ import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPag
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
-import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
+import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import type { WeekDay } from "../../types/worker.types";
 import { getWeekDays, getWeekRange, formatDateStr } from "../../utils/date";
@@ -44,16 +44,7 @@ const EmployerHomeScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
 
-  // Drawer 상태
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
-
-  const closeDrawer = () => setIsDrawerVisible(false);
-  const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
-    closeDrawer();
-    navigation.navigate(route);
-  };
-  const handleLogout = useLogoutHandler(closeDrawer, navigation);
+  const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
   const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
@@ -135,7 +126,7 @@ const EmployerHomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <Header onPressLeft={() => setIsDrawerVisible(true)} />
+      <Header onPressLeft={openDrawer} />
       {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -224,26 +215,8 @@ const EmployerHomeScreen: React.FC = () => {
         </View>
       </BottomSheetModal>
 
-      {/* 마이페이지 Drawer */}
-      <EmployerMyPageDrawer
-        visible={isDrawerVisible}
-        onClose={closeDrawer}
-        onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
-        onPressWorkplaceManage={() => navigateFromDrawer("EmployerWorkplaceManage")}
-        onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
-        onPressAccountSettings={() => {
-          setIsDrawerVisible(false);
-          setTimeout(() => setIsAccountSheetVisible(true), 220);
-        }}
-        onPressLogout={handleLogout}
-        onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
-      />
-
-      {/* 계정 이용/이용동의 바텀시트 */}
-      <BottomSheetModal
-        visible={isAccountSheetVisible}
-        onClose={() => setIsAccountSheetVisible(false)}
-      >
+      <EmployerMyPageDrawer {...drawerProps} />
+      <BottomSheetModal {...accountSheetProps}>
         <AccountTermsContent />
       </BottomSheetModal>
     </SafeAreaView>

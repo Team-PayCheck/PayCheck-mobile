@@ -13,6 +13,7 @@ import Header from "../../components/layout/Header";
 import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
+import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, {
   type WorkerFilterId,
@@ -23,7 +24,6 @@ import type { ContractUpdateRequest } from "../../types/employer/employer.types"
 import type { WorkplaceDetails } from "../../api/employer/types";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
@@ -35,15 +35,7 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerWorkerManageScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
-
-  const closeDrawer = () => setIsDrawerVisible(false);
-  const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
-    closeDrawer();
-    navigation.navigate(route);
-  };
-  const handleLogout = useLogoutHandler(closeDrawer, navigation);
+  const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
   const {
     workplaces,
@@ -120,7 +112,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <Header onPressLeft={() => setIsDrawerVisible(true)} />
+      <Header onPressLeft={openDrawer} />
       {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -177,24 +169,8 @@ const EmployerWorkerManageScreen: React.FC = () => {
         />
       )}
 
-      <EmployerMyPageDrawer
-        visible={isDrawerVisible}
-        onClose={closeDrawer}
-        onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
-        onPressWorkplaceManage={() => navigateFromDrawer("EmployerWorkplaceManage")}
-        onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
-        onPressAccountSettings={() => {
-          setIsDrawerVisible(false);
-          setTimeout(() => setIsAccountSheetVisible(true), 220);
-        }}
-        onPressLogout={handleLogout}
-        onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
-      />
-
-      <BottomSheetModal
-        visible={isAccountSheetVisible}
-        onClose={() => setIsAccountSheetVisible(false)}
-      >
+      <EmployerMyPageDrawer {...drawerProps} />
+      <BottomSheetModal {...accountSheetProps}>
         <AccountTermsContent />
       </BottomSheetModal>
     </SafeAreaView>

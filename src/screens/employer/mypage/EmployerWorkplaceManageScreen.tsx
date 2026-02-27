@@ -19,7 +19,7 @@ import AddWorkplaceModal from "../../../components/employer/mypage/AddWorkplaceM
 import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
-import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
+import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",
@@ -30,16 +30,8 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerWorkplaceManageScreen: React.FC = () => {
 	const navigation =
 		useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
-	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
+	const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation, "EmployerWorkplaceManage");
 	const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-
-	const closeDrawer = () => setIsDrawerVisible(false);
-	const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
-		closeDrawer();
-		navigation.navigate(route);
-	};
-	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
 	const [workplaces, setWorkplaces] = useState<WorkplaceListItem[]>([]);
 	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
@@ -87,7 +79,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 
 	return (
 		<SafeAreaView style={styles.container} edges={["top"]}>
-			<Header onPressLeft={() => setIsDrawerVisible(true)} />
+			<Header onPressLeft={openDrawer} />
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
@@ -126,24 +118,8 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 			</ScrollView>
 			<EmployerNavigationBar activeTab="home" onTabPress={handleTabPress} />
 
-			<EmployerMyPageDrawer
-				visible={isDrawerVisible}
-				onClose={closeDrawer}
-				onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
-				onPressWorkplaceManage={() => closeDrawer()}
-				onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
-				onPressAccountSettings={() => {
-					setIsDrawerVisible(false);
-					setTimeout(() => setIsAccountSheetVisible(true), 220);
-				}}
-				onPressLogout={handleLogout}
-				onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
-			/>
-
-			<BottomSheetModal
-				visible={isAccountSheetVisible}
-				onClose={() => setIsAccountSheetVisible(false)}
-			>
+			<EmployerMyPageDrawer {...drawerProps} />
+			<BottomSheetModal {...accountSheetProps}>
 				<AccountTermsContent />
 			</BottomSheetModal>
 

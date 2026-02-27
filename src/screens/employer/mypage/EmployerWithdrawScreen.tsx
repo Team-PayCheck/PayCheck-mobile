@@ -13,21 +13,13 @@ import BottomSheetModal from "../../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import { colors } from "../../../constants/colors";
-import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
+import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
 
 type Props = NativeStackScreenProps<EmployerStackParamList, "EmployerWithdraw">;
 
 const EmployerWithdrawScreen: React.FC<Props> = ({ navigation }) => {
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation, "EmployerWithdraw");
   const [loading, setLoading] = useState(false);
-  const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
-
-  const closeDrawer = () => setIsDrawerVisible(false);
-  const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
-    closeDrawer();
-    navigation.navigate(route);
-  };
-  const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
   const handleWithdraw = () => {
     Alert.alert("회원 탈퇴", "정말로 탈퇴하시겠습니까?", [
@@ -60,7 +52,7 @@ const EmployerWithdrawScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header onPressLeft={() => setIsDrawerVisible(true)} />
+      <Header onPressLeft={openDrawer} />
       <View style={styles.scrollContent}>
         <View style={styles.headerArea}>
           <HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "EmployerHomeMain" }] })} />
@@ -84,24 +76,8 @@ const EmployerWithdrawScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </View>
 
-      <EmployerMyPageDrawer
-        visible={isDrawerVisible}
-        onClose={closeDrawer}
-        onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
-        onPressWorkplaceManage={() => navigateFromDrawer("EmployerWorkplaceManage")}
-        onPressReceivedRequests={() => navigateFromDrawer("EmployerReceivedRequests")}
-        onPressAccountSettings={() => {
-          setIsDrawerVisible(false);
-          setTimeout(() => setIsAccountSheetVisible(true), 220);
-        }}
-        onPressLogout={handleLogout}
-        onPressWithdraw={() => closeDrawer()}
-      />
-
-      <BottomSheetModal
-        visible={isAccountSheetVisible}
-        onClose={() => setIsAccountSheetVisible(false)}
-      >
+      <EmployerMyPageDrawer {...drawerProps} />
+      <BottomSheetModal {...accountSheetProps}>
         <AccountTermsContent />
       </BottomSheetModal>
     </SafeAreaView>

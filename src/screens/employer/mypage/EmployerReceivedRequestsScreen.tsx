@@ -20,7 +20,7 @@ import WorkplaceTabSelector from "../../../components/worker/salary/WorkplaceTab
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import type { CorrectionRequestStatus } from "../../../api/employer/types";
 import { colors } from "../../../constants/colors";
-import { useLogoutHandler } from "../../../hooks/common/useLogoutHandler";
+import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
 import { useReceivedRequests } from "../../../hooks/employer/useReceivedRequests";
 
 type Props = NativeStackScreenProps<EmployerStackParamList, "EmployerReceivedRequests">;
@@ -33,15 +33,7 @@ const FILTER_OPTIONS: { label: string; value: CorrectionRequestStatus | null }[]
 ];
 
 const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
-	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-	const [isAccountSheetVisible, setIsAccountSheetVisible] = useState(false);
-
-	const closeDrawer = () => setIsDrawerVisible(false);
-	const navigateFromDrawer = (route: keyof EmployerStackParamList) => {
-		closeDrawer();
-		navigation.navigate(route);
-	};
-	const handleLogout = useLogoutHandler(closeDrawer, navigation);
+	const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation, "EmployerReceivedRequests");
 
 	const {
 		workplaces,
@@ -71,7 +63,7 @@ const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Header onPressLeft={() => setIsDrawerVisible(true)} />
+			<Header onPressLeft={openDrawer} />
 
 			<View style={styles.headerSection}>
 				<HomeBackButton onPress={() => navigation.reset({ index: 0, routes: [{ name: "EmployerHomeMain" }] })} />
@@ -154,24 +146,8 @@ const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
 				/>
 			)}
 
-			<EmployerMyPageDrawer
-				visible={isDrawerVisible}
-				onClose={closeDrawer}
-				onPressProfileEdit={() => navigateFromDrawer("EmployerProfileEdit")}
-				onPressWorkplaceManage={() => navigateFromDrawer("EmployerWorkplaceManage")}
-				onPressReceivedRequests={() => closeDrawer()}
-				onPressAccountSettings={() => {
-					setIsDrawerVisible(false);
-					setTimeout(() => setIsAccountSheetVisible(true), 220);
-				}}
-				onPressLogout={handleLogout}
-				onPressWithdraw={() => navigateFromDrawer("EmployerWithdraw")}
-			/>
-
-			<BottomSheetModal
-				visible={isAccountSheetVisible}
-				onClose={() => setIsAccountSheetVisible(false)}
-			>
+			<EmployerMyPageDrawer {...drawerProps} />
+			<BottomSheetModal {...accountSheetProps}>
 				<AccountTermsContent />
 			</BottomSheetModal>
 		</SafeAreaView>
