@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { StyleSheet, ScrollView, ActivityIndicator, View } from "react-native";
+import { StyleSheet, ScrollView, ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,6 +17,7 @@ import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, { type WorkerFilterId } from "../../components/employer/worker-manage/WorkerFilterTabs";
+import SalaryStatementSheet from "../../components/worker/salary/SalaryStatementSheet";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
@@ -128,6 +129,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     return dots;
   }, [workRecords]);
 
+  const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
+
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
     else { setMonth((m) => m - 1); }
@@ -202,11 +205,28 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 {formatCurrency(Math.round(estimatedPay))}원
               </Text>
             </View>
+            {/* TODO: 고용주 전용 급여명세서 API 연동 필요 (GET /api/employer/contracts/{contractId}/salary)
+                현재 SalaryStatementSheet는 근로자 API 기반이라 고용주 화면에서 데이터 없음 */}
+            <TouchableOpacity
+              style={styles.outlineButton}
+              onPress={() => setIsSalarySheetVisible(true)}
+              activeOpacity={0.7}
+            >
+              <Text weight="SemiBold" style={styles.outlineButtonText}>
+                급여명세서 확인하기
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
         </>
       )}
       <EmployerNavigationBar activeTab="transfer" onTabPress={handleTabPress} />
 
+      <SalaryStatementSheet
+        visible={isSalarySheetVisible}
+        onClose={() => setIsSalarySheetVisible(false)}
+        year={year}
+        month={month + 1}
+      />
       <EmployerMyPageDrawer {...drawerProps} />
       <BottomSheetModal {...accountSheetProps}>
         <AccountTermsContent />
@@ -294,6 +314,18 @@ const styles = StyleSheet.create({
   },
   salaryValue: {
     fontSize: 20,
+    color: colors.textPrimary,
+  },
+  outlineButton: {
+    marginTop: 12,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  outlineButtonText: {
+    fontSize: 15,
     color: colors.textPrimary,
   },
 });
