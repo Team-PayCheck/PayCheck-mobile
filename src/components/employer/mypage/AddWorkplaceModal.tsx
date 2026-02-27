@@ -7,6 +7,7 @@ import {
 	ScrollView,
 	Alert,
 	ActivityIndicator,
+	Switch,
 } from "react-native";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import PrimaryButton from "../../common/PrimaryButton";
@@ -35,6 +36,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchResults, setSearchResults] = useState<KakaoAddress[]>([]);
 	const [showResults, setShowResults] = useState(false);
+	const [isSmallBusiness, setIsSmallBusiness] = useState(false);
 
 	const isValid = workplaceName.trim() !== "" && address.trim() !== "" && businessNumber.trim() !== "";
 
@@ -46,6 +48,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 		setBusinessNumber("");
 		setSearchResults([]);
 		setShowResults(false);
+		setIsSmallBusiness(false);
 	};
 
 	const handleClose = () => {
@@ -95,6 +98,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 				businessName: workplaceName.trim(),
 				address: fullAddress.trim(),
 				businessNumber: businessNumber.trim(),
+				isLessThanFiveEmployees: isSmallBusiness,
 			});
 
 			if (res.success) {
@@ -215,6 +219,16 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 					/>
 				</View>
 
+				{/* 5인 미만 사업장 여부 */}
+				<View style={styles.switchGroup}>
+					<Text weight="Medium" style={styles.label}>5인 미만 사업장</Text>
+					<Switch
+						value={isSmallBusiness}
+						onValueChange={setIsSmallBusiness}
+						trackColor={{ false: colors.border, true: colors.primary }}
+					/>
+				</View>
+
 				{/* 등록하기 버튼 */}
 				<View style={styles.buttonArea}>
 					{isLoading ? (
@@ -312,6 +326,12 @@ const styles = StyleSheet.create({
 	resultAddress: {
 		fontSize: 14,
 		color: colors.textPrimary,
+	},
+	switchGroup: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 24,
 	},
 	buttonArea: {
 		alignItems: "flex-end",
