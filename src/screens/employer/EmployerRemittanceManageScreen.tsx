@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "../../constants/colors";
 import { Text } from "../../components/common/Text";
+import { formatCurrency } from "../../utils/format";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
@@ -104,6 +105,18 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     fetchRecords();
   }, [selectedWorkplace?.id, selectedContractId, year, month]);
 
+  // 예상 노무비 계산
+  const estimatedPay = useMemo(() => {
+    return workRecords.reduce((total, record) => {
+      const [startH = 0, startM = 0] = record.startTime.split(":").map(Number);
+      const [endH = 0, endM = 0] = record.endTime.split(":").map(Number);
+      const totalMinutes =
+        ((endH * 60 + endM - (startH * 60 + startM) + 24 * 60) % (24 * 60)) -
+        (record.breakMinutes ?? 0);
+      return total + (Math.max(0, totalMinutes) / 60) * record.hourlyWage;
+    }, 0);
+  }, [workRecords]);
+
   const workDots = useMemo(() => {
     const dots: Record<string, { count: number; hasCorrectionRequest: boolean }> = {};
     workRecords.forEach((r) => {
@@ -183,6 +196,12 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               onDateSelect={setSelectedDate}
               workDots={workDots}
             />
+            <View style={styles.salaryRow}>
+              <Text weight="Medium" style={styles.salaryLabel}>이번 달 예상 노무비</Text>
+              <Text weight="Bold" style={styles.salaryValue}>
+                {formatCurrency(Math.round(estimatedPay))}원
+              </Text>
+            </View>
           </ScrollView>
         </>
       )}
@@ -252,6 +271,30 @@ const styles = StyleSheet.create({
   workerDays: {
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  salaryRow: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    padding: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  salaryLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  salaryValue: {
+    fontSize: 20,
+    color: colors.textPrimary,
   },
 });
 
