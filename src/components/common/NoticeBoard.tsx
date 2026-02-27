@@ -1,3 +1,6 @@
+/**
+ * 공지사항 목록 보드. 가로 스크롤로 NoticeCard를 나열한다.
+ */
 import React from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { Text } from "./Text";

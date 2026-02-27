@@ -5,7 +5,6 @@ import { colors } from "../../../constants/colors";
 
 export interface EmployerWorkplaceCardProps {
 	name: string;
-	businessName: string;
 	workerCount: number;
 	colorCode?: string;
 	businessNumber?: string;
@@ -14,7 +13,6 @@ export interface EmployerWorkplaceCardProps {
 
 const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
 	name,
-	businessName,
 	workerCount,
 	colorCode,
 	businessNumber,
@@ -30,7 +28,6 @@ const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
 					{name}
 				</Text>
 			</View>
-			<Text style={styles.info}>사업자명: {businessName}</Text>
 			<Text style={styles.info}>직원 수: {workerCount}명</Text>
 			<Text style={styles.info}>사업자번호: {businessNumber ?? "?"}</Text>
 			<Text style={styles.info}>주소: {address ?? "?"}</Text>

@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Text } from "../../components/common/Text";
+import { colors } from "../../constants/colors";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
@@ -19,12 +20,14 @@ import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
-import { colors } from "../../constants/colors";
 import EmployerTimeline from "../../components/employer/home/EmployerTimeline";
 import EmployerWorkerListSection from "../../components/employer/home/EmployerWorkerListSection";
 import EmployerAddWorkModal from "../../components/employer/home/EmployerAddWorkModal";
+import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
+import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import type { WeekDay } from "../../types/worker.types";
 import { getWeekDays, getWeekRange, formatDateStr } from "../../utils/date";
@@ -40,6 +43,8 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerHomeScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+
+  const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
   const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
@@ -121,7 +126,7 @@ const EmployerHomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <Header />
+      <Header onPressLeft={openDrawer} />
       {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -208,6 +213,11 @@ const EmployerHomeScreen: React.FC = () => {
             onDateSelect={handleDateSelect}
           />
         </View>
+      </BottomSheetModal>
+
+      <EmployerMyPageDrawer {...drawerProps} />
+      <BottomSheetModal {...accountSheetProps}>
+        <AccountTermsContent />
       </BottomSheetModal>
     </SafeAreaView>
   );

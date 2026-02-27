@@ -126,7 +126,7 @@ const WorkCard: React.FC<WorkCardProps> = ({
 							<Text style={styles.detailLabel}>시급</Text>
 							<View style={styles.detailValueBox}>
 								<Text weight="Medium" style={styles.detailValue}>
-									{work.salary != null ? `${formatCurrency(work.salary)} 원` : "? 원"}
+									{work.hourlyWage != null ? `${formatCurrency(work.hourlyWage)} 원` : "? 원"}
 								</Text>
 							</View>
 						</View>

@@ -10,6 +10,10 @@ import EmployerNavigationBar, {
 } from "../../components/layout/EmployerNavigationBar";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import Header from "../../components/layout/Header";
+import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
+import BottomSheetModal from "../../components/common/BottomSheetModal";
+import AccountTermsContent from "../../components/mypage/AccountTermsContent";
+import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, {
   type WorkerFilterId,
@@ -31,6 +35,7 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 const EmployerWorkerManageScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+  const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
   const {
     workplaces,
@@ -107,8 +112,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* TODO: 고용주 Drawer 완료되면 추후 수정 */}
-      <Header />
+      <Header onPressLeft={openDrawer} />
       {isWorkplacesLoading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -164,6 +168,11 @@ const EmployerWorkerManageScreen: React.FC = () => {
           }}
         />
       )}
+
+      <EmployerMyPageDrawer {...drawerProps} />
+      <BottomSheetModal {...accountSheetProps}>
+        <AccountTermsContent />
+      </BottomSheetModal>
     </SafeAreaView>
   );
 };

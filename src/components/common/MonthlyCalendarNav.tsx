@@ -1,3 +1,6 @@
+/**
+ * 월간 캘린더 상단 네비게이션. 이전/다음 달 이동, 현재 년/월 표시.
+ */
 import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

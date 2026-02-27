@@ -1,3 +1,6 @@
+/**
+ * 주간 캘린더 상단 날짜 바. 좌우 주 이동, 요일별 근무 상태 dot 표시.
+ */
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";

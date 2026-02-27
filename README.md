@@ -20,38 +20,32 @@ src/
 │   ├── axios.ts      # Axios 인스턴스 + 인터셉터
 │   ├── auth/         # 인증 API (로그인, 회원가입, 로그아웃)
 │   ├── user/         # 사용자 API (프로필 조회/수정)
-│   └── worker/       # 근로자 API (계약, 근무기록, 정정요청)
+│   ├── worker/       # 근로자 API (계약, 근무기록, 정정요청, 급여, 송금)
+│   ├── employer/     # 고용주 API (근무지 CRUD, 계약 CRUD, 정정요청 승인/거절)
+│   └── kakao/        # 카카오 API (주소 검색)
 ├── assets/           # 폰트, 이미지
-├── components/       # 재사용 컴포넌트
-│   ├── common/       # 공통 (Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar 등)
-│   ├── employer/     # 고용주 전용
-│   ├── layout/       # 레이아웃 (Header)
-│   ├── mypage/       # 마이페이지 (Drawer, 프로필 수정, 근무지 관리 등)
-│   ├── signup/       # 회원가입 (ProgressBar, FormInput 등)
+├── components/
+│   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination 등
+│   ├── employer/     # 고용주 전용 (직원관리, 마이페이지)
+│   ├── layout/       # Header
+│   ├── mypage/       # 공통 마이페이지 (Drawer, ProfileCard, SentRequestCard 등)
+│   ├── signup/       # 회원가입
 │   ├── skeleton/     # 로딩 스켈레톤
-│   └── worker/       # 근로자 전용
-│       ├── weeklyCalendar/  # 주간 캘린더 (WorkCard, WorkListSection, 모달 등)
-│       ├── monthlyCalendar/ # 월간 캘린더 (MonthlySalarySummary, SelectedDateWorkList 등)
-│       └── salary/          # 급여명세서 (SalaryStatementSheet, PaymentSection, DeductionSection 등)
-├── hooks/            # 커스텀 훅
+│   └── worker/       # 근로자 전용 (주간/월간 캘린더, 급여명세서)
+├── hooks/
 │   ├── common/       # useOnboardingStatus, useLogoutHandler
-│   ├── employer/
-│   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData 등
-├── navigation/       # 네비게이션 설정
-│   ├── RootNavigator.tsx
-│   ├── SignUpNavigator.tsx
-│   ├── OnboardingStack.tsx
-│   └── WorkerStack.tsx
-├── dummyData/        # 더미 데이터 (개발용)
-├── screens/          # 화면 컴포넌트
+│   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests
+│   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData, useSalaryStatement 등
+├── navigation/       # RootNavigator, WorkerStack, EmployerStack, SignUpNavigator, OnboardingStack
+├── screens/
 │   ├── auth/         # 회원가입 (Step1~5)
-│   ├── employer/     # 고용주 화면 (EmployerHomeScreen 등)
+│   ├── employer/     # 고용주 화면 (홈, 직원관리, 송금관리, 마이페이지)
 │   ├── onboarding/   # 온보딩, 로그인
-│   └── worker/       # 근로자 화면 (주간/월간 캘린더, 마이페이지 서브 화면)
+│   └── worker/       # 근로자 화면 (주간/월간 캘린더, 마이페이지)
 ├── stores/           # Zustand 전역 상태 (authStore, onboardingStore, signUpStore)
 ├── types/            # TypeScript 타입 (공통 API 타입, UI 도메인 타입)
-├── constants/        # 상수 (colors, bank, pickerItems)
-└── utils/            # 유틸리티 함수 (alert, date, format, image, notification)
+├── constants/        # 상수 (colors, bank, pickerItems, wage)
+└── utils/            # 유틸리티 함수 (alert, date, format, image, notification, employerSchedule)
 ```
 
 ## 주요 기능
@@ -61,6 +55,12 @@ src/
 - 월간 캘린더: 월별 근무 기록 조회, 날짜별 근무 상세, 근무지별 급여/송금 현황
 - 급여명세서: 근무지별 급여 상세 (지급/공제 항목), 4대보험/소득세 토글 표시
 - 마이페이지: Drawer 메뉴, 프로필 수정, 근무지 관리, 보낸 요청, 회원탈퇴
+
+### 고용주 기능
+- 직원관리: 근무지별 근무자 목록 조회, Accordion 카드 (시급/급여지급일/근무시간 편집), 퇴사처리
+- 근무자 추가: 2단계 플로우 (근무자 코드 검색 → 근무시간 설정), 근무 스케줄 타임라인 차트 프리뷰
+- 근무지 관리: 근무지 CRUD, 카카오 주소 검색 연동
+- 마이페이지: 프로필 수정, 받은 근무요청 보기 (사업장별 탭, 상태 필터, 페이지네이션, 승인/거절)
 
 ### 인증
 - 카카오 네이티브 SDK 로그인 (`@react-native-seoul/kakao-login`)
@@ -79,25 +79,6 @@ Welcome (카카오 로그인)
                       └─ EMPLOYER → WorkplaceManage
 ```
 
-### 회원가입 플로우 (5단계)
-```
-Step1: 회원유형 선택 (근로자/사장님)
-    ↓
-Step2: 프로필 사진 (선택, 갤러리에서 선택 → 압축 → base64)
-    - 사진 미선택 시 '다음' 버튼 비활성화
-    ↓
-Step3: 기본정보 (이름, 전화번호, 은행/계좌 - 근로자만)
-    - 필수 항목 미입력 시 '다음' 버튼 비활성화
-    ↓
-Step4: 알람 설정 (푸시 알림 권한 요청) → 회원가입 API 호출
-    - expo-notifications, expo-device 사용
-    - 성공 시 Step5로 이동, 실패 시 Welcome으로 이동
-    ↓
-Step5: 가입완료 화면
-    - WORKER: '시작하기' → WorkerHome
-    - EMPLOYER: '매장 관리하러 가기' → WorkplaceManage
-```
-
 ### 상태 관리
 - **authStore**: accessToken, userInfo, isLoggedIn (AsyncStorage 자동 persist)
 - **onboardingStore**: isOnboardingCompleted (AsyncStorage 자동 persist)
@@ -106,18 +87,11 @@ Step5: 가입완료 화면
 ## 명령어
 
 ```bash
-# 개발 서버 시작
-npx expo start
-
-# iOS 시뮬레이터
-npx expo start --ios
-
-# Android 에뮬레이터
-npx expo start --android
-
-# 빌드
-eas build --platform ios
-eas build --platform android
+npx expo start              # 개발 서버 시작
+npx expo start --ios        # iOS 시뮬레이터
+npx expo start --android    # Android 에뮬레이터
+eas build --platform ios    # iOS 빌드
+eas build --platform android  # Android 빌드
 ```
 
 ## 환경 변수
@@ -125,3 +99,4 @@ eas build --platform android
 `app.config.ts`의 `extra` 섹션에서 설정:
 - `backendApiUrl`: 백엔드 API URL
 - `kakaoAppKey`: 카카오 네이티브 앱 키
+- `kakaoRestApiKey`: 카카오 REST API 키 (주소 검색용)

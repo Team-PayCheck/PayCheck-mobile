@@ -1,3 +1,6 @@
+/**
+ * 하단에서 올라오는 모달. overlay fade-in + 컨텐츠 slide-up 애니메이션 포함.
+ */
 import React, { useRef, useEffect, useCallback } from "react";
 import {
 	View,
