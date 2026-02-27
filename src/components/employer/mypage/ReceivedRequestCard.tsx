@@ -21,7 +21,7 @@ interface ReceivedRequestCardProps {
   isDetailLoading: boolean;
   onApprove?: (id: number) => void;
   onReject?: (id: number) => void;
-  isProcessing?: boolean;
+  isProcessing?: "approve" | "reject" | false;
 }
 
 const TYPE_LABEL: Record<string, string> = {
@@ -210,21 +210,21 @@ const ReceivedRequestCard: React.FC<ReceivedRequestCardProps> = ({
                     <TouchableOpacity
                       style={styles.rejectButton}
                       onPress={() => onReject?.(request.id)}
-                      disabled={isProcessing}
+                      disabled={!!isProcessing}
                       activeOpacity={0.7}
                     >
                       <Text weight="SemiBold" style={styles.rejectButtonText}>
-                        {isProcessing ? "처리 중..." : "거절"}
+                        {isProcessing === "reject" ? "처리 중..." : "거절"}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.approveButton}
                       onPress={() => onApprove?.(request.id)}
-                      disabled={isProcessing}
+                      disabled={!!isProcessing}
                       activeOpacity={0.7}
                     >
                       <Text weight="SemiBold" style={styles.approveButtonText}>
-                        {isProcessing ? "처리 중..." : "승인"}
+                        {isProcessing === "approve" ? "처리 중..." : "승인"}
                       </Text>
                     </TouchableOpacity>
                   </View>

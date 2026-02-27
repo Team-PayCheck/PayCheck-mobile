@@ -50,7 +50,8 @@ interface UseReceivedRequestsReturn {
 	toggleExpand: (id: number) => void;
 
 	// 승인/거절
-	isProcessing: boolean;
+	processingId: number | null;
+	processingAction: "approve" | "reject" | null;
 	handleApprove: (id: number) => void;
 	handleReject: (id: number) => void;
 }
@@ -75,7 +76,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 	const [isDetailLoading, setIsDetailLoading] = useState(false);
 
 	// === 승인/거절 ===
-	const [isProcessing, setIsProcessing] = useState(false);
+	const [processingId, setProcessingId] = useState<number | null>(null);
+	const [processingAction, setProcessingAction] = useState<"approve" | "reject" | null>(null);
 
 	// 클라이언트 페이징 계산
 	const totalPages = useMemo(() => Math.ceil(allRequests.length / PAGE_SIZE), [allRequests]);
@@ -182,7 +184,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 			{
 				text: "승인",
 				onPress: async () => {
-					setIsProcessing(true);
+					setProcessingId(id);
+					setProcessingAction("approve");
 					try {
 						const response = await approveCorrectionRequest(id);
 						if (response.success) {
@@ -196,7 +199,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 					} catch {
 						showError("승인 처리에 실패했습니다.");
 					} finally {
-						setIsProcessing(false);
+						setProcessingId(null);
+						setProcessingAction(null);
 					}
 				},
 			},
@@ -211,7 +215,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 				text: "거절",
 				style: "destructive",
 				onPress: async () => {
-					setIsProcessing(true);
+					setProcessingId(id);
+					setProcessingAction("reject");
 					try {
 						const response = await rejectCorrectionRequest(id);
 						if (response.success) {
@@ -225,7 +230,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 					} catch {
 						showError("거절 처리에 실패했습니다.");
 					} finally {
-						setIsProcessing(false);
+						setProcessingId(null);
+						setProcessingAction(null);
 					}
 				},
 			},
@@ -252,7 +258,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 		isDetailLoading,
 		toggleExpand,
 
-		isProcessing,
+		processingId,
+		processingAction,
 		handleApprove,
 		handleReject,
 	};

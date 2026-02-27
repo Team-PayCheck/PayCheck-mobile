@@ -63,7 +63,8 @@ const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
 		isDetailLoading,
 		toggleExpand,
 
-		isProcessing,
+		processingId,
+		processingAction,
 		handleApprove,
 		handleReject,
 	} = useReceivedRequests();
@@ -140,7 +141,7 @@ const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
 							isDetailLoading={expandedId === item.id && isDetailLoading}
 							onApprove={handleApprove}
 							onReject={handleReject}
-							isProcessing={isProcessing}
+							isProcessing={processingId === item.id ? processingAction || false : false}
 						/>
 					)}
 					ListFooterComponent={
