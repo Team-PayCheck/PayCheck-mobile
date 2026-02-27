@@ -87,7 +87,7 @@ const EmployerProfileEditScreen: React.FC<Props> = ({ navigation }) => {
       <ProfileEditModal
         visible={isProfileEditVisible}
         onClose={() => setIsProfileEditVisible(false)}
-        user={user ? { ...user, phone: user.phone ?? "--" } : null}
+        user={user ? { ...user, phone: user.phone ?? "-" } : null}
         onSuccess={fetchUser}
       />
     </SafeAreaView>
