@@ -111,9 +111,7 @@ const EmployerMyPageDrawer: React.FC<EmployerMyPageDrawerProps> = ({
 						<MenuButton
 							title="계정 이용 / 이용동의"
 							iconSource={require("../../../assets/images/mypage/info.png")}
-							onPress={() => {
-								if (onPressAccountSettings) onPressAccountSettings();
-							}}
+							onPress={onPressAccountSettings}
 						/>
 					</View>
 
