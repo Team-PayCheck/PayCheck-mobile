@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { StyleSheet, ScrollView, ActivityIndicator, View, TouchableOpacity } from "react-native";
+import { StyleSheet, ScrollView, ActivityIndicator, View, TouchableOpacity, Linking, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "../../constants/colors";
+import { BANK_NAME_TO_CODE } from "../../constants/bank";
 import { Text } from "../../components/common/Text";
 import { formatCurrency } from "../../utils/format";
 import Header from "../../components/layout/Header";
@@ -21,8 +22,9 @@ import SalaryStatementSheet from "../../components/worker/salary/SalaryStatement
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { getWorkplaces, getWorkRecords } from "../../api/employer";
-import type { WorkplaceDetails, WorkRecord } from "../../api/employer/types";
+import { getWorkplaces, getWorkRecords, getContract } from "../../api/employer";
+import type { WorkplaceDetails, WorkRecord, Contract, SearchedWorker } from "../../api/employer/types";
+import { getWorkerByCode } from "../../api/worker";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -129,6 +131,29 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     return dots;
   }, [workRecords]);
 
+  // 선택된 근무자의 계좌 정보 (토스 송금 연동)
+  const [workerBankInfo, setWorkerBankInfo] = useState<{ bankName?: string; accountNumber?: string } | null>(null);
+
+  useEffect(() => {
+    if (!selectedContractId || selectedContractId === "all") {
+      setWorkerBankInfo(null);
+      return;
+    }
+    const fetchBankInfo = async () => {
+      try {
+        const contractRes = await getContract(selectedContractId as number);
+        const workerCode = (contractRes.data as Contract)?.workerCode;
+        if (!workerCode) return;
+        const workerRes = await getWorkerByCode(workerCode);
+        const worker = workerRes.data as SearchedWorker;
+        setWorkerBankInfo({ bankName: worker?.bankName, accountNumber: worker?.accountNumber });
+      } catch {
+        setWorkerBankInfo(null);
+      }
+    };
+    fetchBankInfo();
+  }, [selectedContractId]);
+
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
 
   const handlePrevMonth = () => {
@@ -142,6 +167,23 @@ const EmployerRemittanceManageScreen: React.FC = () => {
 
   const handleTabPress = (tab: EmployerTabName) => {
     navigation.replace(TAB_SCREEN_MAP[tab]);
+  };
+
+  const handleRemittance = async () => {
+    const amount = Math.round(estimatedPay);
+    let url = `supertoss://send?amount=${amount}`;
+    if (workerBankInfo?.bankName && workerBankInfo?.accountNumber) {
+      const bankCode = BANK_NAME_TO_CODE[workerBankInfo.bankName];
+      if (bankCode) {
+        url += `&bankCode=${bankCode}&accountNumber=${workerBankInfo.accountNumber}`;
+      }
+    }
+    const canOpen = await Linking.canOpenURL(url);
+    if (canOpen) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert("토스 앱이 설치되어 있지 않습니다.");
+    }
   };
 
   return (
@@ -205,7 +247,7 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 {formatCurrency(Math.round(estimatedPay))}원
               </Text>
             </View>
-            {/* TODO: 고용주 전용 급여명세서 API 연동 필요 (GET /api/employer/contracts/{contractId}/salary)
+            {/* TODO: 고용주 전용 급여명세서 API 필요 (GET /api/employer/contracts/{contractId}/salary)
                 현재 SalaryStatementSheet는 근로자 API 기반이라 고용주 화면에서 데이터 없음 */}
             <TouchableOpacity
               style={styles.outlineButton}
@@ -214,6 +256,15 @@ const EmployerRemittanceManageScreen: React.FC = () => {
             >
               <Text weight="SemiBold" style={styles.outlineButtonText}>
                 급여명세서 확인하기
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleRemittance}
+              activeOpacity={0.8}
+            >
+              <Text weight="Bold" style={styles.primaryButtonText}>
+                송금하기
               </Text>
             </TouchableOpacity>
           </ScrollView>
@@ -327,6 +378,17 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     fontSize: 15,
     color: colors.textPrimary,
+  },
+  primaryButton: {
+    marginTop: 10,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  primaryButtonText: {
+    fontSize: 15,
+    color: colors.white,
   },
 });
 
