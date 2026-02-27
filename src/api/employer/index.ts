@@ -73,11 +73,10 @@ export const createWorkplace = async (
 		"/api/employer/workplaces",
 		{
 			businessNumber: reqData.businessNumber,
-			businessName: reqData.businessName,
-			name: reqData.workplaceName,
+			name: reqData.name,
 			address: reqData.address,
 			colorCode: reqData.colorCode,
-			isLessThanFiveEmployees: reqData.isLessThanFiveEmployees ?? false,
+			isLessThanFiveEmployees: reqData.isLessThanFiveEmployees,
 		}
 	);
 	return data;
@@ -94,8 +93,7 @@ export const updateWorkplace = async (
 	const { data } = await api.put<ApiResponse<WorkplaceDetail>>(
 		`/api/employer/workplaces/${id}`,
 		{
-			businessName: reqData.businessName,
-			name: reqData.workplaceName,
+			name: reqData.name,
 			address: reqData.address,
 			colorCode: reqData.colorCode,
 			isLessThanFiveEmployees: reqData.isLessThanFiveEmployees,

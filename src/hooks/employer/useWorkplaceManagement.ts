@@ -134,8 +134,7 @@ export function useWorkplaceManagement({
 
     try {
       const response = await createWorkplace({
-        businessName: workplaceName,
-        workplaceName,
+        name: workplaceName,
         address: newWorkplaceAddress.trim(),
         businessNumber: newWorkplaceBusinessNumber.trim(),
         isLessThanFiveEmployees: newWorkplaceIsSmallBusiness,
@@ -204,7 +203,6 @@ export function useWorkplaceManagement({
   const handleEditWorkplace = (workplace: WorkplaceDetails) => {
     setEditingWorkplace({
       id: workplace.id,
-      businessName: workplace.businessName || workplace.name || "",
       name: workplace.name || "",
       address: workplace.address || "",
       businessNumber: workplace.businessNumber || "",
@@ -231,8 +229,7 @@ export function useWorkplaceManagement({
 
     try {
       await updateWorkplace(editingWorkplace.id, {
-        businessName: editingWorkplace.name.trim(),
-        workplaceName: editingWorkplace.name.trim(),
+        name: editingWorkplace.name.trim(),
         address: editingWorkplace.address?.trim() ?? "",
         isLessThanFiveEmployees: !!editingWorkplace.isSmallBusiness,
       });

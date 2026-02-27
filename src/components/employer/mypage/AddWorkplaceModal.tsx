@@ -103,8 +103,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 		try {
 			const fullAddress = zipCode ? `(${zipCode}) ${address}` : address;
 			const res = await createWorkplace({
-				workplaceName: workplaceName.trim(),
-				businessName: workplaceName.trim(),
+				name: workplaceName.trim(),
 				address: fullAddress.trim(),
 				businessNumber: businessNumber.trim(),
 				isLessThanFiveEmployees: isSmallBusiness,

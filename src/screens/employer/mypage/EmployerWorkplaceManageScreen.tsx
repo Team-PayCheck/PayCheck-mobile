@@ -113,7 +113,6 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 								<EmployerWorkplaceCard
 									key={w.id}
 									name={w.name}
-									businessName={w.businessName}
 									workerCount={w.workerCount ?? 0}
 									colorCode={w.colorCode}
 									businessNumber={detail?.businessNumber}
