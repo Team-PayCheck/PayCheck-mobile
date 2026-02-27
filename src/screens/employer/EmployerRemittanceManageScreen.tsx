@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "../../constants/colors";
+import { Text } from "../../components/common/Text";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
   type EmployerTabName,
@@ -70,6 +71,12 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     }
   }, [workers]);
 
+  // 선택된 근무자 객체
+  const selectedWorker = useMemo(
+    () => workers.find((w) => w.contractId === selectedContractId) ?? null,
+    [workers, selectedContractId]
+  );
+
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
     else { setMonth((m) => m - 1); }
@@ -114,6 +121,23 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               onNextMonth={handleNextMonth}
               showListButton={false}
             />
+            {selectedWorker && (
+              <View style={styles.workerCard}>
+                <View style={styles.workerAvatar}>
+                  <Text weight="Bold" style={styles.workerAvatarText}>
+                    {selectedWorker.workerName.charAt(0)}
+                  </Text>
+                </View>
+                <View style={styles.workerInfo}>
+                  <Text weight="Bold" style={styles.workerName}>
+                    {selectedWorker.workerName}
+                  </Text>
+                  <Text weight="Regular" style={styles.workerDays}>
+                    {selectedWorker.workDaysSummary.join(" / ")}
+                  </Text>
+                </View>
+              </View>
+            )}
           </ScrollView>
         </>
       )}
@@ -145,6 +169,44 @@ const styles = StyleSheet.create({
   },
   workerLoader: {
     paddingVertical: 12,
+  },
+  workerCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    marginTop: 16,
+    padding: 16,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  workerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: colors.backgroundGrey,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  workerAvatarText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+  workerInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  workerName: {
+    fontSize: 15,
+    color: colors.textPrimary,
+  },
+  workerDays: {
+    fontSize: 13,
+    color: colors.textSecondary,
   },
 });
 
