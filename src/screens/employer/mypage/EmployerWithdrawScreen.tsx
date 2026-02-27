@@ -63,7 +63,7 @@ const EmployerWithdrawScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.desc}>회원 탈퇴시 30일 이후 기존의 고용 정보가 말소됩니다</Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()} disabled={loading}>
-              <Text style={styles.cancelText}>취소</Text>
+              <Text weight="Bold" style={styles.cancelText}>취소</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.withdrawBtn} activeOpacity={0.8} onPress={handleWithdraw} disabled={loading}>
               {loading ? (
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
   cancelText: {
     color: colors.red,
     fontSize: 14,
-    fontWeight: "bold",
   },
   withdrawText: {
     color: colors.white,
