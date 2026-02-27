@@ -13,13 +13,14 @@ import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPag
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
+import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, { type WorkerFilterId } from "../../components/employer/worker-manage/WorkerFilterTabs";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { getWorkplaces } from "../../api/employer";
-import type { WorkplaceDetails } from "../../api/employer/types";
+import { getWorkplaces, getWorkRecords } from "../../api/employer";
+import type { WorkplaceDetails, WorkRecord } from "../../api/employer/types";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -76,6 +77,43 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     () => workers.find((w) => w.contractId === selectedContractId) ?? null,
     [workers, selectedContractId]
   );
+
+  // 근무 기록 + workDots
+  const [workRecords, setWorkRecords] = useState<WorkRecord[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!selectedWorkplace?.id || selectedContractId === "all") {
+      setWorkRecords([]);
+      return;
+    }
+    const startDate = `${year}-${String(month + 1).padStart(2, "0")}-01`;
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+    const fetchRecords = async () => {
+      try {
+        const res = await getWorkRecords(selectedWorkplace.id, startDate, endDate);
+        const all: WorkRecord[] = Array.isArray(res.data) ? res.data : [];
+        // 선택된 근무자의 기록만 필터링
+        setWorkRecords(all.filter((r) => r.contractId === selectedContractId));
+      } catch {
+        setWorkRecords([]);
+      }
+    };
+    fetchRecords();
+  }, [selectedWorkplace?.id, selectedContractId, year, month]);
+
+  const workDots = useMemo(() => {
+    const dots: Record<string, { count: number; hasCorrectionRequest: boolean }> = {};
+    workRecords.forEach((r) => {
+      const key = r.workDate;
+      if (!dots[key]) dots[key] = { count: 0, hasCorrectionRequest: false };
+      dots[key].count += 1;
+      if (r.status === "PENDING_APPROVAL") dots[key].hasCorrectionRequest = true;
+    });
+    return dots;
+  }, [workRecords]);
 
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
@@ -138,6 +176,13 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 </View>
               </View>
             )}
+            <MonthlyCalendar
+              year={year}
+              month={month}
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+              workDots={workDots}
+            />
           </ScrollView>
         </>
       )}
