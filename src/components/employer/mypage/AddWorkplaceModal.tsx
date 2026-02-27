@@ -38,7 +38,16 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	const [showResults, setShowResults] = useState(false);
 	const [isSmallBusiness, setIsSmallBusiness] = useState(false);
 
-	const isValid = workplaceName.trim() !== "" && address.trim() !== "" && businessNumber.trim() !== "";
+	const formatBusinessNumber = (text: string) => {
+		const digits = text.replace(/\D/g, "").slice(0, 10);
+		if (digits.length <= 3) return digits;
+		if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+		return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+	};
+
+	const BUSINESS_NUMBER_REGEX = /^\d{3}-\d{2}-\d{5}$/;
+	const isValidBusinessNumber = BUSINESS_NUMBER_REGEX.test(businessNumber);
+	const isValid = workplaceName.trim() !== "" && address.trim() !== "" && isValidBusinessNumber;
 
 	const resetForm = () => {
 		setWorkplaceName("");
@@ -212,10 +221,11 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 					<TextInput
 						style={styles.input}
 						value={businessNumber}
-						onChangeText={setBusinessNumber}
+						onChangeText={(text) => setBusinessNumber(formatBusinessNumber(text))}
 						placeholder="000-00-00000"
 						placeholderTextColor={colors.textDisabled}
 						keyboardType="number-pad"
+						maxLength={12}
 					/>
 				</View>
 
