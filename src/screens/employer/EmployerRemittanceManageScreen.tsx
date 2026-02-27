@@ -13,8 +13,10 @@ import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
+import WorkerFilterTabs, { type WorkerFilterId } from "../../components/employer/worker-manage/WorkerFilterTabs";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
+import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
 import { getWorkplaces } from "../../api/employer";
 import type { WorkplaceDetails } from "../../api/employer/types";
 
@@ -55,6 +57,19 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     fetchWorkplaces();
   }, []);
 
+  // 근무자 목록 (선택된 근무지 기준)
+  const { workers, isLoading: isWorkersLoading } = useWorkplaceContracts(selectedWorkplace?.id ?? null);
+  const [selectedContractId, setSelectedContractId] = useState<WorkerFilterId>("all");
+
+  // 근무지가 바뀌거나 근무자 목록이 처음 로딩되면 첫 번째 근무자 자동선택
+  useEffect(() => {
+    if (workers.length > 0) {
+      setSelectedContractId(workers[0].contractId);
+    } else {
+      setSelectedContractId("all");
+    }
+  }, [workers]);
+
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
     else { setMonth((m) => m - 1); }
@@ -80,6 +95,15 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               selectedWorkplace={selectedWorkplace}
               workplaces={workplaces}
               onWorkplaceChange={setSelectedWorkplace}
+            />
+          )}
+          {isWorkersLoading ? (
+            <ActivityIndicator style={styles.workerLoader} color={colors.primary} size="small" />
+          ) : (
+            <WorkerFilterTabs
+              workers={workers}
+              selectedId={selectedContractId}
+              onSelect={setSelectedContractId}
             />
           )}
           <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -118,6 +142,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     flex: 1,
+  },
+  workerLoader: {
+    paddingVertical: 12,
   },
 });
 
