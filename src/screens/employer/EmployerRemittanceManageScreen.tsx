@@ -1,9 +1,8 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useState, useMemo } from "react";
+import { StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Text } from "../../components/common/Text";
 import { colors } from "../../constants/colors";
 import Header from "../../components/layout/Header";
 import EmployerNavigationBar, {
@@ -12,6 +11,7 @@ import EmployerNavigationBar, {
 import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
+import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 
@@ -26,6 +26,19 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
   const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
+  const today = useMemo(() => new Date(), []);
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+
+  const handlePrevMonth = () => {
+    if (month === 0) { setYear((y) => y - 1); setMonth(11); }
+    else { setMonth((m) => m - 1); }
+  };
+  const handleNextMonth = () => {
+    if (month === 11) { setYear((y) => y + 1); setMonth(0); }
+    else { setMonth((m) => m + 1); }
+  };
+
   const handleTabPress = (tab: EmployerTabName) => {
     navigation.replace(TAB_SCREEN_MAP[tab]);
   };
@@ -33,11 +46,15 @@ const EmployerRemittanceManageScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Header onPressLeft={openDrawer} />
-      <View style={styles.content}>
-        <Text weight="Bold" style={styles.title}>
-          송금관리
-        </Text>
-      </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <MonthlyCalendarNav
+          year={year}
+          month={month}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
+          showListButton={false}
+        />
+      </ScrollView>
       <EmployerNavigationBar activeTab="transfer" onTabPress={handleTabPress} />
 
       <EmployerMyPageDrawer {...drawerProps} />
@@ -53,14 +70,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  scroll: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
-  title: {
-    fontSize: 24,
-    color: colors.textPrimary,
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 32,
   },
 });
 
