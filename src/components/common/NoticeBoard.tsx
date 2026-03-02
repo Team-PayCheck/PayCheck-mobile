@@ -6,12 +6,12 @@ import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { Text } from "./Text";
 import NoticeCard from "./NoticeCard";
 import { colors } from "../../constants/colors";
-import type { NoticeItem } from "../../types/worker.types";
+import type { NoticeCardItem } from "../../types/common/notice.types";
 
 interface NoticeBoardProps {
-	notices: NoticeItem[];
+	notices: NoticeCardItem[];
 	onPressAdd?: () => void;
-	onPressNotice?: (notice: NoticeItem) => void;
+	onPressNotice?: (notice: NoticeCardItem) => void;
 }
 
 const NoticeBoard: React.FC<NoticeBoardProps> = ({

@@ -1,28 +1,25 @@
-import type { NoticeItem } from "../types/worker.types";
+import type { NoticeCardItem } from "../types/common/notice.types";
 
-export const dummyNotices: NoticeItem[] = [
+export const dummyNotices: NoticeCardItem[] = [
 	{
 		id: 1,
-		icon: require("../assets/images/notice/handover.png"),
-		category: "인수인계",
+		category: "HANDOVER",
 		title: "오전타임 변동 사항 공지사항",
-		author: "사장님",
-		time: "09:00",
+		authorName: "사장님",
+		createdAt: "2026-03-02T09:00:00",
 	},
 	{
 		id: 2,
-		icon: require("../assets/images/notice/urgent.png"),
-		category: "긴급공지",
+		category: "URGENT",
 		title: "사장님 공지 : 위생사항 준수",
-		author: "사장님",
-		time: "12:00",
+		authorName: "사장님",
+		createdAt: "2026-03-02T12:00:00",
 	},
 	{
 		id: 3,
-		icon: require("../assets/images/notice/etc.png"),
-		category: "기타",
+		category: "ETC",
 		title: "공업 교재 관리 안내",
-		author: "관리자",
-		time: "18:00",
+		authorName: "관리자",
+		createdAt: "2026-03-02T18:00:00",
 	},
 ];
