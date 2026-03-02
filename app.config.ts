@@ -18,7 +18,9 @@ const config: ExpoConfig = {
     supportsTablet: true,
     appleTeamId: '4XTGL2D5GF',
     "infoPlist": {
-      "ITSAppUsesNonExemptEncryption": false
+      "ITSAppUsesNonExemptEncryption": false,
+      "NSAllowsArbitraryLoads": true,
+      "NSAllowsLocalNetworking": true,
     },
   },
   android: {
