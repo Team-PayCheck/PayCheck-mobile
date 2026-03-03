@@ -193,6 +193,16 @@ const EmployerRemittanceManageScreen: React.FC = () => {
         <ActivityIndicator style={styles.loader} color={colors.primary} />
       ) : (
         <>
+          <View style={styles.calendarNavWrapper}>
+            <MonthlyCalendarNav
+              year={year}
+              month={month}
+              onPrevMonth={handlePrevMonth}
+              onNextMonth={handleNextMonth}
+              showListButton={false}
+            />
+          </View>
+          <View style={styles.dashedDivider} />
           {selectedWorkplace && (
             <WorkerManageHeader
               selectedWorkplace={selectedWorkplace}
@@ -210,13 +220,6 @@ const EmployerRemittanceManageScreen: React.FC = () => {
             />
           )}
           <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-            <MonthlyCalendarNav
-              year={year}
-              month={month}
-              onPrevMonth={handlePrevMonth}
-              onNextMonth={handleNextMonth}
-              showListButton={false}
-            />
             {selectedWorker && (
               <View style={styles.workerCard}>
                 <View style={styles.workerAvatar}>
@@ -305,6 +308,17 @@ const styles = StyleSheet.create({
   workerLoader: {
     paddingVertical: 12,
   },
+  calendarNavWrapper: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  dashedDivider: {
+    borderStyle: "dashed",
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginHorizontal: 20,
+    marginVertical: 20,
+  },
   workerCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -369,9 +383,10 @@ const styles = StyleSheet.create({
   },
   outlineButton: {
     marginTop: 12,
+    backgroundColor: colors.disabled,
     borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: 24,
     paddingVertical: 14,
     alignItems: "center",
   },
@@ -382,7 +397,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     marginTop: 10,
     backgroundColor: colors.primary,
-    borderRadius: 12,
+    borderRadius: 24,
     paddingVertical: 14,
     alignItems: "center",
   },
