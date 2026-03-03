@@ -22,9 +22,9 @@ import SalaryStatementSheet from "../../components/worker/salary/SalaryStatement
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { getWorkplaces, getWorkRecords, getContract } from "../../api/employer";
-import type { WorkplaceDetails, WorkRecord, Contract, SearchedWorker } from "../../api/employer/types";
-import { getWorkerByCode } from "../../api/worker";
+import { getWorkplaces, getWorkRecords } from "../../api/employer";
+import type { WorkplaceDetails, WorkRecord } from "../../api/employer/types";
+import { getWorkerById } from "../../api/worker";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -135,24 +135,20 @@ const EmployerRemittanceManageScreen: React.FC = () => {
   const [workerBankInfo, setWorkerBankInfo] = useState<{ bankName?: string; accountNumber?: string } | null>(null);
 
   useEffect(() => {
-    if (!selectedContractId || selectedContractId === "all") {
+    if (!selectedWorker) {
       setWorkerBankInfo(null);
       return;
     }
     const fetchBankInfo = async () => {
       try {
-        const contractRes = await getContract(selectedContractId as number);
-        const workerCode = (contractRes.data as Contract)?.workerCode;
-        if (!workerCode) return;
-        const workerRes = await getWorkerByCode(workerCode);
-        const worker = workerRes.data as SearchedWorker;
-        setWorkerBankInfo({ bankName: worker?.bankName, accountNumber: worker?.accountNumber });
+        const res = await getWorkerById(selectedWorker.workerId);
+        setWorkerBankInfo({ bankName: res.data?.bankName, accountNumber: res.data?.accountNumber });
       } catch {
         setWorkerBankInfo(null);
       }
     };
     fetchBankInfo();
-  }, [selectedContractId]);
+  }, [selectedWorker?.workerId]);
 
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
 
