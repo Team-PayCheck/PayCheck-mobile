@@ -7,8 +7,9 @@ import { useState, useMemo, useCallback } from "react";
 import { getContracts, getContractDetail } from "../../api/worker";
 import type { WheelPickerItem } from "../../components/common/WheelPicker";
 
-interface WorkplaceOption {
+export interface WorkplaceOption {
 	contractId: number;
+	workplaceId: number;
 	workplaceName: string;
 	hourlyWage: number;
 }
@@ -29,6 +30,7 @@ const useWorkplaces = () => {
 					const detailRes = await getContractDetail(contract.id);
 					return {
 						contractId: contract.id,
+						workplaceId: detailRes.data?.workplaceId ?? 0,
 						workplaceName:
 							detailRes.data?.workplaceName ?? "알 수 없음",
 						hourlyWage: detailRes.data?.hourlyWage ?? 0,
