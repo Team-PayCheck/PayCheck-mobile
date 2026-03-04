@@ -20,44 +20,15 @@ import { Text } from "../Text";
 import NoticeCategorySelector from "./NoticeCategorySelector";
 import { colors } from "../../../constants/colors";
 import { NOTICE_CATEGORY_LABEL } from "../../../types/common/notice.types";
-import { HOUR_ITEMS, MINUTE_ITEMS } from "../../../constants/pickerItems";
+import { usePickerState } from "../../../hooks/common/usePickerState";
+import { extractDate, extractHour, extractMinute } from "../../../utils/notice";
 import type {
 	NoticeCategory,
 	NoticeDetailResponse,
 	UpdateNoticeRequest,
 } from "../../../api/notice/types";
-import type { WheelPickerItem } from "../WheelPicker";
 
 const CONTENT_MAX_LENGTH = 200;
-
-type PickerTarget = "date" | "hour" | "minute" | null;
-
-/** 오늘부터 60일간의 날짜 아이템 생성 */
-const getExpiresDateItems = (): WheelPickerItem[] => {
-	const items: WheelPickerItem[] = [];
-	const today = new Date();
-	for (let i = 0; i <= 60; i++) {
-		const d = new Date(today);
-		d.setDate(today.getDate() + i);
-		const yyyy = d.getFullYear();
-		const mm = String(d.getMonth() + 1).padStart(2, "0");
-		const dd = String(d.getDate()).padStart(2, "0");
-		items.push({
-			label: `${d.getMonth() + 1}/${d.getDate()}`,
-			value: `${yyyy}-${mm}-${dd}`,
-		});
-	}
-	return items;
-};
-
-/** ISO 문자열에서 날짜 부분 추출 "YYYY-MM-DD" */
-const extractDate = (iso: string): string => iso.slice(0, 10);
-
-/** ISO 문자열에서 시 추출 */
-const extractHour = (iso: string): number => new Date(iso).getHours();
-
-/** ISO 문자열에서 분 추출 */
-const extractMinute = (iso: string): number => new Date(iso).getMinutes();
 
 interface NoticeEditSheetProps {
 	visible: boolean;
@@ -77,13 +48,9 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 	const [category, setCategory] = useState<NoticeCategory>("HANDOVER");
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
-	const [expiresDate, setExpiresDate] = useState("");
-	const [expiresHour, setExpiresHour] = useState(18);
-	const [expiresMinute, setExpiresMinute] = useState(0);
-	const [activePicker, setActivePicker] = useState<PickerTarget>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const dateItems = useMemo(() => getExpiresDateItems(), []);
+	const picker = usePickerState({ includeToday: true });
 
 	// notice가 변경되면 폼 초기화
 	useEffect(() => {
@@ -91,55 +58,14 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 			setCategory(notice.category);
 			setTitle(notice.title);
 			setContent(notice.content);
-			setExpiresDate(extractDate(notice.expiresAt));
-			setExpiresHour(extractHour(notice.expiresAt));
-			setExpiresMinute(extractMinute(notice.expiresAt));
-			setActivePicker(null);
+			picker.resetPicker(
+				extractDate(notice.expiresAt),
+				extractHour(notice.expiresAt),
+				extractMinute(notice.expiresAt)
+			);
 			setIsSubmitting(false);
 		}
 	}, [notice, visible]);
-
-	const togglePicker = useCallback(
-		(target: PickerTarget) => {
-			setActivePicker(activePicker === target ? null : target);
-		},
-		[activePicker]
-	);
-
-	const handlePickerChange = useCallback(
-		(value: string | number) => {
-			switch (activePicker) {
-				case "date":
-					setExpiresDate(value as string);
-					break;
-				case "hour":
-					setExpiresHour(value as number);
-					break;
-				case "minute":
-					setExpiresMinute(value as number);
-					break;
-			}
-		},
-		[activePicker]
-	);
-
-	const pickerConfig = useMemo(() => {
-		switch (activePicker) {
-			case "date":
-				return { items: dateItems, selectedValue: expiresDate, width: 120 };
-			case "hour":
-				return { items: HOUR_ITEMS, selectedValue: expiresHour, width: 80 };
-			case "minute":
-				return { items: MINUTE_ITEMS, selectedValue: expiresMinute, width: 80 };
-			default:
-				return { items: [], selectedValue: 0, width: 80 };
-		}
-	}, [activePicker, dateItems, expiresDate, expiresHour, expiresMinute]);
-
-	const displayDate = useMemo(() => {
-		const item = dateItems.find((d) => d.value === expiresDate);
-		return item?.label ?? expiresDate.slice(5).replace("-", "/");
-	}, [expiresDate, dateItems]);
 
 	const hasChanges = useMemo(() => {
 		if (!notice) return false;
@@ -147,11 +73,11 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 			category !== notice.category ||
 			title.trim() !== notice.title ||
 			content.trim() !== notice.content ||
-			expiresDate !== extractDate(notice.expiresAt) ||
-			expiresHour !== extractHour(notice.expiresAt) ||
-			expiresMinute !== extractMinute(notice.expiresAt)
+			picker.expiresDate !== extractDate(notice.expiresAt) ||
+			picker.expiresHour !== extractHour(notice.expiresAt) ||
+			picker.expiresMinute !== extractMinute(notice.expiresAt)
 		);
-	}, [notice, category, title, content, expiresDate, expiresHour, expiresMinute]);
+	}, [notice, category, title, content, picker.expiresDate, picker.expiresHour, picker.expiresMinute]);
 
 	const canSubmit =
 		title.trim().length > 0 && content.trim().length > 0 && hasChanges && !isSubmitting;
@@ -165,14 +91,11 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 				text: "수정",
 				onPress: async () => {
 					setIsSubmitting(true);
-					const hh = String(expiresHour).padStart(2, "0");
-					const mm = String(expiresMinute).padStart(2, "0");
-
 					const success = await onSubmit(notice.id, {
 						category,
 						title: title.trim(),
 						content: content.trim(),
-						expiresAt: `${expiresDate}T${hh}:${mm}:00`,
+						expiresAt: picker.buildExpiresAt(),
 					});
 
 					setIsSubmitting(false);
@@ -180,7 +103,7 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 				},
 			},
 		]);
-	}, [notice, canSubmit, category, title, content, expiresDate, expiresHour, expiresMinute, onSubmit, onClose]);
+	}, [notice, canSubmit, category, title, content, picker, onSubmit, onClose]);
 
 	const handleDelete = useCallback(() => {
 		if (!notice) return;
@@ -199,17 +122,17 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 	}, [notice, onDelete, onClose]);
 
 	const renderSelectField = (
-		target: PickerTarget,
+		target: "date" | "hour" | "minute",
 		displayValue: string,
 		style?: object
 	) => (
 		<TouchableOpacity
 			style={[
 				styles.selectField,
-				activePicker === target && styles.selectFieldActive,
+				picker.activePicker === target && styles.selectFieldActive,
 				style,
 			]}
-			onPress={() => togglePicker(target)}
+			onPress={() => picker.togglePicker(target)}
 			activeOpacity={0.7}
 		>
 			<Text weight="Medium" style={styles.selectText}>
@@ -272,7 +195,7 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 						maxLength={100}
 						placeholder="제목을 입력하시오.."
 						placeholderTextColor={colors.textMuted}
-						onFocus={() => setActivePicker(null)}
+						onFocus={picker.closePicker}
 					/>
 				</View>
 
@@ -290,7 +213,7 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 						textAlignVertical="top"
 						placeholder="내용을 입력하세요 (최대 200자)"
 						placeholderTextColor={colors.textMuted}
-						onFocus={() => setActivePicker(null)}
+						onFocus={picker.closePicker}
 					/>
 					<Text style={styles.charCount}>
 						{content.length}/{CONTENT_MAX_LENGTH}
@@ -303,15 +226,15 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 						일정 종료일시
 					</Text>
 					<View style={styles.timeRow}>
-						{renderSelectField("date", displayDate, { minWidth: 80 })}
+						{renderSelectField("date", picker.displayDate, { minWidth: 80 })}
 						{renderSelectField(
 							"hour",
-							`${String(expiresHour).padStart(2, "0")}시`,
+							`${String(picker.expiresHour).padStart(2, "0")}시`,
 							{ minWidth: 64 }
 						)}
 						{renderSelectField(
 							"minute",
-							`${String(expiresMinute).padStart(2, "0")}분`,
+							`${String(picker.expiresMinute).padStart(2, "0")}분`,
 							{ minWidth: 64 }
 						)}
 					</View>
@@ -319,14 +242,14 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 			</ScrollView>
 
 			{/* WheelPicker 영역 (ScrollView 바깥) */}
-			{activePicker && pickerConfig.items.length > 0 && (
+			{picker.activePicker && picker.pickerConfig.items.length > 0 && (
 				<View style={styles.pickerArea}>
 					<View style={styles.pickerWrapper}>
 						<WheelPicker
-							items={pickerConfig.items}
-							selectedValue={pickerConfig.selectedValue}
-							onValueChange={handlePickerChange}
-							width={pickerConfig.width}
+							items={picker.pickerConfig.items}
+							selectedValue={picker.pickerConfig.selectedValue}
+							onValueChange={picker.handlePickerChange}
+							width={picker.pickerConfig.width}
 						/>
 					</View>
 				</View>

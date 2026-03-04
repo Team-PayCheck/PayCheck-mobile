@@ -2,7 +2,7 @@
  * 공지사항 작성 바텀시트.
  * 카테고리, 제목, 내용, 만료일시를 입력받아 공지를 생성한다.
  */
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import {
 	View,
 	StyleSheet,
@@ -17,31 +17,10 @@ import PrimaryButton from "../PrimaryButton";
 import { Text } from "../Text";
 import NoticeCategorySelector from "./NoticeCategorySelector";
 import { colors } from "../../../constants/colors";
-import { HOUR_ITEMS, MINUTE_ITEMS } from "../../../constants/pickerItems";
+import { usePickerState } from "../../../hooks/common/usePickerState";
 import type { NoticeCategory, CreateNoticeRequest } from "../../../api/notice/types";
-import type { WheelPickerItem } from "../WheelPicker";
 
 const CONTENT_MAX_LENGTH = 200;
-
-type PickerTarget = "date" | "hour" | "minute" | null;
-
-/** 오늘부터 60일간의 날짜 아이템 생성 */
-const getExpiresDateItems = (): WheelPickerItem[] => {
-	const items: WheelPickerItem[] = [];
-	const today = new Date();
-	for (let i = 1; i <= 60; i++) {
-		const d = new Date(today);
-		d.setDate(today.getDate() + i);
-		const yyyy = d.getFullYear();
-		const mm = String(d.getMonth() + 1).padStart(2, "0");
-		const dd = String(d.getDate()).padStart(2, "0");
-		items.push({
-			label: `${d.getMonth() + 1}/${d.getDate()}`,
-			value: `${yyyy}-${mm}-${dd}`,
-		});
-	}
-	return items;
-};
 
 interface NoticeCreateModalProps {
 	visible: boolean;
@@ -57,79 +36,22 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 	const [category, setCategory] = useState<NoticeCategory>("HANDOVER");
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
-	const [expiresDate, setExpiresDate] = useState("");
-	const [expiresHour, setExpiresHour] = useState(18);
-	const [expiresMinute, setExpiresMinute] = useState(0);
-	const [activePicker, setActivePicker] = useState<PickerTarget>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const dateItems = useMemo(() => getExpiresDateItems(), []);
-
-	// 초기 날짜 설정 (내일)
-	const defaultDate = dateItems[0]?.value as string;
+	const picker = usePickerState({ includeToday: false });
 
 	const resetForm = useCallback(() => {
 		setCategory("HANDOVER");
 		setTitle("");
 		setContent("");
-		setExpiresDate("");
-		setExpiresHour(18);
-		setExpiresMinute(0);
-		setActivePicker(null);
 		setIsSubmitting(false);
-	}, []);
+		picker.resetPicker();
+	}, [picker]);
 
 	const handleClose = useCallback(() => {
 		resetForm();
 		onClose();
 	}, [onClose, resetForm]);
-
-	const togglePicker = useCallback(
-		(target: PickerTarget) => {
-			setActivePicker(activePicker === target ? null : target);
-		},
-		[activePicker]
-	);
-
-	const handlePickerChange = useCallback(
-		(value: string | number) => {
-			switch (activePicker) {
-				case "date":
-					setExpiresDate(value as string);
-					break;
-				case "hour":
-					setExpiresHour(value as number);
-					break;
-				case "minute":
-					setExpiresMinute(value as number);
-					break;
-			}
-		},
-		[activePicker]
-	);
-
-	const pickerConfig = useMemo(() => {
-		switch (activePicker) {
-			case "date":
-				return {
-					items: dateItems,
-					selectedValue: expiresDate || defaultDate,
-					width: 120,
-				};
-			case "hour":
-				return { items: HOUR_ITEMS, selectedValue: expiresHour, width: 80 };
-			case "minute":
-				return { items: MINUTE_ITEMS, selectedValue: expiresMinute, width: 80 };
-			default:
-				return { items: [], selectedValue: 0, width: 80 };
-		}
-	}, [activePicker, dateItems, expiresDate, defaultDate, expiresHour, expiresMinute]);
-
-	const displayDate = useMemo(() => {
-		const dateVal = expiresDate || defaultDate;
-		const item = dateItems.find((d) => d.value === dateVal);
-		return item?.label ?? "";
-	}, [expiresDate, defaultDate, dateItems]);
 
 	const canSubmit =
 		title.trim().length > 0 && content.trim().length > 0 && !isSubmitting;
@@ -138,44 +60,29 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 		if (!canSubmit) return;
 		setIsSubmitting(true);
 
-		const dateVal = expiresDate || defaultDate;
-		const hh = String(expiresHour).padStart(2, "0");
-		const mm = String(expiresMinute).padStart(2, "0");
-
 		const success = await onSubmit({
 			category,
 			title: title.trim(),
 			content: content.trim(),
-			expiresAt: `${dateVal}T${hh}:${mm}:00`,
+			expiresAt: picker.buildExpiresAt(),
 		});
 
 		setIsSubmitting(false);
 		if (success) handleClose();
-	}, [
-		canSubmit,
-		category,
-		title,
-		content,
-		expiresDate,
-		defaultDate,
-		expiresHour,
-		expiresMinute,
-		onSubmit,
-		handleClose,
-	]);
+	}, [canSubmit, category, title, content, picker, onSubmit, handleClose]);
 
 	const renderSelectField = (
-		target: PickerTarget,
+		target: "date" | "hour" | "minute",
 		displayValue: string,
 		style?: object
 	) => (
 		<TouchableOpacity
 			style={[
 				styles.selectField,
-				activePicker === target && styles.selectFieldActive,
+				picker.activePicker === target && styles.selectFieldActive,
 				style,
 			]}
-			onPress={() => togglePicker(target)}
+			onPress={() => picker.togglePicker(target)}
 			activeOpacity={0.7}
 		>
 			<Text weight="Medium" style={styles.selectText}>
@@ -221,7 +128,7 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 						value={title}
 						onChangeText={setTitle}
 						maxLength={100}
-						onFocus={() => setActivePicker(null)}
+						onFocus={picker.closePicker}
 					/>
 					<TextInput
 						style={styles.contentInput}
@@ -232,7 +139,7 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 						maxLength={CONTENT_MAX_LENGTH}
 						multiline
 						textAlignVertical="top"
-						onFocus={() => setActivePicker(null)}
+						onFocus={picker.closePicker}
 					/>
 					<Text style={styles.charCount}>
 						{content.length}/{CONTENT_MAX_LENGTH}
@@ -245,15 +152,15 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 						일정 종료일시
 					</Text>
 					<View style={styles.timeRow}>
-						{renderSelectField("date", displayDate, { minWidth: 80 })}
+						{renderSelectField("date", picker.displayDate, { minWidth: 80 })}
 						{renderSelectField(
 							"hour",
-							`${String(expiresHour).padStart(2, "0")}시`,
+							`${String(picker.expiresHour).padStart(2, "0")}시`,
 							{ minWidth: 64 }
 						)}
 						{renderSelectField(
 							"minute",
-							`${String(expiresMinute).padStart(2, "0")}분`,
+							`${String(picker.expiresMinute).padStart(2, "0")}분`,
 							{ minWidth: 64 }
 						)}
 					</View>
@@ -261,14 +168,14 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 			</ScrollView>
 
 			{/* WheelPicker 영역 (ScrollView 바깥) */}
-			{activePicker && pickerConfig.items.length > 0 && (
+			{picker.activePicker && picker.pickerConfig.items.length > 0 && (
 				<View style={styles.pickerArea}>
 					<View style={styles.pickerWrapper}>
 						<WheelPicker
-							items={pickerConfig.items}
-							selectedValue={pickerConfig.selectedValue}
-							onValueChange={handlePickerChange}
-							width={pickerConfig.width}
+							items={picker.pickerConfig.items}
+							selectedValue={picker.pickerConfig.selectedValue}
+							onValueChange={picker.handlePickerChange}
+							width={picker.pickerConfig.width}
 						/>
 					</View>
 				</View>
