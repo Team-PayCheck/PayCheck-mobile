@@ -490,6 +490,26 @@ export const getSalariesByYearMonth = async (
 };
 
 /**
+ * 급여 상세 조회
+ * GET /api/employer/salaries/{id}
+ */
+export const getSalaryById = async (id: number): Promise<ApiResponse<SalaryDetail>> => {
+	try {
+		const { data } = await api.get<ApiResponse<SalaryDetail>>(
+			`/api/employer/salaries/${id}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<SalaryDetail>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"급여 상세 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
  * 급여 자동 계산
  * POST /api/employer/salaries/contracts/{contractId}/calculate
  */

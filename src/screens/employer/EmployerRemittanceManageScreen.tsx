@@ -15,7 +15,8 @@ import MonthlyCalendarNav from "../../components/common/MonthlyCalendarNav";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import WorkerFilterTabs, { type WorkerFilterId } from "../../components/employer/worker-manage/WorkerFilterTabs";
-import SalaryStatementSheet from "../../components/worker/salary/SalaryStatementSheet";
+import PaymentSection from "../../components/worker/salary/PaymentSection";
+import DeductionSection from "../../components/worker/salary/DeductionSection";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
@@ -24,11 +25,12 @@ import {
   getWorkRecords,
   getSalariesByYearMonth,
   getPaymentsByYearMonth,
+  getSalaryById,
   calculateSalary,
   createPayment,
   completePayment,
 } from "../../api/employer";
-import type { WorkplaceDetails, WorkRecord, SalaryPaymentItem } from "../../api/employer/types";
+import type { WorkplaceDetails, WorkRecord, SalaryPaymentItem, SalaryDetail } from "../../api/employer/types";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -157,7 +159,28 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     fetch();
   }, [selectedWorkplace?.id, selectedWorker?.workerName, year, month]);
 
+  // ─── 급여명세서 ────────────────────────────────────────────────────────────
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
+  const [salaryDetail, setSalaryDetail] = useState<SalaryDetail | null>(null);
+  const [isSalaryDetailLoading, setIsSalaryDetailLoading] = useState(false);
+
+  const handleOpenSalarySheet = async () => {
+    if (!salaryPaymentItem) {
+      Alert.alert(`${month + 1}월 급여 데이터가 없습니다.`);
+      return;
+    }
+    setIsSalarySheetVisible(true);
+    setIsSalaryDetailLoading(true);
+    try {
+      const res = await getSalaryById(salaryPaymentItem.id);
+      setSalaryDetail(res.data ?? null);
+    } catch (e: any) {
+      Alert.alert("급여명세서 조회 실패", e.message ?? "다시 시도해주세요.");
+      setIsSalarySheetVisible(false);
+    } finally {
+      setIsSalaryDetailLoading(false);
+    }
+  };
 
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
@@ -170,6 +193,9 @@ const EmployerRemittanceManageScreen: React.FC = () => {
 
   const handleTabPress = (tab: EmployerTabName) => navigation.replace(TAB_SCREEN_MAP[tab]);
 
+  // ─── 송금하기 ─────────────────────────────────────────────────────────────
+  // 흐름: 확인 Alert → (필요 시 서버 급여 자동계산) → createPayment → 토스 딥링크 오픈
+  // 주의: createPayment 호출 시 해당 시점 급여 금액으로 레코드가 확정됨
   const handleRemittance = () => {
     if (!salaryPaymentItem) {
       Alert.alert(`${month + 1}월 급여 데이터가 없습니다.`);
@@ -281,10 +307,9 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 {formatCurrency(salaryAmount)}원
               </Text>
             </View>
-            {/* TODO: 고용주 전용 급여명세서 API 필요 — 현재 SalaryStatementSheet는 근로자 API 기반 */}
             <TouchableOpacity
               style={styles.outlineButton}
-              onPress={() => setIsSalarySheetVisible(true)}
+              onPress={handleOpenSalarySheet}
               activeOpacity={0.7}
             >
               <Text weight="SemiBold" style={styles.outlineButtonText}>
@@ -295,7 +320,7 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               버튼 상태:
               1. "송금하기"      → handleRemittance (토스 딥링크 오픈)
               2. "송금 완료 처리" → handleCompletePayment (서버 완료 통보)
-              3. "n월 송금 완료" 배지 
+              3. "n월 송금 완료" 배지
             */}
             {isPaymentCompleted ? (
               <View style={styles.paidBadge}>
@@ -314,12 +339,33 @@ const EmployerRemittanceManageScreen: React.FC = () => {
         </>
       )}
       <EmployerNavigationBar activeTab="transfer" onTabPress={handleTabPress} />
-      <SalaryStatementSheet
+
+      <BottomSheetModal
         visible={isSalarySheetVisible}
-        onClose={() => setIsSalarySheetVisible(false)}
-        year={year}
-        month={month + 1}
-      />
+        onClose={() => { setIsSalarySheetVisible(false); setSalaryDetail(null); }}
+        maxHeight="95%"
+      >
+        {isSalaryDetailLoading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={styles.sheetLoader} />
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
+            <View style={styles.sheetHeader}>
+              <Text weight="Bold" style={styles.sheetTitle}>급여명세서</Text>
+              <TouchableOpacity onPress={() => { setIsSalarySheetVisible(false); setSalaryDetail(null); }} hitSlop={8}>
+                <Text style={styles.sheetClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <PaymentSection salary={salaryDetail as any} />
+            <DeductionSection salary={salaryDetail as any} />
+            <View style={styles.netPayContainer}>
+              <Text weight="Bold" style={styles.netPayText}>
+                실 수령액 : {salaryDetail?.netPay != null ? `${formatCurrency(salaryDetail.netPay)}원` : "?"}
+              </Text>
+            </View>
+          </ScrollView>
+        )}
+      </BottomSheetModal>
+
       <EmployerMyPageDrawer {...drawerProps} />
       <BottomSheetModal {...accountSheetProps}>
         <AccountTermsContent />
@@ -452,6 +498,38 @@ const styles = StyleSheet.create({
   paidText: {
     fontSize: 15,
     color: colors.primary,
+  },
+  // 급여명세서 바텀시트
+  sheetLoader: {
+    paddingVertical: 60,
+  },
+  sheetContent: {
+    paddingBottom: 20,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 22,
+    color: colors.textPrimary,
+  },
+  sheetClose: {
+    fontSize: 20,
+    color: colors.textSecondary,
+  },
+  netPayContainer: {
+    alignItems: "center",
+    marginTop: 28,
+    paddingVertical: 16,
+    backgroundColor: colors.backgroundGrey,
+    borderRadius: 12,
+  },
+  netPayText: {
+    fontSize: 20,
+    color: colors.textPrimary,
   },
 });
 
