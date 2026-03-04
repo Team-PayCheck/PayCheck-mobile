@@ -17,12 +17,8 @@ const config: ExpoConfig = {
     bundleIdentifier: 'com.teampaycheck.paycheck',
     supportsTablet: true,
     appleTeamId: '4XTGL2D5GF',
-    "infoPlist": {
-      "ITSAppUsesNonExemptEncryption": false,
-      "NSAppTransportSecurity": {
-        "NSAllowsArbitraryLoads": true,
-        "NSAllowsLocalNetworking": true,
-      },
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
     },
   },
   android: {
@@ -57,7 +53,7 @@ const config: ExpoConfig = {
       "@react-native-seoul/kakao-login",
       {
         kakaoAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY,
-        kotlinVersion: "1.9.0", 
+        kotlinVersion: "1.9.0",
       },
     ],
     "expo-dev-client",
@@ -66,7 +62,7 @@ const config: ExpoConfig = {
       "expo-build-properties",
       {
         ios: {
-          
+
         },
         android: {
           kotlinVersion: "1.9.0",
