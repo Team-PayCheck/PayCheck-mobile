@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   StyleSheet,
   ScrollView,
@@ -16,6 +16,9 @@ import EmployerNavigationBar, {
 } from "../../components/layout/EmployerNavigationBar";
 import WorkerManageHeader from "../../components/employer/worker-manage/WorkerManageHeader";
 import NoticeBoard from "../../components/common/NoticeBoard";
+import NoticeCreateModal from "../../components/common/notice/NoticeCreateModal";
+import NoticeDetailSheet from "../../components/common/notice/NoticeDetailSheet";
+import NoticeEditSheet from "../../components/common/notice/NoticeEditSheet";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import MonthlyCalendar from "../../components/common/MonthlyCalendar";
@@ -28,10 +31,11 @@ import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useEmployerDailyWorkRecords from "../../hooks/employer/useEmployerDailyWorkRecords";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
+import { useNotices } from "../../hooks/common/useNotices";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import type { WeekDay } from "../../types/worker.types";
+import type { NoticeCardItem } from "../../types/common/notice.types";
 import { getWeekDays, getWeekRange, formatDateStr } from "../../utils/date";
-import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
@@ -62,6 +66,46 @@ const EmployerHomeScreen: React.FC = () => {
 
   const selectedWorkplace =
     workplaces.find((wp) => wp.id === selectedWorkplaceId) ?? null;
+
+  // 공지 게시판
+  const {
+    notices,
+    selectedNotice,
+    isDetailLoading,
+    fetchDetail,
+    clearDetail,
+    handleCreate: createNotice,
+    handleUpdate: updateNotice,
+    handleDelete: deleteNotice,
+  } = useNotices(selectedWorkplaceId);
+
+  const [isNoticeCreateVisible, setIsNoticeCreateVisible] = useState(false);
+  const [isNoticeDetailVisible, setIsNoticeDetailVisible] = useState(false);
+  const [isNoticeEditVisible, setIsNoticeEditVisible] = useState(false);
+
+  const handlePressNotice = useCallback(
+    (notice: NoticeCardItem) => {
+      fetchDetail(notice.id);
+      setIsNoticeDetailVisible(true);
+    },
+    [fetchDetail]
+  );
+
+  const handleNoticeEdit = useCallback(() => {
+    setIsNoticeDetailVisible(false);
+    setTimeout(() => setIsNoticeEditVisible(true), 250);
+  }, []);
+
+  const handleNoticeDelete = useCallback(
+    async (noticeId: number) => {
+      const success = await deleteNotice(noticeId);
+      if (success) {
+        setIsNoticeDetailVisible(false);
+        clearDetail();
+      }
+    },
+    [deleteNotice, clearDetail]
+  );
 
   const dateStr = useMemo(() => formatDateStr(selectedDate), [selectedDate]);
 
@@ -147,8 +191,11 @@ const EmployerHomeScreen: React.FC = () => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* TODO: 공지 게시판 API 연동 후 dummyNotices 교체 */}
-            <NoticeBoard notices={dummyNotices} />
+            <NoticeBoard
+              notices={notices}
+              onPressAdd={() => setIsNoticeCreateVisible(true)}
+              onPressNotice={handlePressNotice}
+            />
 
             <WeeklyDateBar
               weekTitle={weekTitle}
@@ -214,6 +261,38 @@ const EmployerHomeScreen: React.FC = () => {
           />
         </View>
       </BottomSheetModal>
+
+      {/* 공지 작성 모달 */}
+      <NoticeCreateModal
+        visible={isNoticeCreateVisible}
+        onClose={() => setIsNoticeCreateVisible(false)}
+        onSubmit={createNotice}
+      />
+
+      {/* 공지 상세 바텀시트 */}
+      <NoticeDetailSheet
+        visible={isNoticeDetailVisible}
+        onClose={() => {
+          setIsNoticeDetailVisible(false);
+          clearDetail();
+        }}
+        notice={selectedNotice}
+        isLoading={isDetailLoading}
+        onPressEdit={handleNoticeEdit}
+        onPressDelete={handleNoticeDelete}
+      />
+
+      {/* 공지 수정 바텀시트 */}
+      <NoticeEditSheet
+        visible={isNoticeEditVisible}
+        onClose={() => {
+          setIsNoticeEditVisible(false);
+          clearDetail();
+        }}
+        notice={selectedNotice}
+        onSubmit={updateNotice}
+        onDelete={deleteNotice}
+      />
 
       <EmployerMyPageDrawer {...drawerProps} />
       <BottomSheetModal {...accountSheetProps}>

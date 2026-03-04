@@ -97,8 +97,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				});
 				onLoginSuccess?.(result.data.userType);
 			}
-		} catch (error) {
-			Alert.alert("Dev 로그인 실패", "서버 연결을 확인해주세요.");
+		} catch (error: any) {
+			console.error("Dev 로그인 에러:", error);
+			Alert.alert("Dev 로그인 실패", error?.message || "서버 연결을 확인해주세요.");
 		} finally {
 			setIsLoading(false);
 		}

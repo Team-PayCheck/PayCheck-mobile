@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -10,22 +10,27 @@ import AccountTermsContent from "../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../navigation/WorkerStack";
 import WeeklyDateBar from "../../components/common/WeeklyDateBar";
 import NoticeBoard from "../../components/common/NoticeBoard";
+import NoticeCreateModal from "../../components/common/notice/NoticeCreateModal";
+import NoticeDetailSheet from "../../components/common/notice/NoticeDetailSheet";
+import NoticeEditSheet from "../../components/common/notice/NoticeEditSheet";
 import WorkListSection from "../../components/worker/weeklyCalendar/WorkListSection";
 import WeeklySummary from "../../components/worker/weeklyCalendar/WeeklySummary";
 import AddWorkRequestModal from "../../components/worker/weeklyCalendar/AddWorkRequestModal";
 import WorkerCorrectionRequestModal from "../../components/worker/weeklyCalendar/WorkerCorrectionRequestModal";
 import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import useWorkRecords from "../../hooks/worker/useWorkRecords";
+import useWorkplaces from "../../hooks/worker/useWorkplaces";
+import { useNotices } from "../../hooks/common/useNotices";
 import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 import { colors } from "../../constants/colors";
 import type { WeekDay } from "../../types/worker.types";
+import type { NoticeCardItem } from "../../types/common/notice.types";
 import {
 	getWeekTitle,
 	getWeekDays,
 	getWeekLabel,
 	getWeekRange,
 } from "../../utils/date";
-import { dummyNotices } from "../../dummyData/workerWeeklyCalendar";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
 
@@ -39,7 +44,55 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	};
 	const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
-	
+	// 근로자 근무지 조회 (공지 게시판용 workplaceId 확보)
+	const { workplaces: workerWorkplaces, fetchWorkplaces } = useWorkplaces();
+
+	useEffect(() => {
+		fetchWorkplaces();
+	}, []);
+
+	const workerWorkplaceId = workerWorkplaces[0]?.workplaceId ?? null;
+
+	// 공지 게시판
+	const {
+		notices,
+		selectedNotice,
+		isDetailLoading,
+		fetchDetail,
+		clearDetail,
+		handleCreate: createNotice,
+		handleUpdate: updateNotice,
+		handleDelete: deleteNotice,
+	} = useNotices(workerWorkplaceId);
+
+	const [isNoticeCreateVisible, setIsNoticeCreateVisible] = useState(false);
+	const [isNoticeDetailVisible, setIsNoticeDetailVisible] = useState(false);
+	const [isNoticeEditVisible, setIsNoticeEditVisible] = useState(false);
+
+	const handlePressNotice = useCallback(
+		(notice: NoticeCardItem) => {
+			fetchDetail(notice.id);
+			setIsNoticeDetailVisible(true);
+		},
+		[fetchDetail]
+	);
+
+	const handleNoticeEdit = useCallback(() => {
+		setIsNoticeDetailVisible(false);
+		setTimeout(() => setIsNoticeEditVisible(true), 250);
+	}, []);
+
+	const handleNoticeDelete = useCallback(
+		async (noticeId: number) => {
+			const success = await deleteNotice(noticeId);
+			if (success) {
+				setIsNoticeDetailVisible(false);
+				clearDetail();
+			}
+		},
+		[deleteNotice, clearDetail]
+	);
+
 	const today = new Date();
 	const weekTitle = getWeekTitle(today);
 	const baseWeekDays = getWeekDays(today);
@@ -97,7 +150,11 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 					weekDays={weekDays}
 				/>
 
-				<NoticeBoard notices={dummyNotices} />
+				<NoticeBoard
+				notices={notices}
+				onPressAdd={() => setIsNoticeCreateVisible(true)}
+				onPressNotice={handlePressNotice}
+			/>
 
 				{isLoading ? (
 					<ActivityIndicator
@@ -153,6 +210,38 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				onClose={closeCorrectionModal}
 				work={selectedWork}
 				onSubmit={handleCorrectionSubmit}
+			/>
+
+			{/* 공지 작성 모달 */}
+			<NoticeCreateModal
+				visible={isNoticeCreateVisible}
+				onClose={() => setIsNoticeCreateVisible(false)}
+				onSubmit={createNotice}
+			/>
+
+			{/* 공지 상세 바텀시트 */}
+			<NoticeDetailSheet
+				visible={isNoticeDetailVisible}
+				onClose={() => {
+					setIsNoticeDetailVisible(false);
+					clearDetail();
+				}}
+				notice={selectedNotice}
+				isLoading={isDetailLoading}
+				onPressEdit={handleNoticeEdit}
+				onPressDelete={handleNoticeDelete}
+			/>
+
+			{/* 공지 수정 바텀시트 */}
+			<NoticeEditSheet
+				visible={isNoticeEditVisible}
+				onClose={() => {
+					setIsNoticeEditVisible(false);
+					clearDetail();
+				}}
+				notice={selectedNotice}
+				onSubmit={updateNotice}
+				onDelete={deleteNotice}
 			/>
 		</SafeAreaView>
 	);

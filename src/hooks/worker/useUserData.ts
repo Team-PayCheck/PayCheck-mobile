@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { getUserProfile } from "../../api/user";
-import { getWorkerInfo } from "../../api/worker";
 import type { UserResponse, WorkerResponse } from "../../api/user/types";
 
 interface UseUserDataReturn {
@@ -12,9 +11,7 @@ interface UseUserDataReturn {
 
 /**
  * 사용자 프로필 및 근로자 정보 관리 훅
- * - 사용자 프로필 조회 (getUserProfile)
- * - 근로자 정보 조회 (getWorkerInfo)
- * - 프로필 업데이트 (updateUserProfile, updateAccountInfo)
+ * - /api/users/me 응답에서 사용자 + 근로자 정보를 함께 추출
  */
 
 export function useWorkerData(): UseUserDataReturn {
@@ -26,7 +23,6 @@ export function useWorkerData(): UseUserDataReturn {
     try {
       setIsLoading(true);
 
-      // 1. 사용자 프로필 조회
       const userRes = await getUserProfile();
 
       if (!userRes.success || !userRes.data) {
@@ -37,18 +33,18 @@ export function useWorkerData(): UseUserDataReturn {
 
       setUser(userRes.data);
 
-      // 2. 근로자 정보 조회
-      try {
-        const workerResponse = await getWorkerInfo(userRes.data.id);
-        const hasValidWorkerData = workerResponse.success && workerResponse.data;
-
-        if (hasValidWorkerData && workerResponse.data) {
-          setWorker(workerResponse.data);
-        } else {
-          setWorker(null);
-        }
-      } catch (workerError) {
-        console.error('근로자 정보 조회 실패:', workerError);
+      // /api/users/me 응답에 workerCode가 있으면 근로자 정보 추출
+      if (userRes.data.workerCode) {
+        setWorker({
+          id: userRes.data.id,
+          userId: userRes.data.id,
+          name: userRes.data.name,
+          phone: userRes.data.phone,
+          workerCode: userRes.data.workerCode,
+          accountNumber: userRes.data.accountNumber || '',
+          bankName: userRes.data.bankName || '',
+        });
+      } else {
         setWorker(null);
       }
     } catch (error) {

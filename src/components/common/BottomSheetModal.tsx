@@ -1,5 +1,6 @@
 /**
  * 하단에서 올라오는 모달. overlay fade-in + 컨텐츠 slide-up 애니메이션 포함.
+ * handle 영역을 아래로 스와이프하면 모달이 닫힌다.
  */
 import React, { useRef, useEffect, useCallback } from "react";
 import {
@@ -8,6 +9,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Animated,
+	PanResponder,
 	Dimensions,
 	KeyboardAvoidingView,
 	Platform,
@@ -23,6 +25,7 @@ interface BottomSheetModalProps {
 }
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
+const SWIPE_THRESHOLD = 100;
 
 const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 	visible,
@@ -32,9 +35,11 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 }) => {
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const overlayAnim = useRef(new Animated.Value(0)).current;
+	const panY = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
 		if (visible) {
+			panY.setValue(0);
 			Animated.parallel([
 				Animated.timing(overlayAnim, {
 					toValue: 1,
@@ -51,6 +56,7 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 		} else {
 			slideAnim.setValue(0);
 			overlayAnim.setValue(0);
+			panY.setValue(0);
 		}
 	}, [visible]);
 
@@ -67,14 +73,42 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 				useNativeDriver: true,
 			}),
 		]).start(() => {
+			panY.setValue(0);
 			onClose();
 		});
 	}, [onClose]);
+
+	const panResponder = useRef(
+		PanResponder.create({
+			onStartShouldSetPanResponder: () => true,
+			onMoveShouldSetPanResponder: (_, gestureState) =>
+				Math.abs(gestureState.dy) > 5,
+			onPanResponderMove: (_, gestureState) => {
+				if (gestureState.dy > 0) {
+					panY.setValue(gestureState.dy);
+				}
+			},
+			onPanResponderRelease: (_, gestureState) => {
+				if (gestureState.dy > SWIPE_THRESHOLD) {
+					handleClose();
+				} else {
+					Animated.spring(panY, {
+						toValue: 0,
+						useNativeDriver: true,
+						damping: 20,
+						stiffness: 200,
+					}).start();
+				}
+			},
+		})
+	).current;
 
 	const translateY = slideAnim.interpolate({
 		inputRange: [0, 1],
 		outputRange: [SCREEN_HEIGHT, 0],
 	});
+
+	const combinedTranslateY = Animated.add(translateY, panY);
 
 	return (
 		<Modal
@@ -104,10 +138,15 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 						style={[
 							styles.modalContainer,
 							{ maxHeight },
-							{ transform: [{ translateY }] },
+							{ transform: [{ translateY: combinedTranslateY }] },
 						]}
 					>
-						<View style={styles.handle} />
+						<View
+							{...panResponder.panHandlers}
+							style={styles.handleArea}
+						>
+							<View style={styles.handle} />
+						</View>
 						{children}
 					</Animated.View>
 				</View>
@@ -132,17 +171,19 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.white,
 		borderTopLeftRadius: 32,
 		borderTopRightRadius: 32,
-		paddingTop: 12,
+		paddingTop: 0,
 		paddingHorizontal: 24,
 		paddingBottom: 40,
+	},
+	handleArea: {
+		paddingVertical: 16,
+		alignItems: "center",
 	},
 	handle: {
 		width: 40,
 		height: 4,
 		backgroundColor: colors.grey,
 		borderRadius: 2,
-		alignSelf: "center",
-		marginBottom: 20,
 	},
 });
 

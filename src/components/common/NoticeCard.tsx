@@ -1,19 +1,39 @@
 /**
- * 공지사항 개별 카드. 아이콘, 카테고리, 제목, 작성자, 시간을 표시한다.
+ * 공지사항 개별 카드. 카테고리 아이콘, 카테고리명, 제목, 작성자, 시간을 표시한다.
  */
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Text } from "./Text";
 import { colors } from "../../constants/colors";
-import type { NoticeItem } from "../../types/worker.types";
+import { NOTICE_CATEGORY_LABEL } from "../../types/common/notice.types";
+import type { NoticeCardItem } from "../../types/common/notice.types";
+import type { NoticeCategory } from "../../api/notice/types";
+
+// 카테고리별 아이콘 이미지 매핑
+const CATEGORY_ICON: Record<NoticeCategory, any> = {
+	HANDOVER: require("../../assets/images/notice/handover.png"),
+	URGENT: require("../../assets/images/notice/urgent.png"),
+  SCHEDULE: require("../../../assets/images/notice/schedule.png"),
+	ETC: require("../../assets/images/notice/etc.png"),
+};
+
+/** createdAt ISO 문자열에서 "HH:MM" 추출 */
+const formatTime = (createdAt: string): string => {
+	const date = new Date(createdAt);
+	const h = String(date.getHours()).padStart(2, "0");
+	const m = String(date.getMinutes()).padStart(2, "0");
+	return `${h}:${m}`;
+};
 
 interface NoticeCardProps {
-	notice: NoticeItem;
-	onPress?: (notice: NoticeItem) => void;
+	notice: NoticeCardItem;
+	onPress?: (notice: NoticeCardItem) => void;
 }
 
 const NoticeCard: React.FC<NoticeCardProps> = ({ notice, onPress }) => {
+	const iconSource = CATEGORY_ICON[notice.category];
+
 	return (
 		<TouchableOpacity
 			style={styles.card}
@@ -21,25 +41,25 @@ const NoticeCard: React.FC<NoticeCardProps> = ({ notice, onPress }) => {
 			activeOpacity={0.7}
 		>
 			<View style={styles.iconContainer}>
-				{notice.icon ? (
-					<Image source={notice.icon} style={styles.icon} resizeMode="contain" />
+				{iconSource ? (
+					<Image source={iconSource} style={styles.icon} resizeMode="contain" />
 				) : (
 					<Ionicons
-						name="document-text-outline"
-						size={24}
+						name="calendar-outline"
+						size={28}
 						color={colors.primary}
 					/>
 				)}
 			</View>
 			<Text weight="SemiBold" style={styles.category}>
-				{notice.category}
+				{NOTICE_CATEGORY_LABEL[notice.category]}
 			</Text>
-      <Text weight="ExtraBold" style={styles.title} numberOfLines={2}>
+			<Text weight="ExtraBold" style={styles.title} numberOfLines={2}>
 				{notice.title}
 			</Text>
 			<View style={styles.footer}>
-				<Text style={styles.author}>{notice.author}</Text>
-				<Text style={styles.time}>{notice.time}</Text>
+				<Text style={styles.author}>{notice.authorName}</Text>
+				<Text style={styles.time}>{formatTime(notice.createdAt)}</Text>
 			</View>
 		</TouchableOpacity>
 	);
