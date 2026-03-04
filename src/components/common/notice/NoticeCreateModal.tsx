@@ -1,23 +1,20 @@
 /**
- * 공지사항 작성 전체 화면 모달.
+ * 공지사항 작성 바텀시트.
  * 카테고리, 제목, 내용, 만료일시를 입력받아 공지를 생성한다.
  */
 import React, { useState, useCallback, useMemo } from "react";
 import {
-	Modal,
 	View,
 	StyleSheet,
 	TouchableOpacity,
 	TextInput,
 	ScrollView,
-	KeyboardAvoidingView,
-	Platform,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons, Feather } from "@expo/vector-icons";
-import { Text } from "../Text";
+import { Feather } from "@expo/vector-icons";
+import BottomSheetModal from "../BottomSheetModal";
 import WheelPicker from "../WheelPicker";
 import PrimaryButton from "../PrimaryButton";
+import { Text } from "../Text";
 import NoticeCategorySelector from "./NoticeCategorySelector";
 import { colors } from "../../../constants/colors";
 import { HOUR_ITEMS, MINUTE_ITEMS } from "../../../constants/pickerItems";
@@ -189,165 +186,127 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 	);
 
 	return (
-		<Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
-			<SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-				<KeyboardAvoidingView
-					style={styles.flex}
-					behavior={Platform.OS === "ios" ? "padding" : undefined}
-				>
-					{/* 헤더 */}
-					<View style={styles.header}>
-						<TouchableOpacity onPress={handleClose} activeOpacity={0.7}>
-							<Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-						</TouchableOpacity>
-						<Text weight="Bold" style={styles.headerTitle}>
-							공지 작성
-						</Text>
-						<View style={{ width: 24 }} />
+		<BottomSheetModal visible={visible} onClose={handleClose}>
+			{/* 스크롤 가능한 폼 영역 */}
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps="handled"
+				style={styles.scroll}
+			>
+				{/* 타이틀 */}
+				<Text weight="ExtraBold" style={styles.sheetTitle}>
+					공지 게시판 글쓰기
+				</Text>
+
+				{/* 카테고리 */}
+				<View style={styles.section}>
+					<Text weight="SemiBold" style={styles.sectionLabel}>
+						카테고리 지정하기
+					</Text>
+					<NoticeCategorySelector
+						selected={category}
+						onSelect={setCategory}
+					/>
+				</View>
+
+				{/* 내용 작성 (제목 + 내용) */}
+				<View style={styles.section}>
+					<Text weight="SemiBold" style={styles.sectionLabel}>
+						내용 작성
+					</Text>
+					<TextInput
+						style={styles.titleInput}
+						placeholder="제목을 입력하시오.."
+						placeholderTextColor={colors.textMuted}
+						value={title}
+						onChangeText={setTitle}
+						maxLength={100}
+						onFocus={() => setActivePicker(null)}
+					/>
+					<TextInput
+						style={styles.contentInput}
+						placeholder="내용을 입력하세요 (최대 200자)"
+						placeholderTextColor={colors.textMuted}
+						value={content}
+						onChangeText={setContent}
+						maxLength={CONTENT_MAX_LENGTH}
+						multiline
+						textAlignVertical="top"
+						onFocus={() => setActivePicker(null)}
+					/>
+					<Text style={styles.charCount}>
+						{content.length}/{CONTENT_MAX_LENGTH}
+					</Text>
+				</View>
+
+				{/* 일정 종료일시 */}
+				<View style={styles.section}>
+					<Text weight="SemiBold" style={styles.sectionLabel}>
+						일정 종료일시
+					</Text>
+					<View style={styles.timeRow}>
+						{renderSelectField("date", displayDate, { minWidth: 80 })}
+						{renderSelectField(
+							"hour",
+							`${String(expiresHour).padStart(2, "0")}시`,
+							{ minWidth: 64 }
+						)}
+						{renderSelectField(
+							"minute",
+							`${String(expiresMinute).padStart(2, "0")}분`,
+							{ minWidth: 64 }
+						)}
 					</View>
+				</View>
+			</ScrollView>
 
-					{/* 본문 */}
-					<ScrollView
-						style={styles.flex}
-						contentContainerStyle={styles.scrollContent}
-						showsVerticalScrollIndicator={false}
-						keyboardShouldPersistTaps="handled"
-					>
-						{/* 카테고리 */}
-						<View style={styles.section}>
-							<Text weight="SemiBold" style={styles.sectionLabel}>
-								카테고리
-							</Text>
-							<NoticeCategorySelector
-								selected={category}
-								onSelect={setCategory}
-							/>
-						</View>
-
-						{/* 제목 */}
-						<View style={styles.section}>
-							<Text weight="SemiBold" style={styles.sectionLabel}>
-								제목
-							</Text>
-							<TextInput
-								style={styles.titleInput}
-								placeholder="제목을 입력하시오.."
-								placeholderTextColor={colors.textMuted}
-								value={title}
-								onChangeText={setTitle}
-								maxLength={100}
-								onFocus={() => setActivePicker(null)}
-							/>
-						</View>
-
-						{/* 내용 */}
-						<View style={styles.section}>
-							<Text weight="SemiBold" style={styles.sectionLabel}>
-								내용
-							</Text>
-							<TextInput
-								style={styles.contentInput}
-								placeholder="내용을 입력하세요 (최대 200자)"
-								placeholderTextColor={colors.textMuted}
-								value={content}
-								onChangeText={setContent}
-								maxLength={CONTENT_MAX_LENGTH}
-								multiline
-								textAlignVertical="top"
-								onFocus={() => setActivePicker(null)}
-							/>
-							<Text style={styles.charCount}>
-								{content.length}/{CONTENT_MAX_LENGTH}
-							</Text>
-						</View>
-
-						{/* 일정 종료일시 */}
-						<View style={styles.section}>
-							<Text weight="SemiBold" style={styles.sectionLabel}>
-								일정 종료일시
-							</Text>
-							<View style={styles.timeRow}>
-								{renderSelectField("date", displayDate, { minWidth: 80 })}
-								{renderSelectField(
-									"hour",
-									`${String(expiresHour).padStart(2, "0")}시`,
-									{ minWidth: 64 }
-								)}
-								{renderSelectField(
-									"minute",
-									`${String(expiresMinute).padStart(2, "0")}분`,
-									{ minWidth: 64 }
-								)}
-							</View>
-						</View>
-					</ScrollView>
-
-					{/* WheelPicker 영역 (ScrollView 바깥) */}
-					{activePicker && pickerConfig.items.length > 0 && (
-						<View style={styles.pickerArea}>
-							<View style={styles.pickerWrapper}>
-								<WheelPicker
-									items={pickerConfig.items}
-									selectedValue={pickerConfig.selectedValue}
-									onValueChange={handlePickerChange}
-									width={pickerConfig.width}
-								/>
-							</View>
-						</View>
-					)}
-
-					{/* 하단 버튼 */}
-					<View style={styles.footer}>
-						<TouchableOpacity onPress={handleClose} activeOpacity={0.7}>
-							<Text weight="SemiBold" style={styles.deleteText}>
-								삭제
-							</Text>
-						</TouchableOpacity>
-						<PrimaryButton
-							text="+ 추가하기"
-							onPress={handleSubmit}
-							disabled={!canSubmit}
-							size="compact"
+			{/* WheelPicker 영역 (ScrollView 바깥) */}
+			{activePicker && pickerConfig.items.length > 0 && (
+				<View style={styles.pickerArea}>
+					<View style={styles.pickerWrapper}>
+						<WheelPicker
+							items={pickerConfig.items}
+							selectedValue={pickerConfig.selectedValue}
+							onValueChange={handlePickerChange}
+							width={pickerConfig.width}
 						/>
 					</View>
-				</KeyboardAvoidingView>
-			</SafeAreaView>
-		</Modal>
+				</View>
+			)}
+
+			{/* 하단 버튼 */}
+			<View style={styles.footer}>
+				<TouchableOpacity onPress={handleClose} activeOpacity={0.7}>
+					<Text weight="SemiBold" style={styles.deleteText}>
+						삭제
+					</Text>
+				</TouchableOpacity>
+				<PrimaryButton
+					text="+ 추가하기"
+					onPress={handleSubmit}
+					disabled={!canSubmit}
+					size="compact"
+				/>
+			</View>
+		</BottomSheetModal>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: colors.background,
+	scroll: {
+		maxHeight: 420,
 	},
-	flex: {
-		flex: 1,
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		paddingHorizontal: 20,
-		paddingVertical: 14,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.borderLight,
-	},
-	headerTitle: {
-		fontSize: 18,
+	sheetTitle: {
+		fontSize: 20,
 		color: colors.textPrimary,
-	},
-	scrollContent: {
-		paddingHorizontal: 20,
-		paddingTop: 20,
-		paddingBottom: 24,
-		gap: 24,
+		marginBottom: 16,
 	},
 	section: {
-		gap: 10,
+		gap: 8,
+		marginBottom: 16,
 	},
 	sectionLabel: {
-		fontSize: 14,
+		fontSize: 13,
 		color: colors.textPrimary,
 	},
 	titleInput: {
@@ -355,8 +314,8 @@ const styles = StyleSheet.create({
 		borderColor: colors.border,
 		borderRadius: 10,
 		paddingHorizontal: 14,
-		paddingVertical: 12,
-		fontSize: 15,
+		paddingVertical: 10,
+		fontSize: 14,
 		color: colors.textPrimary,
 		backgroundColor: colors.white,
 		fontFamily: "Pretendard-Medium",
@@ -366,12 +325,12 @@ const styles = StyleSheet.create({
 		borderColor: colors.border,
 		borderRadius: 10,
 		paddingHorizontal: 14,
-		paddingVertical: 12,
-		fontSize: 15,
+		paddingVertical: 10,
+		fontSize: 14,
 		color: colors.textPrimary,
 		backgroundColor: colors.white,
 		fontFamily: "Pretendard-Medium",
-		minHeight: 120,
+		minHeight: 80,
 	},
 	charCount: {
 		fontSize: 12,
@@ -406,7 +365,6 @@ const styles = StyleSheet.create({
 		borderTopWidth: 1,
 		borderTopColor: colors.borderLight,
 		paddingVertical: 12,
-		backgroundColor: colors.background,
 	},
 	pickerWrapper: {
 		alignItems: "center",
@@ -415,8 +373,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		paddingHorizontal: 20,
-		paddingVertical: 16,
+		paddingTop: 12,
 		borderTopWidth: 1,
 		borderTopColor: colors.borderLight,
 	},
