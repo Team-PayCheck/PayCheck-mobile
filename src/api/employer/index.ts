@@ -16,6 +16,10 @@ import type {
 	CorrectionRequestDetail,
 	CorrectionRequestStatus,
 	CreatePaymentRequest,
+	SalaryPaymentItem,
+	PaymentRecord,
+	PaymentListItem,
+	SalaryDetail,
 } from "./types";
 
 /**
@@ -460,16 +464,136 @@ export const rejectCorrectionRequest = async (
 
 // ============ 송금 (Payment) ============
 
-export const createPayment = async (reqData: CreatePaymentRequest) => {
+/**
+ * 사업장별 연월 급여+송금 현황 조회
+ * GET /api/employer/salaries/year-month
+ */
+export const getSalariesByYearMonth = async (
+	workplaceId: number,
+	year: number,
+	month: number
+): Promise<ApiResponse<SalaryPaymentItem[]>> => {
 	try {
-		const { data } = await api.post("/api/employer/payments", reqData);
+		const { data } = await api.get<ApiResponse<SalaryPaymentItem[]>>(
+			"/api/employer/salaries/year-month",
+			{ params: { workplaceId, year, month } }
+		);
 		return data;
 	} catch (error) {
-		const axiosError = error as AxiosError;
+		const axiosError = error as AxiosError<ApiResponse<SalaryPaymentItem[]>>;
 		const message =
-			(axiosError.response?.data as any)?.error?.message ||
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"급여 목록 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 급여 자동 계산
+ * POST /api/employer/salaries/contracts/{contractId}/calculate
+ */
+export const calculateSalary = async (
+	contractId: number,
+	year: number,
+	month: number
+): Promise<ApiResponse<SalaryDetail>> => {
+	try {
+		const { data } = await api.post<ApiResponse<SalaryDetail>>(
+			`/api/employer/salaries/contracts/${contractId}/calculate`,
+			null,
+			{ params: { year, month } }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<SalaryDetail>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"급여 계산 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 송금 내역 상세 조회 (tossLink 포함)
+ * GET /api/employer/payments/{id}
+ */
+export const getPaymentById = async (id: number): Promise<ApiResponse<PaymentRecord>> => {
+	try {
+		const { data } = await api.get<ApiResponse<PaymentRecord>>(
+			`/api/employer/payments/${id}`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<PaymentRecord>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"송금 내역 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 사업장별 연월 송금 현황 조회
+ * GET /api/employer/payments/year-month
+ */
+export const getPaymentsByYearMonth = async (
+	workplaceId: number,
+	year: number,
+	month: number
+): Promise<ApiResponse<PaymentListItem[]>> => {
+	try {
+		const { data } = await api.get<ApiResponse<PaymentListItem[]>>(
+			"/api/employer/payments/year-month",
+			{ params: { workplaceId, year, month } }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<PaymentListItem[]>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"송금 현황 조회 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 급여 송금 처리 (토스 딥링크 생성)
+ * POST /api/employer/payments
+ */
+export const createPayment = async (reqData: CreatePaymentRequest): Promise<ApiResponse<PaymentRecord>> => {
+	try {
+		const { data } = await api.post<ApiResponse<PaymentRecord>>("/api/employer/payments", reqData);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<PaymentRecord>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
 			axiosError.message ||
 			"송금 생성 실패";
+		throw new Error(message);
+	}
+};
+
+/**
+ * 급여 송금 완료 처리
+ * PUT /api/employer/payments/{id}/complete
+ */
+export const completePayment = async (id: number): Promise<ApiResponse<PaymentRecord>> => {
+	try {
+		const { data } = await api.put<ApiResponse<PaymentRecord>>(
+			`/api/employer/payments/${id}/complete`
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<PaymentRecord>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"송금 완료 처리 실패";
 		throw new Error(message);
 	}
 };

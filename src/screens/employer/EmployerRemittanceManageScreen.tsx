@@ -4,13 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "../../constants/colors";
-import { BANK_NAME_TO_CODE } from "../../constants/bank";
 import { Text } from "../../components/common/Text";
 import { formatCurrency } from "../../utils/format";
 import Header from "../../components/layout/Header";
-import EmployerNavigationBar, {
-  type EmployerTabName,
-} from "../../components/layout/EmployerNavigationBar";
+import EmployerNavigationBar, { type EmployerTabName } from "../../components/layout/EmployerNavigationBar";
 import EmployerMyPageDrawer from "../../components/employer/mypage/EmployerMyPageDrawer";
 import BottomSheetModal from "../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../components/mypage/AccountTermsContent";
@@ -22,9 +19,16 @@ import SalaryStatementSheet from "../../components/worker/salary/SalaryStatement
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
-import { getWorkplaces, getWorkRecords } from "../../api/employer";
-import type { WorkplaceDetails, WorkRecord } from "../../api/employer/types";
-import { getWorkerByCode } from "../../api/worker";
+import {
+  getWorkplaces,
+  getWorkRecords,
+  getSalariesByYearMonth,
+  getPaymentsByYearMonth,
+  calculateSalary,
+  createPayment,
+  completePayment,
+} from "../../api/employer";
+import type { WorkplaceDetails, WorkRecord, SalaryPaymentItem } from "../../api/employer/types";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -33,21 +37,25 @@ const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 };
 
 const EmployerRemittanceManageScreen: React.FC = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
   const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
-  const today = useMemo(() => new Date(), []);
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
+  // 송금관리는 지난달 급여를 기본으로 보여줌 (예: 3월 10일(월급날) 접속 → 2월 급여 표시)
+  const [year, setYear] = useState(() => {
+    const d = new Date();
+    return d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
+  });
+  const [month, setMonth] = useState(() => {
+    const d = new Date();
+    return d.getMonth() === 0 ? 11 : d.getMonth() - 1;
+  });
 
-  // 근무지 목록
   const [workplaces, setWorkplaces] = useState<WorkplaceDetails[]>([]);
   const [selectedWorkplace, setSelectedWorkplace] = useState<WorkplaceDetails | null>(null);
   const [isWorkplacesLoading, setIsWorkplacesLoading] = useState(false);
 
   useEffect(() => {
-    const fetchWorkplaces = async () => {
+    const fetch = async () => {
       setIsWorkplacesLoading(true);
       try {
         const res = await getWorkplaces();
@@ -60,29 +68,21 @@ const EmployerRemittanceManageScreen: React.FC = () => {
         setIsWorkplacesLoading(false);
       }
     };
-    fetchWorkplaces();
+    fetch();
   }, []);
 
-  // 근무자 목록 (선택된 근무지 기준)
   const { workers, isLoading: isWorkersLoading } = useWorkplaceContracts(selectedWorkplace?.id ?? null);
   const [selectedContractId, setSelectedContractId] = useState<WorkerFilterId>("all");
 
-  // 근무지가 바뀌거나 근무자 목록이 처음 로딩되면 첫 번째 근무자 자동선택
   useEffect(() => {
-    if (workers.length > 0) {
-      setSelectedContractId(workers[0].contractId);
-    } else {
-      setSelectedContractId("all");
-    }
+    setSelectedContractId(workers.length > 0 ? workers[0].contractId : "all");
   }, [workers]);
 
-  // 선택된 근무자 객체
   const selectedWorker = useMemo(
     () => workers.find((w) => w.contractId === selectedContractId) ?? null,
     [workers, selectedContractId]
   );
 
-  // 근무 기록 + workDots
   const [workRecords, setWorkRecords] = useState<WorkRecord[]>([]);
 
   useEffect(() => {
@@ -94,91 +94,127 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     const lastDay = new Date(year, month + 1, 0).getDate();
     const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
-    const fetchRecords = async () => {
+    const fetch = async () => {
       try {
         const res = await getWorkRecords(selectedWorkplace.id, startDate, endDate);
         const all: WorkRecord[] = Array.isArray(res.data) ? res.data : [];
-        // 선택된 근무자의 기록만 필터링
         setWorkRecords(all.filter((r) => r.contractId === selectedContractId));
       } catch {
         setWorkRecords([]);
       }
     };
-    fetchRecords();
+    fetch();
   }, [selectedWorkplace?.id, selectedContractId, year, month]);
-
-  // 예상 노무비 계산
-  const estimatedPay = useMemo(() => {
-    return workRecords.reduce((total, record) => {
-      const [startH = 0, startM = 0] = record.startTime.split(":").map(Number);
-      const [endH = 0, endM = 0] = record.endTime.split(":").map(Number);
-      const totalMinutes =
-        ((endH * 60 + endM - (startH * 60 + startM) + 24 * 60) % (24 * 60)) -
-        (record.breakMinutes ?? 0);
-      return total + (Math.max(0, totalMinutes) / 60) * record.hourlyWage;
-    }, 0);
-  }, [workRecords]);
 
   const workDots = useMemo(() => {
     const dots: Record<string, { count: number; hasCorrectionRequest: boolean }> = {};
     workRecords.forEach((r) => {
-      const key = r.workDate;
-      if (!dots[key]) dots[key] = { count: 0, hasCorrectionRequest: false };
-      dots[key].count += 1;
-      if (r.status === "PENDING_APPROVAL") dots[key].hasCorrectionRequest = true;
+      if (!dots[r.workDate]) dots[r.workDate] = { count: 0, hasCorrectionRequest: false };
+      dots[r.workDate].count += 1;
+      if (r.status === "PENDING_APPROVAL") dots[r.workDate].hasCorrectionRequest = true;
     });
     return dots;
   }, [workRecords]);
 
-  // 선택된 근무자의 계좌 정보 (토스 송금 연동)
-  const [workerBankInfo, setWorkerBankInfo] = useState<{ bankName?: string; accountNumber?: string } | null>(null);
+  const [salaryPaymentItem, setSalaryPaymentItem] = useState<SalaryPaymentItem | null>(null);
+  const [pendingPaymentId, setPendingPaymentId] = useState<number | null>(null);
+  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
 
   useEffect(() => {
-    if (!selectedWorker) {
-      setWorkerBankInfo(null);
+    if (!selectedWorkplace?.id || !selectedWorker) {
+      setSalaryPaymentItem(null);
+      setPendingPaymentId(null);
+      setIsPaymentCompleted(false);
       return;
     }
-    const fetchBankInfo = async () => {
+    const fetch = async () => {
       try {
-        const res = await getWorkerByCode(selectedWorker.workerCode);
-        setWorkerBankInfo({ bankName: res.data?.bankName, accountNumber: res.data?.accountNumber });
+        const [salaryRes, paymentRes] = await Promise.all([
+          getSalariesByYearMonth(selectedWorkplace.id, year, month + 1),
+          getPaymentsByYearMonth(selectedWorkplace.id, year, month + 1),
+        ]);
+
+        const salaryItems = Array.isArray(salaryRes.data) ? salaryRes.data : [];
+        setSalaryPaymentItem(
+          salaryItems.find((item) => item.workerName === selectedWorker.workerName) ?? null
+        );
+
+        const paymentItems = Array.isArray(paymentRes.data) ? paymentRes.data : [];
+        const matchedPayment = paymentItems.find((p) => p.workerName === selectedWorker.workerName) ?? null;
+        if (matchedPayment?.isPaid) {
+          setIsPaymentCompleted(true);
+          setPendingPaymentId(null);
+        } else {
+          setIsPaymentCompleted(false);
+          setPendingPaymentId(matchedPayment?.id ?? null);
+        }
       } catch {
-        setWorkerBankInfo(null);
+        setSalaryPaymentItem(null);
+        setIsPaymentCompleted(false);
+        setPendingPaymentId(null);
       }
     };
-    fetchBankInfo();
-  }, [selectedWorker?.workerCode]);
+    fetch();
+  }, [selectedWorkplace?.id, selectedWorker?.workerName, year, month]);
 
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
 
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
-    else { setMonth((m) => m - 1); }
+    else setMonth((m) => m - 1);
   };
   const handleNextMonth = () => {
     if (month === 11) { setYear((y) => y + 1); setMonth(0); }
-    else { setMonth((m) => m + 1); }
+    else setMonth((m) => m + 1);
   };
 
-  const handleTabPress = (tab: EmployerTabName) => {
-    navigation.replace(TAB_SCREEN_MAP[tab]);
-  };
+  const handleTabPress = (tab: EmployerTabName) => navigation.replace(TAB_SCREEN_MAP[tab]);
 
-  const handleRemittance = async () => {
-    const amount = Math.round(estimatedPay);
-    let url = `supertoss://send?amount=${amount}`;
-    if (workerBankInfo?.bankName && workerBankInfo?.accountNumber) {
-      const bankCode = BANK_NAME_TO_CODE[workerBankInfo.bankName];
-      if (bankCode) {
-        url += `&bankCode=${bankCode}&accountNo=${workerBankInfo.accountNumber}`;
-      }
+  const handleRemittance = () => {
+    if (!salaryPaymentItem) {
+      Alert.alert(`${month + 1}월 급여 데이터가 없습니다.`);
+      return;
     }
+    Alert.alert(
+      "송금 확인",
+      `${selectedWorker?.workerName}님에게\n${formatCurrency(salaryAmount)}원을 송금하시겠습니까?`,
+      [
+        { text: "취소", style: "cancel" },
+        {
+          text: "송금하기",
+          onPress: async () => {
+            try {
+              let salaryId = salaryPaymentItem.id;
+              if (salaryPaymentItem.totalGrossPay === 0) {
+                const calcRes = await calculateSalary(salaryPaymentItem.contractId, year, month + 1);
+                if (!calcRes.data) throw new Error("급여 계산에 실패했습니다.");
+                salaryId = calcRes.data.id;
+              }
+              const res = await createPayment({ salaryId });
+              if (!res.data) throw new Error("송금 데이터를 받지 못했습니다.");
+              setPendingPaymentId(res.data.id);
+              await Linking.openURL(res.data.tossLink);
+            } catch (e: any) {
+              Alert.alert("송금 실패", e.message ?? "다시 시도해주세요.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleCompletePayment = async () => {
+    if (!pendingPaymentId) return;
     try {
-      await Linking.openURL(url);
-    } catch {
-      Alert.alert("토스 앱이 설치되어 있지 않습니다.");
+      await completePayment(pendingPaymentId);
+      setPendingPaymentId(null);
+      setIsPaymentCompleted(true);
+    } catch (e: any) {
+      Alert.alert("완료 처리 실패", e.message ?? "다시 시도해주세요.");
     }
   };
+
+  const salaryAmount = salaryPaymentItem?.netPay ?? 0;
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -239,13 +275,12 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               workDots={workDots}
             />
             <View style={styles.salaryRow}>
-              <Text weight="Medium" style={styles.salaryLabel}>이번 달 예상 노무비</Text>
+              <Text weight="Medium" style={styles.salaryLabel}>{month + 1}월 순 급여</Text>
               <Text weight="Bold" style={styles.salaryValue}>
-                {formatCurrency(Math.round(estimatedPay))}원
+                {formatCurrency(salaryAmount)}원
               </Text>
             </View>
-            {/* TODO: 고용주 전용 급여명세서 API 필요 (GET /api/employer/contracts/{contractId}/salary)
-                현재 SalaryStatementSheet는 근로자 API 기반이라 고용주 화면에서 데이터 없음 */}
+            {/* TODO: 고용주 전용 급여명세서 API 필요 — 현재 SalaryStatementSheet는 근로자 API 기반 */}
             <TouchableOpacity
               style={styles.outlineButton}
               onPress={() => setIsSalarySheetVisible(true)}
@@ -255,20 +290,29 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 급여명세서 확인하기
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleRemittance}
-              activeOpacity={0.8}
-            >
-              <Text weight="Bold" style={styles.primaryButtonText}>
-                송금하기
-              </Text>
-            </TouchableOpacity>
+            {/*
+              버튼 상태:
+              1. "송금하기"      → handleRemittance (토스 딥링크 오픈)
+              2. "송금 완료 처리" → handleCompletePayment (서버 완료 통보)
+              3. "n월 송금 완료" 배지 
+            */}
+            {isPaymentCompleted ? (
+              <View style={styles.paidBadge}>
+                <Text weight="SemiBold" style={styles.paidText}>{month + 1}월 송금 완료</Text>
+              </View>
+            ) : pendingPaymentId !== null ? (
+              <TouchableOpacity style={styles.primaryButton} onPress={handleCompletePayment} activeOpacity={0.8}>
+                <Text weight="Bold" style={styles.primaryButtonText}>송금 완료 처리</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.primaryButton} onPress={handleRemittance} activeOpacity={0.8}>
+                <Text weight="Bold" style={styles.primaryButtonText}>송금하기</Text>
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </>
       )}
       <EmployerNavigationBar activeTab="transfer" onTabPress={handleTabPress} />
-
       <SalaryStatementSheet
         visible={isSalarySheetVisible}
         onClose={() => setIsSalarySheetVisible(false)}
@@ -293,6 +337,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   loader: {
     flex: 1,
@@ -395,6 +440,17 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 15,
     color: colors.white,
+  },
+  paidBadge: {
+    marginTop: 10,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 24,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  paidText: {
+    fontSize: 15,
+    color: colors.primary,
   },
 });
 
