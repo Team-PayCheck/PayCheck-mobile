@@ -11,6 +11,9 @@ export interface UserResponse {
   phone: string;
   userType: UserType;
   profileImageUrl: string | null;
+  workerCode: string | null;
+  bankName: string | null;
+  accountNumber: string | null;
 }
 
 /** [PUT] /api/users/me 요청 데이터 */

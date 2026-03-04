@@ -2,7 +2,6 @@ import { AxiosError } from "axios";
 import api from "../axios";
 import type { ApiResponse } from "../../types/api.types";
 import type { WorkItem } from "../../types/worker.types";
-import type { WorkerResponse } from "../user/types";
 import type {
 	ContractListItem,
 	ContractDetail,
@@ -22,27 +21,6 @@ import type {
 export const getWorkerByCode = async (workerCode: string) => {
 	const { data } = await api.get(`/api/workers/code/${workerCode}`);
 	return data;
-};
-
-/**
- * 근로자 정보 조회
- */
-export const getWorkerInfo = async (
-	userId: number
-): Promise<ApiResponse<WorkerResponse>> => {
-	try {
-		const { data } = await api.get<ApiResponse<WorkerResponse>>(
-			`/api/workers/user/${userId}`
-		);
-		return data;
-	} catch (error) {
-		const axiosError = error as AxiosError<ApiResponse<WorkerResponse>>;
-		const message =
-			axiosError.response?.data?.error?.message ||
-			axiosError.message ||
-			"근로자 정보 조회 실패";
-		throw new Error(message);
-	}
 };
 
 /**
