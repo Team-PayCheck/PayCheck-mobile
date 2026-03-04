@@ -1,15 +1,6 @@
 // 근무 상태 (API 응답 기준: SCHEDULED, COMPLETED, DELETED만 존재)
 export type WorkStatus = "SCHEDULED" | "COMPLETED" | "DELETED";
 
-export interface NoticeItem {
-	id: number;
-	icon: any; // require() 이미지
-	category: string; // "전달사항", "공지", "관리"
-	title: string;
-	author: string;
-	time: string; // "09:00", "12:00" 등
-}
-
 export interface WorkItem {
 	id: number;
 	contractId: number;
