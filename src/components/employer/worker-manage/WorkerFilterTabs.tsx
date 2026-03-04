@@ -11,12 +11,14 @@ interface WorkerFilterTabsProps {
   workers: EmployerWorkerContract[];
   selectedId: WorkerFilterId;
   onSelect: (id: WorkerFilterId) => void;
+  showAll?: boolean;
 }
 
 const WorkerFilterTabs: React.FC<WorkerFilterTabsProps> = ({
   workers,
   selectedId,
   onSelect,
+  showAll = true,
 }) => {
   return (
     <View>
@@ -26,21 +28,23 @@ const WorkerFilterTabs: React.FC<WorkerFilterTabsProps> = ({
         contentContainerStyle={styles.container}
       >
         {/* 전체 탭 */}
-        <TouchableOpacity
-          style={[styles.chip, selectedId === "all" && styles.chipSelected]}
-          onPress={() => onSelect("all")}
-          activeOpacity={0.7}
-        >
-          <Text
-            weight={selectedId === "all" ? "SemiBold" : "Regular"}
-            style={[
-              styles.chipText,
-              selectedId === "all" && styles.chipTextSelected,
-            ]}
+        {showAll && (
+          <TouchableOpacity
+            style={[styles.chip, selectedId === "all" && styles.chipSelected]}
+            onPress={() => onSelect("all")}
+            activeOpacity={0.7}
           >
-            전체 {workers.length}
-          </Text>
-        </TouchableOpacity>
+            <Text
+              weight={selectedId === "all" ? "SemiBold" : "Regular"}
+              style={[
+                styles.chipText,
+                selectedId === "all" && styles.chipTextSelected,
+              ]}
+            >
+              전체 {workers.length}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* 근무자별 탭 */}
         {workers.map((worker) => {

@@ -247,6 +247,7 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               workers={workers}
               selectedId={selectedContractId}
               onSelect={setSelectedContractId}
+              showAll={false}
             />
           )}
           <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
