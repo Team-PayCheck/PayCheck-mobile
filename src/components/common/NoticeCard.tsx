@@ -10,11 +10,11 @@ import { NOTICE_CATEGORY_LABEL } from "../../types/common/notice.types";
 import type { NoticeCardItem } from "../../types/common/notice.types";
 import type { NoticeCategory } from "../../api/notice/types";
 
-// 카테고리별 아이콘 이미지 매핑 (SCHEDULE은 이미지 없으므로 null)
+// 카테고리별 아이콘 이미지 매핑
 const CATEGORY_ICON: Record<NoticeCategory, any> = {
 	HANDOVER: require("../../assets/images/notice/handover.png"),
 	URGENT: require("../../assets/images/notice/urgent.png"),
-	SCHEDULE: null,
+  SCHEDULE: require("../../../assets/images/notice/schedule.png"),
 	ETC: require("../../assets/images/notice/etc.png"),
 };
 
