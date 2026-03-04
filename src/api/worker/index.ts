@@ -14,15 +14,6 @@ import type {
 	SalaryCalculateResponse,
 } from "./types";
 
-
-/**
- * 근로자 ID로 조회
- */
-export const getWorkerById = async (workerId: number) => {
-	const { data } = await api.get(`/api/workers/${workerId}`);
-	return data;
-};
-
 /**
  * 근로자 코드로 조회
  */

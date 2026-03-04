@@ -24,7 +24,7 @@ import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
 import { getWorkplaces, getWorkRecords } from "../../api/employer";
 import type { WorkplaceDetails, WorkRecord } from "../../api/employer/types";
-import { getWorkerById } from "../../api/worker";
+import { getWorkerByCode } from "../../api/worker";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -141,14 +141,14 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     }
     const fetchBankInfo = async () => {
       try {
-        const res = await getWorkerById(selectedWorker.workerId);
+        const res = await getWorkerByCode(selectedWorker.workerCode);
         setWorkerBankInfo({ bankName: res.data?.bankName, accountNumber: res.data?.accountNumber });
       } catch {
         setWorkerBankInfo(null);
       }
     };
     fetchBankInfo();
-  }, [selectedWorker?.workerId]);
+  }, [selectedWorker?.workerCode]);
 
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
 
@@ -171,13 +171,12 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     if (workerBankInfo?.bankName && workerBankInfo?.accountNumber) {
       const bankCode = BANK_NAME_TO_CODE[workerBankInfo.bankName];
       if (bankCode) {
-        url += `&bankCode=${bankCode}&accountNumber=${workerBankInfo.accountNumber}`;
+        url += `&bankCode=${bankCode}&accountNo=${workerBankInfo.accountNumber}`;
       }
     }
-    const canOpen = await Linking.canOpenURL(url);
-    if (canOpen) {
+    try {
       await Linking.openURL(url);
-    } else {
+    } catch {
       Alert.alert("토스 앱이 설치되어 있지 않습니다.");
     }
   };
@@ -295,8 +294,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 32,
   },
   loader: {
     flex: 1,
@@ -306,7 +303,6 @@ const styles = StyleSheet.create({
   },
   calendarNavWrapper: {
     paddingHorizontal: 20,
-    paddingTop: 16,
   },
   dashedDivider: {
     borderStyle: "dashed",
@@ -321,13 +317,13 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: colors.white,
     borderRadius: 16,
-    marginTop: 16,
     padding: 16,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
+    marginBottom: 20,
   },
   workerAvatar: {
     width: 40,
