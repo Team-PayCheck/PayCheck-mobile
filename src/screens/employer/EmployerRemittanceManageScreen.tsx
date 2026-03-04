@@ -84,7 +84,6 @@ const EmployerRemittanceManageScreen: React.FC = () => {
 
   // 근무 기록 + workDots
   const [workRecords, setWorkRecords] = useState<WorkRecord[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (!selectedWorkplace?.id || selectedContractId === "all") {
@@ -235,8 +234,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
             <MonthlyCalendar
               year={year}
               month={month}
-              selectedDate={selectedDate}
-              onDateSelect={setSelectedDate}
+              selectedDate={null}
+              onDateSelect={() => {}}
               workDots={workDots}
             />
             <View style={styles.salaryRow}>
