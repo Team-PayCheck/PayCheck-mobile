@@ -61,7 +61,7 @@ const NoticeDetailSheet: React.FC<NoticeDetailSheetProps> = ({
 				<View style={styles.content}>
 					{/* 헤더: 근무지명 + 카테고리 */}
 					<View style={styles.headerRow}>
-						<Text weight="SemiBold" style={styles.workplaceName}>
+						<Text weight="Bold" style={styles.workplaceName}>
 							{notice.workplaceName}
 						</Text>
 						<View style={styles.categoryBadge}>
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
 	},
 	deleteText: {
 		fontSize: 15,
-		color: colors.primary,
+		color: colors.red,
 	},
 });
 
