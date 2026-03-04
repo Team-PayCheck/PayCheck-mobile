@@ -141,8 +141,20 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 		return item?.label ?? expiresDate.slice(5).replace("-", "/");
 	}, [expiresDate, dateItems]);
 
+	const hasChanges = useMemo(() => {
+		if (!notice) return false;
+		return (
+			category !== notice.category ||
+			title.trim() !== notice.title ||
+			content.trim() !== notice.content ||
+			expiresDate !== extractDate(notice.expiresAt) ||
+			expiresHour !== extractHour(notice.expiresAt) ||
+			expiresMinute !== extractMinute(notice.expiresAt)
+		);
+	}, [notice, category, title, content, expiresDate, expiresHour, expiresMinute]);
+
 	const canSubmit =
-		title.trim().length > 0 && content.trim().length > 0 && !isSubmitting;
+		title.trim().length > 0 && content.trim().length > 0 && hasChanges && !isSubmitting;
 
 	const handleSubmit = useCallback(() => {
 		if (!notice || !canSubmit) return;
@@ -460,7 +472,7 @@ const styles = StyleSheet.create({
 	},
 	deleteText: {
 		fontSize: 15,
-		color: colors.primary,
+		color: colors.red,
 	},
 	disabledText: {
 		color: colors.textDisabled,
