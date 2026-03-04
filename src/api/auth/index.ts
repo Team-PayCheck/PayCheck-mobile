@@ -81,17 +81,35 @@ export const devLogin = async (
 	name: string,
 	userType: string
 ): Promise<ApiResponse<AuthSuccessData>> => {
-	const { data } = await api.post<ApiResponse<AuthSuccessData>>(
-		"/api/auth/dev/login",
-		{ userId, name, userType }
-	);
-	return data;
+	try {
+		const { data } = await api.post<ApiResponse<AuthSuccessData>>(
+			"/api/auth/dev/login",
+			{ userId, name, userType }
+		);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ApiResponse<AuthSuccessData>>;
+		const message =
+			axiosError.response?.data?.error?.message ||
+			axiosError.message ||
+			"Dev 로그인 실패";
+		throw new Error(message);
+	}
 };
 
 /**
  * 회원 탈퇴
  */
 export const deleteMyAccount = async () => {
-	const { data } = await api.delete("/api/users/me");
-	return data;
+	try {
+		const { data } = await api.delete("/api/users/me");
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError;
+		const message =
+			(axiosError.response?.data as any)?.error?.message ||
+			axiosError.message ||
+			"회원 탈퇴 실패";
+		throw new Error(message);
+	}
 };

@@ -19,8 +19,17 @@ import type {
  * 근로자 코드로 조회
  */
 export const getWorkerByCode = async (workerCode: string) => {
-	const { data } = await api.get(`/api/workers/code/${workerCode}`);
-	return data;
+	try {
+		const { data } = await api.get(`/api/workers/code/${workerCode}`);
+		return data;
+	} catch (error) {
+		const axiosError = error as AxiosError;
+		const message =
+			(axiosError.response?.data as any)?.error?.message ||
+			axiosError.message ||
+			"근로자 코드 조회 실패";
+		throw new Error(message);
+	}
 };
 
 /**
