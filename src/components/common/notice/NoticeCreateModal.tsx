@@ -93,7 +93,7 @@ const NoticeCreateModal: React.FC<NoticeCreateModalProps> = ({
 	);
 
 	return (
-		<BottomSheetModal visible={visible} onClose={handleClose}>
+		<BottomSheetModal visible={visible} onClose={handleClose} keyboardOffsetRatio={0.7}>
 			{/* 스크롤 가능한 폼 영역 */}
 			<ScrollView
 				showsVerticalScrollIndicator={false}

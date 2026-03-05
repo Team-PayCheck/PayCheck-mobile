@@ -47,7 +47,7 @@ const AccountEditModal: React.FC<AccountEditModalProps> = ({
   };
 
   return (
-    <BottomSheetModal visible={visible} onClose={onClose} maxHeight="60%">
+    <BottomSheetModal visible={visible} onClose={onClose} maxHeight="60%" keyboardOffsetRatio={0.8}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

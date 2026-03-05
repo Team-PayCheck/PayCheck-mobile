@@ -125,7 +125,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	};
 
 	return (
-		<BottomSheetModal visible={visible} onClose={handleClose} maxHeight="85%">
+		<BottomSheetModal visible={visible} onClose={handleClose} maxHeight="85%" keyboardOffsetRatio={0.4}>
 			<ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 				<Text weight="ExtraBold" style={styles.title}>
 					새로운 근무지 추가하기

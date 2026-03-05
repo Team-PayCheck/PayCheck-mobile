@@ -22,19 +22,21 @@ src/
 │   ├── user/         # 사용자 API (프로필 조회/수정)
 │   ├── worker/       # 근로자 API (계약, 근무기록, 정정요청, 급여, 송금)
 │   ├── employer/     # 고용주 API (근무지 CRUD, 계약 CRUD, 정정요청 승인/거절)
+│   ├── notice/       # 공지 API (공지 CRUD)
 │   └── kakao/        # 카카오 API (주소 검색)
 ├── assets/           # 폰트, 이미지
 ├── components/
-│   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination 등
-│   ├── employer/     # 고용주 전용 (직원관리, 마이페이지)
+│   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination, NoticeBoard 등
+│   │   └── notice/          # 공지 컴포넌트 (작성/수정/상세 모달, 카테고리 선택)
+│   ├── employer/     # 고용주 전용 (홈, 직원관리, 송금관리, 마이페이지)
 │   ├── layout/       # Header
 │   ├── mypage/       # 공통 마이페이지 (Drawer, ProfileCard, SentRequestCard 등)
 │   ├── signup/       # 회원가입
 │   ├── skeleton/     # 로딩 스켈레톤
 │   └── worker/       # 근로자 전용 (주간/월간 캘린더, 급여명세서)
 ├── hooks/
-│   ├── common/       # useOnboardingStatus, useLogoutHandler
-│   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests
+│   ├── common/       # useOnboardingStatus, useLogoutHandler, useNotices, usePickerState
+│   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests, useEmployerDailyWorkRecords
 │   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData, useSalaryStatement 등
 ├── navigation/       # RootNavigator, WorkerStack, EmployerStack, SignUpNavigator, OnboardingStack
 ├── screens/
@@ -57,10 +59,14 @@ src/
 - 마이페이지: Drawer 메뉴, 프로필 수정, 근무지 관리, 보낸 요청, 회원탈퇴
 
 ### 고용주 기능
+- 홈: 일간 캘린더, 근무 추가/수정 모달
 - 직원관리: 근무지별 근무자 목록 조회, Accordion 카드 (시급/급여지급일/근무시간 편집), 퇴사처리
 - 근무자 추가: 2단계 플로우 (근무자 코드 검색 → 근무시간 설정), 근무 스케줄 타임라인 차트 프리뷰
 - 근무지 관리: 근무지 CRUD, 카카오 주소 검색 연동
 - 마이페이지: 프로필 수정, 받은 근무요청 보기 (사업장별 탭, 상태 필터, 페이지네이션, 승인/거절)
+
+### 공통 기능
+- 공지 게시판: 공지 작성/수정/삭제, 카테고리 필터, 상세 보기 바텀시트 (고용주/근로자 공용)
 
 ### 인증
 - 카카오 네이티브 SDK 로그인 (`@react-native-seoul/kakao-login`)
