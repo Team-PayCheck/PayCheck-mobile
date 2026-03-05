@@ -145,7 +145,7 @@ const NoticeEditSheet: React.FC<NoticeEditSheetProps> = ({
 	if (!notice) return null;
 
 	return (
-		<BottomSheetModal visible={visible} onClose={onClose}>
+		<BottomSheetModal visible={visible} onClose={onClose} keyboardOffsetRatio={0.8}>
 			{/* 스크롤 가능한 폼 영역 */}
 			<ScrollView
 				showsVerticalScrollIndicator={false}
