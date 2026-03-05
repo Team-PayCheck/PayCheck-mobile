@@ -28,7 +28,7 @@ PayCheck 웹 프로젝트(payCheck-frontend)를 React Native(Expo)로 모바일 
 - **목표**: payCheck-frontend(React 웹앱)을 모바일 앱으로 포팅
 - **웹 원본**: `../payCheck-frontend`
 - **프레임워크**: React Native + Expo
-- **상태**: 근로자 기능 구현 완료, 고용주 마이페이지 구현 중
+- **상태**: 근로자/고용주 기능 구현 완료, 공지 게시판 구현 완료
 
 ## 기술 스택
 
@@ -50,12 +50,16 @@ src/
 │   ├── user/         # 사용자 API (프로필 조회/수정, 계좌 정보 수정)
 │   ├── worker/       # 근로자 API (계약, 근무기록, 정정요청, 급여, 송금)
 │   ├── employer/     # 고용주 API (근무지 CRUD, 계약 CRUD, 정정요청 승인/거절)
+│   ├── notice/       # 공지 API (공지 CRUD)
 │   └── kakao/        # 카카오 API (주소 검색)
 ├── assets/           # 폰트, 이미지
 ├── components/
-│   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination 등
+│   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination, NoticeBoard 등
+│   │   └── notice/          # 공지 컴포넌트 (NoticeCreateModal, NoticeDetailSheet, NoticeEditSheet, NoticeCategorySelector)
 │   ├── employer/
-│   │   ├── worker-manage/   # 직원관리 (WorkerCard, AddWorkerModal 등)
+│   │   ├── home/            # 고용주 홈 (근무 추가/수정 모달)
+│   │   ├── worker-manage/   # 직원관리 (WorkerCard, AddWorkerModal, WorkScheduleCalendarModal 등)
+│   │   ├── remittance/      # 송금관리
 │   │   └── mypage/          # 고용주 마이페이지 (EmployerMyPageDrawer, ReceivedRequestCard, AddWorkplaceModal 등)
 │   ├── layout/       # Header
 │   ├── mypage/       # 공통 마이페이지 (Drawer, ProfileCard, MenuButton, SentRequestCard 등)
@@ -66,8 +70,8 @@ src/
 │       ├── monthlyCalendar/ # 월간 캘린더
 │       └── salary/          # 급여명세서 (WorkplaceTabSelector 등)
 ├── hooks/
-│   ├── common/       # useOnboardingStatus, useLogoutHandler
-│   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests
+│   ├── common/       # useOnboardingStatus, useLogoutHandler, useNotices, usePickerState
+│   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests, useEmployerDrawer, useEmployerDailyWorkRecords
 │   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData, useSalaryStatement 등
 ├── navigation/       # RootNavigator, WorkerStack, EmployerStack, SignUpNavigator, OnboardingStack
 ├── screens/
@@ -96,9 +100,13 @@ src/
 - 마이페이지: 프로필 수정, 근무지 관리, 보낸 근무요청 보기
 
 **고용주(Employer)**:
+- 홈: 일간 캘린더, 근무 추가/수정
 - 직원관리: 근무지별 근무자 목록, 계약 수정, 근무자 추가/퇴사
 - 근무지 관리: 근무지 CRUD (카카오 주소 검색 연동)
 - 마이페이지: 프로필 수정, 받은 근무요청 보기 (승인/거절, 페이지네이션)
+
+**공통**:
+- 공지 게시판: 공지 작성/수정/삭제, 카테고리 필터, 상세 보기 바텀시트
 
 ### 인증
 - 카카오 로그인/회원가입 (`@react-native-seoul/kakao-login`)
@@ -143,7 +151,9 @@ Welcome (카카오 로그인)
 | 컴포넌트 | 설명 |
 |---------|------|
 | `Text` | **필수 사용.** react-native의 Text 대신 사용 (Pretendard 폰트). weight: Regular/Medium/SemiBold/Bold/ExtraBold |
-| `BottomSheetModal` | 하단 슬라이드업 모달 (overlay + slide-up 애니메이션) |
+| `BottomSheetModal` | 하단 슬라이드업 모달 (overlay + slide-up 애니메이션, 키보드 자동 회피, 스와이프 닫기) |
+| `NoticeBoard` | 공지 게시판 (고용주/근로자 공용, 카테고리 필터) |
+| `NoticeCard` | 공지 카드 (제목, 카테고리, 날짜) |
 | `WheelPicker` | iOS 스타일 드럼 롤 피커. **주의: ScrollView 안에 넣으면 VirtualizedList 중첩 경고** |
 | `MonthlyCalendar` | 월간 캘린더 그리드 (날짜별 dot 표시, 오늘/선택 하이라이트) |
 | `MonthlyCalendarNav` | 월간 캘린더 상단 네비게이션 (이전/다음 달) |
@@ -171,6 +181,15 @@ Welcome (카카오 로그인)
 | `useWorkplaceContracts` | 근무지별 근무자 목록 + 계약 상세 병렬 조회 + 퇴사/수정 |
 | `useAddWorker` | 근무자 추가 2단계 폼 (코드 검색 → 시급/근무시간 설정) |
 | `useReceivedRequests` | 받은 정정요청 목록(페이징)/상세/승인/거절 관리 |
+| `useEmployerDrawer` | 고용주 Drawer 보일러플레이트 추출 |
+| `useEmployerDailyWorkRecords` | 고용주 일간 근무기록 조회 |
+| `useWorkTimePicker` | 근무시간 피커 상태 관리 |
+
+**공통:**
+| 훅 | 설명 |
+|---|------|
+| `useNotices` | 공지 목록/상세/CRUD 관리 |
+| `usePickerState` | Picker 로직 공통 훅 |
 
 ### 참조할 웹 파일 위치
 
@@ -207,6 +226,9 @@ eas build --platform ios  # 빌드
 - [x] 고용주 마이페이지 Drawer + 프로필 수정
 - [x] 고용주 받은 근무요청 (사업장별 탭, 상태 필터, 페이지네이션, 승인/거절)
 - [x] 공통 컴포넌트 (Pagination, WorkplaceTabSelector 등)
+- [x] 고용주 일간 캘린더 화면 (근무 추가/수정 모달)
+- [x] 공지 게시판 (공지 작성/수정/삭제, 카테고리 필터, 상세 바텀시트)
+- [x] BottomSheetModal 스와이프 닫기 + 키보드 회피 버그 수정
 
 ### TODO
 - [ ] 고용주 송금관리 화면 구현
