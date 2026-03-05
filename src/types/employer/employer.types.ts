@@ -26,6 +26,7 @@ export interface WorkScheduleRow {
 export interface EmployerWorkerContract {
   contractId: number;
   workerId: number;
+  workerCode: string;
   workerName: string;
   workerProfileImage?: string;
   workDaysSummary: string[];

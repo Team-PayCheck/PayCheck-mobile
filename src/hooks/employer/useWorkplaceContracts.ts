@@ -52,6 +52,7 @@ const mapContractToUI = (contract: Contract): EmployerWorkerContract => {
   return {
     contractId: contract.id,
     workerId: contract.workerId,
+    workerCode: contract.workerCode,
     workerName: contract.workerName,
     workDaysSummary,
     hourlyWage: contract.hourlyWage,

@@ -19,6 +19,7 @@ const config: ExpoConfig = {
     appleTeamId: '4XTGL2D5GF',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
+      LSApplicationQueriesSchemes: ["supertoss"],
     },
   },
   android: {

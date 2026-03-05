@@ -1,3 +1,5 @@
+import type { SalaryDetailResponse } from "../worker/types";
+
 // ============ API Request 타입 ============
 
 // ============ 근무지 (Workplace) ============
@@ -92,8 +94,50 @@ export interface GetSalariesParams {
 // ============ 송금 (Payment) ============
 export interface CreatePaymentRequest {
   salaryId: number;
-  amount: number;
-  memo?: string;
+}
+
+/** GET /api/employer/salaries/year-month 응답 아이템 */
+export interface SalaryPaymentItem {
+  id: number;
+  contractId: number;
+  workerName: string;
+  year: number;
+  month: number;
+  totalGrossPay: number;
+  netPay: number;
+  paymentDueDate: string;
+}
+
+/** GET /api/employer/payments/year-month 응답 아이템 */
+export interface PaymentListItem {
+  id: number;
+  salaryId: number;
+  workerName: string;
+  year: number;
+  month: number;
+  netPay: number;
+  status: string;
+  paymentDate: string;
+  isPaid: boolean;
+}
+
+/** POST /api/employer/payments, PUT /api/employer/payments/{id}/complete 응답 */
+export interface PaymentRecord {
+  id: number;
+  salaryId: number;
+  workerId: number;
+  workerName: string;
+  workplaceId: number;
+  workplaceName: string;
+  year: number;
+  month: number;
+  netPay: number;
+  status: string;
+  paymentDate: string | null;
+  transactionId: string | null;
+  failureReason: string | null;
+  isPaid: boolean;
+  tossLink: string;
 }
 
 // ============ 정정 요청 (Correction Request) ============
@@ -219,28 +263,7 @@ export interface SalaryListItem {
 }
 
 // GET /api/employer/salaries/{id} - 급여 상세 조회
-export interface SalaryDetail {
-  id: number;
-  contractId: number;
-  workerId: number;
-  workerName: string;
-  workplaceId: number;
-  workplaceName: string;
-  year: number;
-  month: number;
-  totalWorkHours: number;
-  basePay: number;
-  overtimePay: number;
-  nightPay: number;
-  holidayPay: number;
-  totalGrossPay: number;
-  fourMajorInsurance: number;
-  incomeTax: number;
-  localIncomeTax: number;
-  totalDeduction: number;
-  netPay: number;
-  paymentDueDate: string;
-}
+export type SalaryDetail = SalaryDetailResponse;
 
 // ============ 정정 요청 (Correction Request) ============
 

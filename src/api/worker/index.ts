@@ -14,7 +14,6 @@ import type {
 	SalaryCalculateResponse,
 } from "./types";
 
-
 /**
  * 근로자 코드로 조회
  */
