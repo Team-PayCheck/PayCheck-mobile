@@ -20,17 +20,16 @@ import DeductionSection from "../../components/worker/salary/DeductionSection";
 import type { EmployerStackParamList } from "../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../hooks/employer/useEmployerDrawer";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
+import useRemittanceStatus from "../../hooks/employer/useRemittanceStatus";
 import {
   getWorkplaces,
   getWorkRecords,
-  getSalariesByYearMonth,
-  getPaymentsByYearMonth,
   getSalaryById,
   calculateSalary,
   createPayment,
   completePayment,
 } from "../../api/employer";
-import type { WorkplaceDetails, WorkRecord, SalaryPaymentItem, SalaryDetail } from "../../api/employer/types";
+import type { WorkplaceDetails, WorkRecord, SalaryDetail } from "../../api/employer/types";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
   home: "EmployerHomeMain",
@@ -115,46 +114,18 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     return dots;
   }, [workRecords]);
 
-  const [salaryPaymentItem, setSalaryPaymentItem] = useState<SalaryPaymentItem | null>(null);
-  const [pendingPaymentId, setPendingPaymentId] = useState<number | null>(null);
-  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
-
-  useEffect(() => {
-    if (!selectedWorkplace?.id || !selectedWorker) {
-      setSalaryPaymentItem(null);
-      setPendingPaymentId(null);
-      setIsPaymentCompleted(false);
-      return;
-    }
-    const fetch = async () => {
-      try {
-        const [salaryRes, paymentRes] = await Promise.all([
-          getSalariesByYearMonth(selectedWorkplace.id, year, month + 1),
-          getPaymentsByYearMonth(selectedWorkplace.id, year, month + 1),
-        ]);
-
-        const salaryItems = Array.isArray(salaryRes.data) ? salaryRes.data : [];
-        setSalaryPaymentItem(
-          salaryItems.find((item) => item.workerName === selectedWorker.workerName) ?? null
-        );
-
-        const paymentItems = Array.isArray(paymentRes.data) ? paymentRes.data : [];
-        const matchedPayment = paymentItems.find((p) => p.workerName === selectedWorker.workerName) ?? null;
-        if (matchedPayment?.isPaid) {
-          setIsPaymentCompleted(true);
-          setPendingPaymentId(null);
-        } else {
-          setIsPaymentCompleted(false);
-          setPendingPaymentId(matchedPayment?.id ?? null);
-        }
-      } catch {
-        setSalaryPaymentItem(null);
-        setIsPaymentCompleted(false);
-        setPendingPaymentId(null);
-      }
-    };
-    fetch();
-  }, [selectedWorkplace?.id, selectedWorker?.workerName, year, month]);
+  const {
+    salaryPaymentItem,
+    pendingPaymentId,
+    isPaymentCompleted,
+    setPendingPaymentId,
+    setIsPaymentCompleted,
+  } = useRemittanceStatus(
+    selectedWorkplace?.id ?? null,
+    selectedWorker?.workerName ?? null,
+    year,
+    month,
+  );
 
   // ─── 급여명세서 ────────────────────────────────────────────────────────────
   const [isSalarySheetVisible, setIsSalarySheetVisible] = useState(false);
