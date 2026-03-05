@@ -22,6 +22,8 @@ interface BottomSheetModalProps {
 	onClose: () => void;
 	children: React.ReactNode;
 	maxHeight?: DimensionValue;
+	/** 키보드 표시 시 모달이 올라가는 비율 (0: 안 올라감 ~ 1: 키보드 높이만큼 올라감) */
+	keyboardOffsetRatio?: number;
 }
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -32,6 +34,7 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 	onClose,
 	children,
 	maxHeight = "90%",
+	keyboardOffsetRatio = 1,
 }) => {
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const overlayAnim = useRef(new Animated.Value(0)).current;
@@ -72,7 +75,7 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 
 		const showSub = Keyboard.addListener(showEvent, (e) => {
 			Animated.timing(keyboardOffset, {
-				toValue: -e.endCoordinates.height,
+				toValue: -e.endCoordinates.height * keyboardOffsetRatio,
 				duration: 150,
 				useNativeDriver: true,
 			}).start();
