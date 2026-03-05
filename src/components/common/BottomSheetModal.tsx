@@ -63,6 +63,8 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 	}, [visible]);
 
 	useEffect(() => {
+		if (!visible) return;
+
 		const showEvent =
 			Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
 		const hideEvent =
@@ -88,7 +90,7 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 			showSub.remove();
 			hideSub.remove();
 		};
-	}, []);
+	}, [visible]);
 
 	const handleClose = useCallback(() => {
 		Keyboard.dismiss();
