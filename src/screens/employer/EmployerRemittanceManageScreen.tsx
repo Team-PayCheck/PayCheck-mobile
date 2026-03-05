@@ -161,6 +161,11 @@ const EmployerRemittanceManageScreen: React.FC = () => {
   const [salaryDetail, setSalaryDetail] = useState<SalaryDetail | null>(null);
   const [isSalaryDetailLoading, setIsSalaryDetailLoading] = useState(false);
 
+  const handleCloseSalarySheet = () => {
+    setIsSalarySheetVisible(false);
+    setSalaryDetail(null);
+  };
+
   const handleOpenSalarySheet = async () => {
     if (!salaryPaymentItem) {
       Alert.alert(`${month + 1}월 급여 데이터가 없습니다.`);
@@ -341,7 +346,7 @@ const EmployerRemittanceManageScreen: React.FC = () => {
 
       <BottomSheetModal
         visible={isSalarySheetVisible}
-        onClose={() => { setIsSalarySheetVisible(false); setSalaryDetail(null); }}
+        onClose={handleCloseSalarySheet}
         maxHeight="95%"
       >
         {isSalaryDetailLoading ? (
@@ -350,7 +355,7 @@ const EmployerRemittanceManageScreen: React.FC = () => {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
             <View style={styles.sheetHeader}>
               <Text weight="Bold" style={styles.sheetTitle}>급여명세서</Text>
-              <TouchableOpacity onPress={() => { setIsSalarySheetVisible(false); setSalaryDetail(null); }} hitSlop={8}>
+              <TouchableOpacity onPress={handleCloseSalarySheet} hitSlop={8}>
                 <Text style={styles.sheetClose}>✕</Text>
               </TouchableOpacity>
             </View>
