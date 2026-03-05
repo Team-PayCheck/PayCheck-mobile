@@ -116,11 +116,6 @@ export type BankName = keyof typeof BANK_INFO;
 
 export const BANK_NAMES = Object.keys(BANK_INFO) as BankName[];
 
-// 은행만 필터 (증권사 제외)
-export const BANK_ONLY_NAMES = BANK_NAMES.slice(0, 26);
-
-// 증권사만 필터
-export const SECURITIES_NAMES = BANK_NAMES.slice(26);
 
 /**
  * 은행명 → 토스 은행 코드 매핑

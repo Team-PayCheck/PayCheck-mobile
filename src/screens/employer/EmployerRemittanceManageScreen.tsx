@@ -43,13 +43,10 @@ const EmployerRemittanceManageScreen: React.FC = () => {
   const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
   // 송금관리는 지난달 급여를 기본으로 보여줌 (예: 3월 10일(월급날) 접속 → 2월 급여 표시)
-  const [year, setYear] = useState(() => {
+  const [{ year, month }, setYearMonth] = useState(() => {
     const d = new Date();
-    return d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
-  });
-  const [month, setMonth] = useState(() => {
-    const d = new Date();
-    return d.getMonth() === 0 ? 11 : d.getMonth() - 1;
+    const m = d.getMonth();
+    return { year: m === 0 ? d.getFullYear() - 1 : d.getFullYear(), month: m === 0 ? 11 : m - 1 };
   });
 
   const [workplaces, setWorkplaces] = useState<WorkplaceDetails[]>([]);
@@ -183,12 +180,14 @@ const EmployerRemittanceManageScreen: React.FC = () => {
   };
 
   const handlePrevMonth = () => {
-    if (month === 0) { setYear((y) => y - 1); setMonth(11); }
-    else setMonth((m) => m - 1);
+    setYearMonth(({ year, month }) =>
+      month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
+    );
   };
   const handleNextMonth = () => {
-    if (month === 11) { setYear((y) => y + 1); setMonth(0); }
-    else setMonth((m) => m + 1);
+    setYearMonth(({ year, month }) =>
+      month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
+    );
   };
 
   const handleTabPress = (tab: EmployerTabName) => navigation.replace(TAB_SCREEN_MAP[tab]);
