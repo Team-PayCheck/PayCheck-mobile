@@ -47,7 +47,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   }, [visible]);
 
   return (
-    <BottomSheetModal visible={visible} onClose={onClose} maxHeight="85%">
+    <BottomSheetModal visible={visible} onClose={onClose} maxHeight="85%" keyboardOffsetRatio={0.8}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
