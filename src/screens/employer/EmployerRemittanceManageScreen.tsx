@@ -194,7 +194,12 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               const res = await createPayment({ salaryId });
               if (!res.data) throw new Error("송금 데이터를 받지 못했습니다.");
               setPendingPaymentId(res.data.id);
-              await Linking.openURL(res.data.tossLink);
+              const canOpen = await Linking.canOpenURL(res.data.tossLink);
+              if (canOpen) {
+                await Linking.openURL(res.data.tossLink);
+              } else {
+                Alert.alert("토스 앱 필요", "송금을 위해 토스 앱을 설치해주세요.");
+              }
             } catch (e: any) {
               Alert.alert("송금 실패", e.message ?? "다시 시도해주세요.");
             }
@@ -330,8 +335,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
                 <Text style={styles.sheetClose}>✕</Text>
               </TouchableOpacity>
             </View>
-            <PaymentSection salary={salaryDetail as any} />
-            <DeductionSection salary={salaryDetail as any} />
+            <PaymentSection salary={salaryDetail} />
+            <DeductionSection salary={salaryDetail} />
             <View style={styles.netPayContainer}>
               <Text weight="Bold" style={styles.netPayText}>
                 실 수령액 : {salaryDetail?.netPay != null ? `${formatCurrency(salaryDetail.netPay)}원` : "?"}

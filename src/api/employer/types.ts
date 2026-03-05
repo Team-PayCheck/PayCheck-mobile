@@ -1,3 +1,5 @@
+import type { SalaryDetailResponse } from "../worker/types";
+
 // ============ API Request 타입 ============
 
 // ============ 근무지 (Workplace) ============
@@ -261,28 +263,7 @@ export interface SalaryListItem {
 }
 
 // GET /api/employer/salaries/{id} - 급여 상세 조회
-export interface SalaryDetail {
-  id: number;
-  contractId: number;
-  workerId: number;
-  workerName: string;
-  workplaceId: number;
-  workplaceName: string;
-  year: number;
-  month: number;
-  totalWorkHours: number;
-  basePay: number;
-  overtimePay: number;
-  nightPay: number;
-  holidayPay: number;
-  totalGrossPay: number;
-  fourMajorInsurance: number;
-  incomeTax: number;
-  localIncomeTax: number;
-  totalDeduction: number;
-  netPay: number;
-  paymentDueDate: string;
-}
+export type SalaryDetail = SalaryDetailResponse;
 
 // ============ 정정 요청 (Correction Request) ============
 
