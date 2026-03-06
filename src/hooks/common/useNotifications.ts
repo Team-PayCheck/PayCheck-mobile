@@ -34,10 +34,8 @@ export function useNotifications(): UseNotificationsReturn {
 	const [notifications, setNotifications] = useState<NotificationResponse[]>(
 		[]
 	);
-	const [unreadCount, setUnreadCount] = useState(0);
-	const setGlobalUnreadCount = useNotificationStore(
-		(s) => s.setUnreadCount
-	);
+	const { unreadCount, setUnreadCount, decrementUnreadCount } =
+		useNotificationStore();
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [totalPages, setTotalPages] = useState(1);
@@ -58,9 +56,8 @@ export function useNotifications(): UseNotificationsReturn {
 			const response = await getNotifications(params);
 			if (response.success && response.data) {
 				const data = response.data;
-				const items = Array.isArray(data) ? data : data.content ?? [];
-				setNotifications(items);
-				if (!Array.isArray(data) && data.totalPages !== undefined) {
+				setNotifications(data.content ?? []);
+				if (data.totalPages !== undefined) {
 					setTotalPages(Math.max(1, data.totalPages));
 				}
 			}
@@ -76,12 +73,11 @@ export function useNotifications(): UseNotificationsReturn {
 			const response = await getUnreadCount();
 			if (response.success && response.data) {
 				setUnreadCount(response.data.count);
-				setGlobalUnreadCount(response.data.count);
 			}
 		} catch {
 			// silent fail
 		}
-	}, [setGlobalUnreadCount]);
+	}, [setUnreadCount]);
 
 	useEffect(() => {
 		fetchNotifications();
@@ -91,23 +87,22 @@ export function useNotifications(): UseNotificationsReturn {
 		fetchUnreadCount();
 	}, [fetchUnreadCount]);
 
-	const handleRead = useCallback(async (id: number) => {
-		try {
-			const response = await readNotification(id);
-			if (response.success) {
-				setNotifications((prev) =>
-					prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-				);
-				setUnreadCount((prev) => {
-					const next = Math.max(0, prev - 1);
-					setGlobalUnreadCount(next);
-					return next;
-				});
+	const handleRead = useCallback(
+		async (id: number) => {
+			try {
+				const response = await readNotification(id);
+				if (response.success) {
+					setNotifications((prev) =>
+						prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+					);
+					decrementUnreadCount();
+				}
+			} catch {
+				// silent fail
 			}
-		} catch {
-			// silent fail
-		}
-	}, [setGlobalUnreadCount]);
+		},
+		[decrementUnreadCount]
+	);
 
 	const handleReadAll = useCallback(async () => {
 		try {
@@ -117,33 +112,29 @@ export function useNotifications(): UseNotificationsReturn {
 					prev.map((n) => ({ ...n, isRead: true }))
 				);
 				setUnreadCount(0);
-				setGlobalUnreadCount(0);
 			}
 		} catch {
 			// silent fail
 		}
-	}, [setGlobalUnreadCount]);
+	}, [setUnreadCount]);
 
-	const handleDelete = useCallback(async (id: number) => {
-		try {
-			const response = await deleteNotification(id);
-			if (response.success) {
-				setNotifications((prev) => {
-					const deleted = prev.find((n) => n.id === id);
+	const handleDelete = useCallback(
+		async (id: number) => {
+			try {
+				const response = await deleteNotification(id);
+				if (response.success) {
+					const deleted = notifications.find((n) => n.id === id);
 					if (deleted && !deleted.isRead) {
-						setUnreadCount((c) => {
-							const next = Math.max(0, c - 1);
-							setGlobalUnreadCount(next);
-							return next;
-						});
+						decrementUnreadCount();
 					}
-					return prev.filter((n) => n.id !== id);
-				});
+					setNotifications((prev) => prev.filter((n) => n.id !== id));
+				}
+			} catch {
+				// silent fail
 			}
-		} catch {
-			// silent fail
-		}
-	}, [setGlobalUnreadCount]);
+		},
+		[notifications, decrementUnreadCount]
+	);
 
 	return {
 		notifications,
