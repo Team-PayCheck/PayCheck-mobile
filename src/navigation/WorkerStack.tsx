@@ -6,6 +6,7 @@ import ProfileEditScreen from "../screens/worker/mypage/WorkerProfileEditScreen"
 import SentRequestsScreen from "../screens/worker/mypage/WorkerSentRequestsScreen";
 import WithdrawScreen from "../screens/worker/mypage/WorkerWithdrawScreen";
 import WorkplaceManageScreen from "../screens/worker/mypage/WorkerWorkplaceManageScreen";
+import NotificationScreen from "../screens/common/NotificationScreen";
 
 export type WorkerStackParamList = {
 	WorkerHomeMain: undefined;
@@ -15,6 +16,7 @@ export type WorkerStackParamList = {
 	SentRequests: undefined;
 	AccountSettings: undefined;
 	Withdraw: undefined;
+	Notifications: undefined;
 };
 
 const Stack = createNativeStackNavigator<WorkerStackParamList>();
@@ -33,6 +35,7 @@ const WorkerStack = () => {
 		       <Stack.Screen name="WorkplaceManage" component={WorkplaceManageScreen} />
 		       <Stack.Screen name="SentRequests" component={SentRequestsScreen} />
 		       <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+		       <Stack.Screen name="Notifications" component={NotificationScreen} />
 	       </Stack.Navigator>
        );
 };
