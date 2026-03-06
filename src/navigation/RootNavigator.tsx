@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { NavigationContainer, NavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
@@ -23,17 +23,18 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
 	const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+	const [isNavReady, setIsNavReady] = useState(false);
 	const { initialRoute, isLoading, handleOnboardingComplete } = useOnboardingStatus();
 	useNotificationStream();
 	useFcmToken();
-	useNotificationNavigation(navigationRef.current);
+	useNotificationNavigation(isNavReady ? navigationRef.current : null);
 
 	if (isLoading) {
 		return null;
 	}
 
 	return (
-		<NavigationContainer ref={navigationRef}>
+		<NavigationContainer ref={navigationRef} onReady={() => setIsNavReady(true)}>
 			<Stack.Navigator
 				initialRouteName={initialRoute}
 				screenOptions={{
