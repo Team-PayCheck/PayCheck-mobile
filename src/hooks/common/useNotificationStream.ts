@@ -46,8 +46,16 @@ export function useNotificationStream() {
 				headers: {
 					Authorization: `Bearer ${accessToken}`,
 				},
-				onMessage: () => {
-					incrementUnreadCount();
+				onMessage: (data: string) => {
+					// JSON 파싱 성공 + id 필드가 있을 때만 실제 알림으로 간주
+					try {
+						const parsed = JSON.parse(data);
+						if (parsed && typeof parsed.id === "number") {
+							incrementUnreadCount();
+						}
+					} catch {
+						// heartbeat 또는 비JSON 메시지 → 무시
+					}
 				},
 			}
 		);
