@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Alert } from "react-native";
+import { showError } from "../../utils/alert";
 import type { WorkplaceDetails } from "../../api/employer/types";
 import {
   getWorkplaces,
@@ -150,9 +151,8 @@ export function useWorkplaceManagement({
       setNewWorkplaceIsSmallBusiness(false);
 
       onWorkplaceChanged?.(createdWorkplace.id);
-    } catch (error) {
-      const err = error as { message?: string };
-      Alert.alert("추가 실패", err.message || "근무지 추가 중 오류가 발생했습니다.");
+    } catch {
+      showError("추가 실패", "근무지 추가 중 오류가 발생했습니다.");
     }
   };
 
@@ -181,7 +181,7 @@ export function useWorkplaceManagement({
           onPress: async () => {
             const updatedWorkplaces = workplaces.filter((wp) => wp.id !== selectedWorkplaceId);
             if (updatedWorkplaces.length === 0) {
-              Alert.alert("오류", "최소 하나의 근무지는 필요합니다.");
+              showError("삭제 실패", "최소 하나의 근무지는 필요합니다.");
               return;
             }
             try {
@@ -190,9 +190,8 @@ export function useWorkplaceManagement({
               const firstWorkplace = updatedWorkplaces[0];
               if (firstWorkplace) setSelectedWorkplaceId(firstWorkplace.id);
               onWorkplaceDeleted?.(selectedWorkplaceId);
-            } catch (error) {
-              const err = error as { message?: string };
-              Alert.alert("삭제 실패", err.message || "근무지 삭제 중 오류가 발생했습니다.");
+            } catch {
+              showError("삭제 실패", "근무지 삭제 중 오류가 발생했습니다.");
             }
           },
         },
@@ -251,9 +250,8 @@ export function useWorkplaceManagement({
       setEditingWorkplace(null);
       setSelectedWorkplaceForEdit(null);
       onWorkplaceChanged?.(editingWorkplace.id);
-    } catch (error) {
-      const err = error as { message?: string };
-      Alert.alert("수정 실패", err.message || "근무지 수정 중 오류가 발생했습니다.");
+    } catch {
+      showError("수정 실패", "근무지 수정 중 오류가 발생했습니다.");
     }
   };
 
