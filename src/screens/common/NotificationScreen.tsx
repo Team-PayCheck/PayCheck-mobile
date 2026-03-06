@@ -51,7 +51,7 @@ const NotificationItem: React.FC<{
 					]}
 					numberOfLines={2}
 				>
-					{notification.message}
+					{notification.message || notification.title}
 				</Text>
 				<Text style={styles.itemTime}>
 					{formatRelativeTime(notification.createdAt)}

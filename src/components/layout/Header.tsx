@@ -28,9 +28,7 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
     try {
       const res = await getNotifications({ size: 5 });
       if (res.success && res.data) {
-        const data = res.data;
-        const items = Array.isArray(data) ? data : data.content ?? [];
-        setNotifications(items);
+        setNotifications(res.data.notifications ?? []);
       }
     } catch {
       // silent fail

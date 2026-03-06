@@ -175,7 +175,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
 												]}
 												numberOfLines={2}
 											>
-												{notification.message}
+												{notification.message || notification.title}
 											</Text>
 											<Text style={styles.itemTime}>
 												{formatRelativeTime(

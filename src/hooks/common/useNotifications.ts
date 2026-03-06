@@ -56,9 +56,10 @@ export function useNotifications(): UseNotificationsReturn {
 			const response = await getNotifications(params);
 			if (response.success && response.data) {
 				const data = response.data;
-				setNotifications(data.content ?? []);
-				if (data.totalPages !== undefined) {
-					setTotalPages(Math.max(1, data.totalPages));
+				setNotifications(data.notifications ?? []);
+				setTotalPages(Math.max(1, data.totalPages));
+				if (data.unreadCount !== undefined) {
+					setUnreadCount(data.unreadCount);
 				}
 			}
 		} catch {
