@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
 import { useNotificationStream } from "../hooks/common/useNotificationStream";
+import { useFcmToken } from "../hooks/common/useFcmToken";
 import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
@@ -22,6 +23,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootNavigator = () => {
 	const { initialRoute, isLoading, handleOnboardingComplete } = useOnboardingStatus();
 	useNotificationStream();
+	useFcmToken();
 
 	if (isLoading) {
 		return null;
