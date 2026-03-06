@@ -4,10 +4,10 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	View,
-	Alert,
 	ActivityIndicator,
 } from "react-native";
 import { Text } from "../../components/common/Text";
+import { showError } from "../../utils/alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
 import { kakaoLoginWithToken, devLogin } from "../../api/auth";
@@ -36,10 +36,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 			kakaoAccessToken = token?.accessToken;
 
 			if (!kakaoAccessToken) {
-				Alert.alert(
-					"로그인 실패",
-					"카카오 액세스 토큰을 가져오지 못했습니다."
-				);
+				showError("로그인 실패", "카카오 로그인에 실패했습니다. 다시 시도해주세요.");
 				return;
 			}
 
@@ -76,9 +73,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 			}
 
 			// 그 외 에러
-			const message =
-				loginError.message || "로그인에 실패했습니다. 다시 시도해주세요.";
-			Alert.alert("로그인 실패", message);
+			showError("로그인 실패", "로그인에 실패했습니다. 다시 시도해주세요.");
 		} finally {
 			setIsLoading(false);
 		}
@@ -97,9 +92,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 				});
 				onLoginSuccess?.(result.data.userType);
 			}
-		} catch (error: any) {
-			console.error("Dev 로그인 에러:", error);
-			Alert.alert("Dev 로그인 실패", error?.message || "서버 연결을 확인해주세요.");
+		} catch {
+			showError("Dev 로그인 실패", "서버 연결을 확인해주세요.");
 		} finally {
 			setIsLoading(false);
 		}
