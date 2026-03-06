@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import { logout } from "../../api/auth";
 import { unregisterPushToken } from "../../utils/pushToken";
+import { showSuccess, showError } from "../../utils/alert";
 
 /**
  * 로그아웃 핸들러
@@ -25,12 +26,9 @@ export const useLogoutHandler = (
             try {
               await unregisterPushToken();
               await logout();
-              Alert.alert("로그아웃", "로그아웃이 완료되었습니다.");
-            } catch (error: any) {
-              Alert.alert(
-                "로그아웃 실패",
-                error?.message || "로그아웃 처리 중 오류가 발생했습니다."
-              );
+              showSuccess("로그아웃이 완료되었습니다.");
+            } catch {
+              showError("로그아웃 실패", "로그아웃 처리 중 오류가 발생했습니다.");
             } finally {
               navigation.getParent()?.reset({ index: 0, routes: [{ name: "Welcome" }] });
             }
