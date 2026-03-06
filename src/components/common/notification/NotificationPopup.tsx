@@ -130,7 +130,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
 								</Text>
 							</View>
 						) : (
-							(notifications ?? []).slice(0, 5).map((notification) => {
+							notifications.slice(0, 5).map((notification) => {
 								const iconConfig = getNotificationIconConfig(
 									notification.type
 								);
