@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { showError } from "../../../utils/alert";
+import { showSuccess, showError } from "../../../utils/alert";
 import { Feather } from "@expo/vector-icons";
 import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
@@ -141,6 +141,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
         endTime,
         breakMinutes,
       });
+      showSuccess("추가 완료", "근무가 추가되었습니다.");
       onSuccess();
       onClose();
     } catch {
