@@ -123,7 +123,7 @@ const EmployerAddWorkModal: React.FC<EmployerAddWorkModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedContractId) {
-      Alert.alert("알림", "근무자를 선택해주세요.");
+      Alert.alert("입력 확인", "근무자를 선택해주세요.");
       return;
     }
     const year = parsedDate.getFullYear();

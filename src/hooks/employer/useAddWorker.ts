@@ -34,7 +34,7 @@ const useAddWorker = () => {
   const handleSearch = useCallback(async () => {
     if (isSearching) return;
     if (!workerCode.trim()) {
-      Alert.alert("입력 오류", "근무자 코드를 입력해주세요.");
+      Alert.alert("입력 확인", "근무자 코드를 입력해주세요.");
       return;
     }
     setIsSearching(true);

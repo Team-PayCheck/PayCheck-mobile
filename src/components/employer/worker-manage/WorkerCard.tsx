@@ -117,11 +117,11 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     const day = parseInt(paymentDay, 10);
 
     if (isNaN(wage) || wage <= 0) {
-      Alert.alert("입력 오류", "올바른 시급을 입력해주세요.");
+      Alert.alert("입력 확인", "올바른 시급을 입력해주세요.");
       return;
     }
     if (isNaN(day) || day < 1 || day > 31) {
-      Alert.alert("입력 오류", "급여지급일은 1~31 사이로 입력해주세요.");
+      Alert.alert("입력 확인", "급여지급일은 1~31 사이로 입력해주세요.");
       return;
     }
 

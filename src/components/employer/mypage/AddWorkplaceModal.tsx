@@ -69,7 +69,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	const handleSearch = async () => {
 		const query = searchQuery.trim();
 		if (!query) {
-			Alert.alert("검색어 입력", "주소를 입력해주세요.");
+			Alert.alert("입력 확인", "주소를 입력해주세요.");
 			return;
 		}
 

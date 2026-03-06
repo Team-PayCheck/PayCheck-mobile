@@ -124,12 +124,12 @@ export function useWorkplaceManagement({
     const workplaceName = newWorkplaceName.trim();
 
     if (!workplaceName) {
-      Alert.alert("입력 오류", "근무지 이름을 입력해주세요.");
+      Alert.alert("입력 확인", "근무지 이름을 입력해주세요.");
       return;
     }
 
     if (workplaces.some((wp) => wp.name === workplaceName)) {
-      Alert.alert("입력 오류", "이미 존재하는 근무지입니다.");
+      Alert.alert("입력 확인", "이미 존재하는 근무지입니다.");
       return;
     }
 
@@ -214,7 +214,7 @@ export function useWorkplaceManagement({
     if (!editingWorkplace) return;
 
     if (!editingWorkplace.name.trim()) {
-      Alert.alert("입력 오류", "근무지 이름을 입력해주세요.");
+      Alert.alert("입력 확인", "근무지 이름을 입력해주세요.");
       return;
     }
 
@@ -222,7 +222,7 @@ export function useWorkplaceManagement({
       (wp) => wp.name === editingWorkplace.name.trim() && wp.id !== editingWorkplace.id
     );
     if (isDuplicate) {
-      Alert.alert("입력 오류", "이미 존재하는 근무지입니다.");
+      Alert.alert("입력 확인", "이미 존재하는 근무지입니다.");
       return;
     }
 
