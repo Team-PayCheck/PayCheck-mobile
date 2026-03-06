@@ -136,15 +136,15 @@ const EmployerReceivedRequestsScreen: React.FC<Props> = ({ navigation }) => {
 							isProcessing={processingId === item.id ? processingAction || false : false}
 						/>
 					)}
-					ListFooterComponent={
-						<Pagination
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={setCurrentPage}
-						/>
-					}
 				/>
 			)}
+
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={setCurrentPage}
+				alwaysShow
+			/>
 
 			<EmployerMyPageDrawer {...drawerProps} />
 			<BottomSheetModal {...accountSheetProps}>

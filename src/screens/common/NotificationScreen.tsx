@@ -213,19 +213,19 @@ const NotificationScreen = () => {
 							</Text>
 						</View>
 					}
-					ListFooterComponent={
-						<Pagination
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={setCurrentPage}
-							alwaysShow
-						/>
-					}
-					contentContainerStyle={
-						safeNotifications.length === 0 && styles.emptyList
-					}
+					contentContainerStyle={[
+						styles.listContent,
+						safeNotifications.length === 0 && styles.emptyList,
+					]}
 				/>
 			)}
+
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={setCurrentPage}
+				alwaysShow
+			/>
 		</SafeAreaView>
 	);
 };
@@ -276,6 +276,9 @@ const styles = StyleSheet.create({
 	},
 	filterChipTextSelected: {
 		color: colors.white,
+	},
+	listContent: {
+		paddingBottom: 8,
 	},
 	loader: {
 		flex: 1,

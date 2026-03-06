@@ -119,17 +119,13 @@ const styles = StyleSheet.create({
 	arrowButton: {
 		width: 36,
 		height: 36,
-		borderRadius: 8,
-		backgroundColor: colors.textPrimary,
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	arrowButtonDisabled: {
-		backgroundColor: colors.disabled,
-	},
+	arrowButtonDisabled: {},
 	arrowText: {
 		fontSize: 16,
-		color: colors.white,
+		color: colors.textPrimary,
 	},
 	arrowTextDisabled: {
 		color: colors.textDisabled,
