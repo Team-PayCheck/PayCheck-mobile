@@ -21,6 +21,9 @@ export function useNotificationStream() {
 	const incrementUnreadCount = useNotificationStore(
 		(s) => s.incrementUnreadCount
 	);
+	const signalNewNotification = useNotificationStore(
+		(s) => s.signalNewNotification
+	);
 	const sseRef = useRef<ReactNativeEventSource | null>(null);
 
 	useEffect(() => {
@@ -52,6 +55,7 @@ export function useNotificationStream() {
 						const parsed = JSON.parse(data);
 						if (parsed && typeof parsed.id === "number") {
 							incrementUnreadCount();
+							signalNewNotification();
 						}
 					} catch {
 						// heartbeat 또는 비JSON 메시지 → 무시
@@ -64,5 +68,5 @@ export function useNotificationStream() {
 			sseRef.current?.close();
 			sseRef.current = null;
 		};
-	}, [isLoggedIn, accessToken, setUnreadCount, incrementUnreadCount]);
+	}, [isLoggedIn, accessToken, setUnreadCount, incrementUnreadCount, signalNewNotification]);
 }

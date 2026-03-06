@@ -34,7 +34,7 @@ export function useNotifications(): UseNotificationsReturn {
 	const [notifications, setNotifications] = useState<NotificationResponse[]>(
 		[]
 	);
-	const { unreadCount, setUnreadCount, decrementUnreadCount } =
+	const { unreadCount, setUnreadCount, decrementUnreadCount, newNotificationSignal } =
 		useNotificationStore();
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(0);
@@ -86,6 +86,12 @@ export function useNotifications(): UseNotificationsReturn {
 	useEffect(() => {
 		fetchUnreadCount();
 	}, [fetchUnreadCount]);
+
+	// SSE로 새 알림 수신 시 목록 자동 갱신 (초기값 0은 건너뜀)
+	useEffect(() => {
+		if (newNotificationSignal === 0) return;
+		fetchNotifications();
+	}, [newNotificationSignal]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const handleRead = useCallback(
 		async (id: number) => {
