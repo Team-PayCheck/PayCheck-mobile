@@ -16,6 +16,8 @@ import { Text } from "../../components/common/Text";
 import Pagination from "../../components/common/Pagination";
 import { getNotificationIconConfig } from "../../components/common/notification/NotificationPopup";
 import { useNotifications } from "../../hooks/common/useNotifications";
+import { getScreenName } from "../../hooks/common/useNotificationNavigation";
+import { useAuthStore } from "../../stores/authStore";
 import { formatRelativeTime } from "../../utils/date";
 import { colors } from "../../constants/colors";
 import type { NotificationResponse } from "../../api/notification/types";
@@ -72,7 +74,8 @@ const NotificationItem: React.FC<{
 type FilterType = "all" | "unread";
 
 const NotificationScreen = () => {
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
+	const userType = useAuthStore((s) => s.userInfo?.userType);
 	const {
 		notifications,
 		unreadCount,
@@ -103,6 +106,10 @@ const NotificationScreen = () => {
 	const handlePressItem = async (notification: NotificationResponse) => {
 		if (!notification.isRead) {
 			await handleRead(notification.id);
+		}
+		const screen = getScreenName(notification.actionType, userType);
+		if (screen !== "Notifications") {
+			navigation.navigate(screen);
 		}
 	};
 

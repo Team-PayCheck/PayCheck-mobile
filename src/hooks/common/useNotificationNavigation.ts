@@ -14,7 +14,7 @@ type NavigationRef = {
 /**
  * actionType → 화면 이름 매핑
  */
-function getScreenName(
+export function getScreenName(
 	actionType: ActionType | string,
 	userType: string | undefined
 ): string {
