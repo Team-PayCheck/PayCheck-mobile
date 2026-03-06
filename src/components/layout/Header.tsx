@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { Text } from "../common/Text";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../constants/colors";
-import { getNotifications, getUnreadCount, readNotification } from "../../api/notification";
+import { getNotifications, readNotification } from "../../api/notification";
+import { useNotificationStore } from "../../stores/notificationStore";
 import type { NotificationResponse } from "../../api/notification/types";
 import NotificationPopup from "../common/notification/NotificationPopup";
 
@@ -15,15 +17,8 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
   const navigation = useNavigation<any>();
   const [popupVisible, setPopupVisible] = useState(false);
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    getUnreadCount()
-      .then((res) => {
-        if (res.success && res.data) setUnreadCount(res.data.count);
-      })
-      .catch(() => {});
-  }, []);
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const decrementUnreadCount = useNotificationStore((s) => s.decrementUnreadCount);
 
   const handleBellPress = useCallback(async () => {
     if (popupVisible) {
@@ -53,12 +48,12 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
               n.id === notification.id ? { ...n, isRead: true } : n
             )
           );
-          setUnreadCount((prev) => Math.max(0, prev - 1));
+          decrementUnreadCount();
         } catch {}
       }
       setPopupVisible(false);
     },
-    []
+    [decrementUnreadCount]
   );
 
   const handleViewAll = useCallback(() => {
@@ -77,7 +72,13 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
           size={28}
           color={colors.textPrimary}
         />
-        {unreadCount > 0 && <View style={styles.badge} />}
+        {unreadCount > 0 && (
+          <View style={styles.badge}>
+            <Text weight="Bold" style={styles.badgeText}>
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </Text>
+          </View>
+        )}
       </TouchableOpacity>
 
       <NotificationPopup
@@ -102,12 +103,20 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: 0,
-    right: 0,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: colors.deleteRed,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 10,
+    color: colors.white,
+    lineHeight: 14,
   },
 });
 
