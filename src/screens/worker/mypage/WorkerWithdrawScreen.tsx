@@ -52,9 +52,8 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 					},
 				},
 			]);
-		} catch (error: any) {
-			const message = error?.message || "회원 탈퇴 중 오류가 발생했습니다.";
-			Alert.alert("탈퇴 실패", message, [{ text: "확인" }]);
+		} catch {
+			Alert.alert("탈퇴 실패", "회원 탈퇴 중 오류가 발생했습니다.", [{ text: "확인" }]);
 		} finally {
 			setLoading(false);
 		}

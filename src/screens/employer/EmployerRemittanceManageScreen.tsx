@@ -147,8 +147,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
     try {
       const res = await getSalaryById(salaryPaymentItem.id);
       setSalaryDetail(res.data ?? null);
-    } catch (e: any) {
-      Alert.alert("급여명세서 조회 실패", e.message ?? "다시 시도해주세요.");
+    } catch {
+      Alert.alert("급여명세서 조회 실패", "다시 시도해주세요.");
       setIsSalarySheetVisible(false);
     } finally {
       setIsSalaryDetailLoading(false);
@@ -200,8 +200,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
               } else {
                 Alert.alert("토스 앱 필요", "송금을 위해 토스 앱을 설치해주세요.");
               }
-            } catch (e: any) {
-              Alert.alert("송금 실패", e.message ?? "다시 시도해주세요.");
+            } catch {
+              Alert.alert("송금 실패", "다시 시도해주세요.");
             }
           },
         },
@@ -215,8 +215,8 @@ const EmployerRemittanceManageScreen: React.FC = () => {
       await completePayment(pendingPaymentId);
       setPendingPaymentId(null);
       setIsPaymentCompleted(true);
-    } catch (e: any) {
-      Alert.alert("완료 처리 실패", e.message ?? "다시 시도해주세요.");
+    } catch {
+      Alert.alert("완료 처리 실패", "다시 시도해주세요.");
     }
   };
 
