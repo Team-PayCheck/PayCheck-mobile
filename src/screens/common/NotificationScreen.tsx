@@ -7,6 +7,7 @@ import {
 	StyleSheet,
 	ActivityIndicator,
 	RefreshControl,
+	Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -115,7 +116,16 @@ const NotificationScreen = () => {
 		<NotificationItem
 			notification={item}
 			onPress={() => handlePressItem(item)}
-			onDelete={() => handleDelete(item.id)}
+			onDelete={() => {
+				Alert.alert(
+					"알림 삭제",
+					"이 알림을 삭제하시겠습니까?",
+					[
+						{ text: "취소", style: "cancel" },
+						{ text: "삭제", style: "destructive", onPress: () => handleDelete(item.id) },
+					]
+				);
+			}}
 		/>
 	);
 
