@@ -16,8 +16,7 @@ import * as Notifications from "expo-notifications";
 import { Text } from "../../components/common/Text";
 import { registerPushToken, unregisterPushToken } from "../../utils/pushToken";
 import { colors } from "../../constants/colors";
-
-const PUSH_ENABLED_KEY = "push_notification_enabled";
+import { PUSH_ENABLED_KEY } from "../../constants/storageKeys";
 
 const NotificationSettingsScreen = () => {
 	const navigation = useNavigation();

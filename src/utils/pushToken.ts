@@ -4,8 +4,7 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { registerFcmToken, deleteFcmToken } from "../api/notification";
-
-const PUSH_TOKEN_KEY = "fcm_push_token";
+import { PUSH_TOKEN_KEY } from "../constants/storageKeys";
 
 /**
  * 푸시 알림 권한 요청 + Expo Push Token 취득

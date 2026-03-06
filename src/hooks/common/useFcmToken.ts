@@ -6,8 +6,7 @@ import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuthStore } from "../../stores/authStore";
 import { registerPushToken } from "../../utils/pushToken";
-
-const PUSH_ENABLED_KEY = "push_notification_enabled";
+import { PUSH_ENABLED_KEY } from "../../constants/storageKeys";
 
 export function useFcmToken() {
 	const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
