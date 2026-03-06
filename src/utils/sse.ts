@@ -11,6 +11,8 @@ interface SSEOptions {
 	reconnectInterval?: number;
 }
 
+const MAX_RESPONSE_SIZE = 1024 * 100; // 100KB
+
 export class ReactNativeEventSource {
 	private xhr: XMLHttpRequest | null = null;
 	private lastIndex = 0;
@@ -56,6 +58,17 @@ export class ReactNativeEventSource {
 			if (!this.xhr) return;
 
 			const responseText = this.xhr.responseText;
+
+			// 메모리 관리: responseText가 너무 커지면 재연결
+			if (responseText.length > MAX_RESPONSE_SIZE) {
+				this.xhr.abort();
+				this.xhr = null;
+				this.lastIndex = 0;
+				this.buffer = "";
+				this.connect();
+				return;
+			}
+
 			const newData = responseText.substring(this.lastIndex);
 			this.lastIndex = responseText.length;
 
