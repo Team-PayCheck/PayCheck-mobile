@@ -178,6 +178,7 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
         onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
         onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
         onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+        onPressNotificationSettings={() => navigateFromDrawer("NotificationSettings")}
         onPressAccountSettings={() => {
           setIsDrawerVisible(false);
           setTimeout(() => setIsAccountSheetVisible(true), 220);

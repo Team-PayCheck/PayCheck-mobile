@@ -1,23 +1,29 @@
 import React from "react";
 import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 
 interface MenuButtonProps {
 	title: string;
-	iconSource: ImageSourcePropType;
+	iconSource?: ImageSourcePropType;
+	iconName?: keyof typeof Ionicons.glyphMap;
 	onPress?: () => void;
 }
 
-const MenuButton: React.FC<MenuButtonProps> = ({ title, iconSource, onPress }) => {
+const MenuButton: React.FC<MenuButtonProps> = ({ title, iconSource, iconName, onPress }) => {
 	return (
 		<TouchableOpacity style={styles.container} activeOpacity={0.8} onPress={onPress}>
 			<View style={styles.iconCircle}>
-				<Image
-					source={iconSource}
-					style={styles.iconImage}
-					resizeMode="contain"
-				/>
+				{iconSource ? (
+					<Image
+						source={iconSource}
+						style={styles.iconImage}
+						resizeMode="contain"
+					/>
+				) : iconName ? (
+					<Ionicons name={iconName} size={28} color={colors.primary} />
+				) : null}
 			</View>
 			<Text weight="Bold" style={styles.title}>{title}</Text>
 		</TouchableOpacity>
