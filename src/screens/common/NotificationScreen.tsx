@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React from "react";
 import {
 	View,
 	FlatList,
@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Text } from "../../components/common/Text";
+import Pagination from "../../components/common/Pagination";
 import { getNotificationIconConfig } from "../../components/common/notification/NotificationPopup";
 import { useNotifications } from "../../hooks/common/useNotifications";
 import { formatRelativeTime } from "../../utils/date";
@@ -71,10 +72,15 @@ type FilterType = "all" | "unread";
 
 const NotificationScreen = () => {
 	const navigation = useNavigation();
-	const [filter, setFilter] = useState<FilterType>("all");
 	const {
 		notifications,
+		unreadCount,
 		isLoading,
+		currentPage,
+		totalPages,
+		setCurrentPage,
+		isReadFilter,
+		setIsReadFilter,
 		fetchNotifications,
 		fetchUnreadCount,
 		handleRead,
@@ -82,17 +88,12 @@ const NotificationScreen = () => {
 		handleDelete,
 	} = useNotifications();
 
-	const filteredNotifications = useMemo(() => {
-		if (filter === "unread") {
-			return (notifications ?? []).filter((n) => !n.isRead);
-		}
-		return notifications ?? [];
-	}, [notifications, filter]);
+	const filter: FilterType = isReadFilter === false ? "unread" : "all";
 
-	const unreadCount = useMemo(
-		() => (notifications ?? []).filter((n) => !n.isRead).length,
-		[notifications]
-	);
+	const handleFilterChange = (type: FilterType) => {
+		setCurrentPage(0);
+		setIsReadFilter(type === "unread" ? false : undefined);
+	};
 
 	const handleRefresh = async () => {
 		await Promise.all([fetchNotifications(), fetchUnreadCount()]);
@@ -103,6 +104,8 @@ const NotificationScreen = () => {
 			await handleRead(notification.id);
 		}
 	};
+
+	const safeNotifications = notifications ?? [];
 
 	const renderItem = ({
 		item,
@@ -145,7 +148,7 @@ const NotificationScreen = () => {
 						styles.filterChip,
 						filter === "all" && styles.filterChipSelected,
 					]}
-					onPress={() => setFilter("all")}
+					onPress={() => handleFilterChange("all")}
 					activeOpacity={0.7}
 				>
 					<Text
@@ -155,7 +158,7 @@ const NotificationScreen = () => {
 							filter === "all" && styles.filterChipTextSelected,
 						]}
 					>
-						전체 {(notifications ?? []).length}
+						전체
 					</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
@@ -163,7 +166,7 @@ const NotificationScreen = () => {
 						styles.filterChip,
 						filter === "unread" && styles.filterChipSelected,
 					]}
-					onPress={() => setFilter("unread")}
+					onPress={() => handleFilterChange("unread")}
 					activeOpacity={0.7}
 				>
 					<Text
@@ -178,7 +181,7 @@ const NotificationScreen = () => {
 				</TouchableOpacity>
 			</View>
 
-			{isLoading && (notifications ?? []).length === 0 ? (
+			{isLoading && safeNotifications.length === 0 ? (
 				<ActivityIndicator
 					size="large"
 					color={colors.primary}
@@ -186,7 +189,7 @@ const NotificationScreen = () => {
 				/>
 			) : (
 				<FlatList
-					data={filteredNotifications}
+					data={safeNotifications}
 					keyExtractor={(item) => String(item.id)}
 					renderItem={renderItem}
 					refreshControl={
@@ -210,8 +213,16 @@ const NotificationScreen = () => {
 							</Text>
 						</View>
 					}
+					ListFooterComponent={
+						<Pagination
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={setCurrentPage}
+							alwaysShow
+						/>
+					}
 					contentContainerStyle={
-						filteredNotifications.length === 0 && styles.emptyList
+						safeNotifications.length === 0 && styles.emptyList
 					}
 				/>
 			)}

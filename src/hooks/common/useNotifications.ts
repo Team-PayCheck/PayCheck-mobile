@@ -6,12 +6,22 @@ import {
 	readAllNotifications,
 	deleteNotification,
 } from "../../api/notification";
-import type { NotificationResponse } from "../../api/notification/types";
+import type {
+	NotificationResponse,
+	NotificationListParams,
+} from "../../api/notification/types";
+
+const PAGE_SIZE = 10;
 
 interface UseNotificationsReturn {
 	notifications: NotificationResponse[];
 	unreadCount: number;
 	isLoading: boolean;
+	currentPage: number;
+	totalPages: number;
+	setCurrentPage: (page: number) => void;
+	isReadFilter: boolean | undefined;
+	setIsReadFilter: (filter: boolean | undefined) => void;
 	fetchNotifications: () => Promise<void>;
 	fetchUnreadCount: () => Promise<void>;
 	handleRead: (id: number) => Promise<void>;
@@ -25,22 +35,37 @@ export function useNotifications(): UseNotificationsReturn {
 	);
 	const [unreadCount, setUnreadCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
+	const [currentPage, setCurrentPage] = useState(0);
+	const [totalPages, setTotalPages] = useState(1);
+	const [isReadFilter, setIsReadFilter] = useState<boolean | undefined>(
+		undefined
+	);
 
 	const fetchNotifications = useCallback(async () => {
 		setIsLoading(true);
 		try {
-			const response = await getNotifications();
+			const params: NotificationListParams = {
+				page: currentPage,
+				size: PAGE_SIZE,
+			};
+			if (isReadFilter !== undefined) {
+				params.is_read = isReadFilter;
+			}
+			const response = await getNotifications(params);
 			if (response.success && response.data) {
 				const data = response.data;
 				const items = Array.isArray(data) ? data : data.content ?? [];
 				setNotifications(items);
+				if (!Array.isArray(data) && data.totalPages !== undefined) {
+					setTotalPages(Math.max(1, data.totalPages));
+				}
 			}
 		} catch {
 			// silent fail
 		} finally {
 			setIsLoading(false);
 		}
-	}, []);
+	}, [currentPage, isReadFilter]);
 
 	const fetchUnreadCount = useCallback(async () => {
 		try {
@@ -55,8 +80,11 @@ export function useNotifications(): UseNotificationsReturn {
 
 	useEffect(() => {
 		fetchNotifications();
+	}, [fetchNotifications]);
+
+	useEffect(() => {
 		fetchUnreadCount();
-	}, [fetchNotifications, fetchUnreadCount]);
+	}, [fetchUnreadCount]);
 
 	const handleRead = useCallback(async (id: number) => {
 		try {
@@ -107,6 +135,11 @@ export function useNotifications(): UseNotificationsReturn {
 		notifications,
 		unreadCount,
 		isLoading,
+		currentPage,
+		totalPages,
+		setCurrentPage,
+		isReadFilter,
+		setIsReadFilter,
 		fetchNotifications,
 		fetchUnreadCount,
 		handleRead,

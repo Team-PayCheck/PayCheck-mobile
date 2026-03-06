@@ -10,6 +10,7 @@ interface PaginationProps {
 	currentPage: number;
 	totalPages: number;
 	onPageChange: (page: number) => void;
+	alwaysShow?: boolean;
 }
 
 const getPageNumbers = (current: number, total: number): (number | "...")[] => {
@@ -47,8 +48,10 @@ const Pagination: React.FC<PaginationProps> = ({
 	currentPage,
 	totalPages,
 	onPageChange,
+	alwaysShow = false,
 }) => {
-	if (totalPages <= 1) return null;
+	if (!alwaysShow && totalPages <= 1) return null;
+	if (totalPages <= 0) return null;
 
 	const displayPage = currentPage + 1; // 0-based → 1-based
 	const pages = getPageNumbers(displayPage, totalPages);
