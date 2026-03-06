@@ -99,13 +99,7 @@ export function useProfileEdit({ user, onSuccess, onClose }: UseProfileEditParam
         onSuccess();
         onClose();
       } else {
-        // 서버 유효성 검증 실패
-        const fieldErrors = response.error?.fieldErrors;
-        if (fieldErrors && fieldErrors.length > 0) {
-          showError(fieldErrors[0].message);
-        } else {
-          showError(response.error?.message ?? "프로필 수정에 실패했습니다.");
-        }
+        showError("수정 실패", "프로필 수정에 실패했습니다.");
       }
     } catch (error) {
       console.error("프로필 수정 실패:", error);

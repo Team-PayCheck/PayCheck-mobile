@@ -105,7 +105,7 @@ export function useGetCorrectionRequests(): UseGetCorrectionRequestsReturn {
         setDetail(null);
         await fetchRequests();
       } else {
-        showError(response.error?.message ?? "요청 취소에 실패했습니다.");
+        showError("취소 실패", "요청 취소에 실패했습니다.");
       }
     } catch (error) {
       console.warn("정정요청 취소 실패:", error);

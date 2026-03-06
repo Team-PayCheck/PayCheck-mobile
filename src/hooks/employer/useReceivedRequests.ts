@@ -194,7 +194,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 							setDetail(null);
 							await fetchRequests();
 						} else {
-							showError(response.error?.message ?? "승인에 실패했습니다.");
+							showError("승인 실패", "요청 승인에 실패했습니다.");
 						}
 					} catch {
 						showError("승인 처리에 실패했습니다.");
@@ -225,7 +225,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 							setDetail(null);
 							await fetchRequests();
 						} else {
-							showError(response.error?.message ?? "거절에 실패했습니다.");
+							showError("거절 실패", "요청 거절에 실패했습니다.");
 						}
 					} catch {
 						showError("거절 처리에 실패했습니다.");
