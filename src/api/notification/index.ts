@@ -4,6 +4,7 @@ import type { ApiResponse } from "../../types/api.types";
 import type {
 	NotificationResponse,
 	NotificationListParams,
+	PagedResponse,
 	UnreadCountResponse,
 	RegisterFcmTokenRequest,
 	DeleteFcmTokenRequest,
@@ -17,15 +18,16 @@ import type {
  */
 export const getNotifications = async (
 	params?: NotificationListParams
-): Promise<ApiResponse<NotificationResponse[]>> => {
+): Promise<ApiResponse<PagedResponse<NotificationResponse>>> => {
 	try {
-		const { data } = await api.get<ApiResponse<NotificationResponse[]>>(
-			"/api/notifications",
-			{ params }
-		);
+		const { data } = await api.get<
+			ApiResponse<PagedResponse<NotificationResponse>>
+		>("/api/notifications", { params });
 		return data;
 	} catch (error) {
-		const axiosError = error as AxiosError<ApiResponse<NotificationResponse[]>>;
+		const axiosError = error as AxiosError<
+			ApiResponse<PagedResponse<NotificationResponse>>
+		>;
 		const message =
 			axiosError.response?.data?.error?.message ||
 			axiosError.message ||

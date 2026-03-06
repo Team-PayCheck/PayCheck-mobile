@@ -39,6 +39,15 @@ export interface DeleteFcmTokenRequest {
 
 // ============ API Response 타입 ============
 
+/** 페이징 응답 래퍼 */
+export interface PagedResponse<T> {
+	content: T[];
+	page: number;
+	size: number;
+	totalElements: number;
+	totalPages: number;
+}
+
 /** GET /api/notifications - 알림 목록 아이템 */
 export interface NotificationResponse {
 	id: number;
