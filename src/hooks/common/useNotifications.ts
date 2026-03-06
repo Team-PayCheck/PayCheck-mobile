@@ -6,6 +6,7 @@ import {
 	readAllNotifications,
 	deleteNotification,
 } from "../../api/notification";
+import { useNotificationStore } from "../../stores/notificationStore";
 import type {
 	NotificationResponse,
 	NotificationListParams,
@@ -34,6 +35,9 @@ export function useNotifications(): UseNotificationsReturn {
 		[]
 	);
 	const [unreadCount, setUnreadCount] = useState(0);
+	const setGlobalUnreadCount = useNotificationStore(
+		(s) => s.setUnreadCount
+	);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [totalPages, setTotalPages] = useState(1);
@@ -72,11 +76,12 @@ export function useNotifications(): UseNotificationsReturn {
 			const response = await getUnreadCount();
 			if (response.success && response.data) {
 				setUnreadCount(response.data.count);
+				setGlobalUnreadCount(response.data.count);
 			}
 		} catch {
 			// silent fail
 		}
-	}, []);
+	}, [setGlobalUnreadCount]);
 
 	useEffect(() => {
 		fetchNotifications();
@@ -93,12 +98,16 @@ export function useNotifications(): UseNotificationsReturn {
 				setNotifications((prev) =>
 					prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
 				);
-				setUnreadCount((prev) => Math.max(0, prev - 1));
+				setUnreadCount((prev) => {
+					const next = Math.max(0, prev - 1);
+					setGlobalUnreadCount(next);
+					return next;
+				});
 			}
 		} catch {
 			// silent fail
 		}
-	}, []);
+	}, [setGlobalUnreadCount]);
 
 	const handleReadAll = useCallback(async () => {
 		try {
@@ -108,11 +117,12 @@ export function useNotifications(): UseNotificationsReturn {
 					prev.map((n) => ({ ...n, isRead: true }))
 				);
 				setUnreadCount(0);
+				setGlobalUnreadCount(0);
 			}
 		} catch {
 			// silent fail
 		}
-	}, []);
+	}, [setGlobalUnreadCount]);
 
 	const handleDelete = useCallback(async (id: number) => {
 		try {
@@ -121,7 +131,11 @@ export function useNotifications(): UseNotificationsReturn {
 				setNotifications((prev) => {
 					const deleted = prev.find((n) => n.id === id);
 					if (deleted && !deleted.isRead) {
-						setUnreadCount((c) => Math.max(0, c - 1));
+						setUnreadCount((c) => {
+							const next = Math.max(0, c - 1);
+							setGlobalUnreadCount(next);
+							return next;
+						});
 					}
 					return prev.filter((n) => n.id !== id);
 				});
@@ -129,7 +143,7 @@ export function useNotifications(): UseNotificationsReturn {
 		} catch {
 			// silent fail
 		}
-	}, []);
+	}, [setGlobalUnreadCount]);
 
 	return {
 		notifications,
