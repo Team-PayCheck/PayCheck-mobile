@@ -47,17 +47,19 @@ export async function getExpoPushToken(): Promise<string | null> {
 
 /**
  * FCM 토큰을 백엔드에 등록하고 로컬에 저장
+ * @returns 등록 성공 여부
  */
-export async function registerPushToken(): Promise<void> {
+export async function registerPushToken(): Promise<boolean> {
 	try {
 		const token = await getExpoPushToken();
-		if (!token) return;
+		if (!token) return false;
 
 		const deviceInfo = `${Platform.OS} ${Platform.Version}`;
 		await registerFcmToken({ token, deviceInfo });
 		await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
+		return true;
 	} catch {
-		// 등록 실패해도 앱 사용에는 지장 없음
+		return false;
 	}
 }
 

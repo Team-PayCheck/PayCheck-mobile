@@ -60,14 +60,18 @@ const NotificationSettingsScreen = () => {
 		setIsToggling(true);
 		try {
 			if (newValue) {
-				await registerPushToken();
+				const success = await registerPushToken();
+				if (!success) {
+					Alert.alert("오류", "푸시 알림 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+					return;
+				}
 			} else {
 				await unregisterPushToken();
 			}
 			setPushEnabled(newValue);
 			await AsyncStorage.setItem(PUSH_ENABLED_KEY, String(newValue));
 		} catch {
-			// 실패 시 토글 원복하지 않음 (이미 등록/삭제 시도 완료)
+			// silent fail
 		} finally {
 			setIsToggling(false);
 		}
