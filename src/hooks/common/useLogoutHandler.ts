@@ -1,5 +1,6 @@
 import { Alert } from "react-native";
 import { logout } from "../../api/auth";
+import { unregisterPushToken } from "../../utils/pushToken";
 
 /**
  * 로그아웃 핸들러
@@ -22,6 +23,7 @@ export const useLogoutHandler = (
           style: "destructive",
           onPress: async () => {
             try {
+              await unregisterPushToken();
               await logout();
               Alert.alert("로그아웃", "로그아웃이 완료되었습니다.");
             } catch (error: any) {

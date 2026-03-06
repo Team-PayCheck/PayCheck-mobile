@@ -7,6 +7,8 @@ import EmployerWorkplaceManageScreen from "../screens/employer/mypage/EmployerWo
 import EmployerProfileEditScreen from "../screens/employer/mypage/EmployerProfileEditScreen";
 import EmployerReceivedRequestsScreen from "../screens/employer/mypage/EmployerReceivedRequestsScreen";
 import EmployerWithdrawScreen from "../screens/employer/mypage/EmployerWithdrawScreen";
+import NotificationScreen from "../screens/common/NotificationScreen";
+import NotificationSettingsScreen from "../screens/common/NotificationSettingsScreen";
 
 export type EmployerStackParamList = {
   EmployerHomeMain: undefined;
@@ -16,6 +18,8 @@ export type EmployerStackParamList = {
   EmployerProfileEdit: undefined;
   EmployerReceivedRequests: undefined;
   EmployerWithdraw: undefined;
+  Notifications: undefined;
+  NotificationSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<EmployerStackParamList>();
@@ -35,6 +39,8 @@ const EmployerStack = () => {
       <Stack.Screen name="EmployerProfileEdit" component={EmployerProfileEditScreen} />
       <Stack.Screen name="EmployerReceivedRequests" component={EmployerReceivedRequestsScreen} />
       <Stack.Screen name="EmployerWithdraw" component={EmployerWithdrawScreen} />
+      <Stack.Screen name="Notifications" component={NotificationScreen} />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
     </Stack.Navigator>
   );
 };

@@ -115,8 +115,8 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 				status: statusFilter ?? undefined,
 			});
 			if (response.success && response.data) {
-				const data = Array.isArray(response.data) ? response.data : [];
-				setAllRequests(data);
+				const content = response.data.content ?? [];
+				setAllRequests(content);
 			} else {
 				setAllRequests([]);
 			}

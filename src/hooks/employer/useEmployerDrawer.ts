@@ -7,7 +7,8 @@ type DrawerScreen =
 	| "EmployerProfileEdit"
 	| "EmployerWorkplaceManage"
 	| "EmployerReceivedRequests"
-	| "EmployerWithdraw";
+	| "EmployerWithdraw"
+	| "NotificationSettings";
 
 /** navigation에서 실제로 사용하는 메서드만 추출한 최소 인터페이스 */
 interface DrawerNavigation {
@@ -55,6 +56,7 @@ export function useEmployerDrawer(
 		onPressProfileEdit: makeHandler("EmployerProfileEdit"),
 		onPressWorkplaceManage: makeHandler("EmployerWorkplaceManage"),
 		onPressReceivedRequests: makeHandler("EmployerReceivedRequests"),
+		onPressNotificationSettings: () => navigateFromDrawer("NotificationSettings"),
 		onPressAccountSettings: () => {
 			setIsDrawerVisible(false);
 			setTimeout(() => setIsAccountSheetVisible(true), 220);

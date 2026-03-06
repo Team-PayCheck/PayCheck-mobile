@@ -118,6 +118,7 @@ const EmployerWorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 				onPressProfileEdit={() => navigateFromDrawer("ProfileEdit")}
 				onPressWorkplaceManage={() => closeDrawer()}
 				onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+				onPressNotificationSettings={() => navigateFromDrawer("NotificationSettings")}
 				onPressAccountSettings={() => {
 					setIsDrawerVisible(false);
 					setTimeout(() => setIsAccountSheetVisible(true), 220);

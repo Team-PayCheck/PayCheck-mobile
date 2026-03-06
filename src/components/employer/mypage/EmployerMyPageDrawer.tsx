@@ -21,6 +21,7 @@ interface EmployerMyPageDrawerProps {
 	onPressProfileEdit?: () => void;
 	onPressWorkplaceManage?: () => void;
 	onPressReceivedRequests?: () => void;
+	onPressNotificationSettings?: () => void;
 	onPressAccountSettings?: () => void;
 	onPressLogout?: () => void;
 	onPressWithdraw?: () => void;
@@ -34,6 +35,7 @@ const EmployerMyPageDrawer: React.FC<EmployerMyPageDrawerProps> = ({
 	onPressProfileEdit,
 	onPressWorkplaceManage,
 	onPressReceivedRequests,
+	onPressNotificationSettings,
 	onPressAccountSettings,
 	onPressLogout,
 	onPressWithdraw,
@@ -107,6 +109,11 @@ const EmployerMyPageDrawer: React.FC<EmployerMyPageDrawerProps> = ({
 							title="받은 근무요청"
 							iconSource={require("../../../assets/images/mypage/chat.png")}
 							onPress={onPressReceivedRequests}
+						/>
+						<MenuButton
+							title="알림 설정"
+							iconName="notifications-outline"
+							onPress={onPressNotificationSettings}
 						/>
 						<MenuButton
 							title="계정 이용 / 이용동의"

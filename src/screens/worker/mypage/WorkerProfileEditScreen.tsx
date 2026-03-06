@@ -100,6 +100,7 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         onPressProfileEdit={() => closeDrawer()}
         onPressWorkplaceManage={() => navigateFromDrawer("WorkplaceManage")}
         onPressSentRequests={() => navigateFromDrawer("SentRequests")}
+        onPressNotificationSettings={() => navigateFromDrawer("NotificationSettings")}
         onPressAccountSettings={() => {
           setIsDrawerVisible(false);
           setTimeout(() => setIsAccountSheetVisible(true), 220);

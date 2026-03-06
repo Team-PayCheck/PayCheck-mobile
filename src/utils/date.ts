@@ -1,5 +1,27 @@
 import type { WeekDay } from "../types/worker.types";
 
+/**
+ * ISO 8601 날짜 문자열을 상대 시간 표기로 변환
+ * e.g. "방금 전", "10분 전", "3시간 전", "2일 전", "3/15"
+ */
+export const formatRelativeTime = (dateStr: string): string => {
+	const now = new Date();
+	const date = new Date(dateStr);
+	const diffMs = now.getTime() - date.getTime();
+	const diffMin = Math.floor(diffMs / (1000 * 60));
+	const diffHour = Math.floor(diffMs / (1000 * 60 * 60));
+	const diffDay = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+	if (diffMin < 1) return "방금 전";
+	if (diffMin < 60) return `${diffMin}분 전`;
+	if (diffHour < 24) return `${diffHour}시간 전`;
+	if (diffDay < 7) return `${diffDay}일 전`;
+
+	const month = date.getMonth() + 1;
+	const day = date.getDate();
+	return `${month}/${day}`;
+};
+
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export const getWeekOfMonth = (date: Date): number => {

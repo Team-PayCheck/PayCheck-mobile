@@ -28,7 +28,7 @@ PayCheck 웹 프로젝트(payCheck-frontend)를 React Native(Expo)로 모바일 
 - **목표**: payCheck-frontend(React 웹앱)을 모바일 앱으로 포팅
 - **웹 원본**: `../payCheck-frontend`
 - **프레임워크**: React Native + Expo
-- **상태**: 근로자/고용주 기능 구현 완료, 공지 게시판 구현 완료
+- **상태**: 근로자/고용주 기능 구현 완료, 공지 게시판/알림/푸시 알림 구현 완료
 
 ## 기술 스택
 
@@ -51,11 +51,13 @@ src/
 │   ├── worker/       # 근로자 API (계약, 근무기록, 정정요청, 급여, 송금)
 │   ├── employer/     # 고용주 API (근무지 CRUD, 계약 CRUD, 정정요청 승인/거절)
 │   ├── notice/       # 공지 API (공지 CRUD)
+│   ├── notification/ # 알림 API (인앱 알림 CRUD, FCM 토큰 등록/삭제)
 │   └── kakao/        # 카카오 API (주소 검색)
 ├── assets/           # 폰트, 이미지
 ├── components/
 │   ├── common/       # Text, PrimaryButton, BottomSheetModal, WheelPicker, MonthlyCalendar, Pagination, NoticeBoard 등
-│   │   └── notice/          # 공지 컴포넌트 (NoticeCreateModal, NoticeDetailSheet, NoticeEditSheet, NoticeCategorySelector)
+│   │   ├── notice/          # 공지 컴포넌트 (NoticeCreateModal, NoticeDetailSheet, NoticeEditSheet, NoticeCategorySelector)
+│   │   └── notification/    # 알림 컴포넌트 (NotificationPopup 드롭다운)
 │   ├── employer/
 │   │   ├── home/            # 고용주 홈 (근무 추가/수정 모달)
 │   │   ├── worker-manage/   # 직원관리 (WorkerCard, AddWorkerModal, WorkScheduleCalendarModal 등)
@@ -70,12 +72,13 @@ src/
 │       ├── monthlyCalendar/ # 월간 캘린더
 │       └── salary/          # 급여명세서 (WorkplaceTabSelector 등)
 ├── hooks/
-│   ├── common/       # useOnboardingStatus, useLogoutHandler, useNotices, usePickerState
+│   ├── common/       # useOnboardingStatus, useLogoutHandler, useNotices, useNotifications, useNotificationStream, useFcmToken, useNotificationNavigation
 │   ├── employer/     # useWorkplaceManagement, useWorkplaceContracts, useAddWorker, useReceivedRequests, useEmployerDrawer, useEmployerDailyWorkRecords
 │   └── worker/       # useWorkRecords, useCorrectionRequest, useUserData, useSalaryStatement 등
 ├── navigation/       # RootNavigator, WorkerStack, EmployerStack, SignUpNavigator, OnboardingStack
 ├── screens/
 │   ├── auth/         # 회원가입 (Step1~5)
+│   ├── common/       # NotificationScreen, NotificationSettingsScreen
 │   ├── employer/
 │   │   ├── EmployerHomeScreen.tsx
 │   │   ├── EmployerWorkerManageScreen.tsx
@@ -86,10 +89,10 @@ src/
 │       ├── WorkerWeeklyCalendarScreen.tsx
 │       ├── WorkerMonthlyCalendarScreen.tsx
 │       └── mypage/   # WorkerProfileEdit, WorkerWorkplaceManage, WorkerSentRequests, Withdraw
-├── stores/           # authStore, onboardingStore, signUpStore (Zustand)
+├── stores/           # authStore, onboardingStore, signUpStore, notificationStore (Zustand)
 ├── types/            # 공통 API 타입(api.types.ts), 근로자 UI 타입, 고용주 UI 타입
 ├── constants/        # colors, bank, pickerItems, wage
-└── utils/            # alert, date, format, image, notification, employerSchedule
+└── utils/            # alert, date, format, image, notification, employerSchedule, sse, pushToken
 ```
 
 ## 주요 기능
@@ -102,11 +105,14 @@ src/
 **고용주(Employer)**:
 - 홈: 일간 캘린더, 근무 추가/수정
 - 직원관리: 근무지별 근무자 목록, 계약 수정, 근무자 추가/퇴사
+- 송금관리: 근무지별 근무자 급여 조회, 송금 처리
 - 근무지 관리: 근무지 CRUD (카카오 주소 검색 연동)
 - 마이페이지: 프로필 수정, 받은 근무요청 보기 (승인/거절, 페이지네이션)
 
 **공통**:
 - 공지 게시판: 공지 작성/수정/삭제, 카테고리 필터, 상세 보기 바텀시트
+- 알림: 인앱 알림 팝업, 알림 상세 화면 (필터/페이지네이션), SSE 실시간 구독, 숫자 뱃지
+- 푸시 알림: FCM 토큰 등록/삭제, 딥링크 네비게이션, 알림 설정 화면
 
 ### 인증
 - 카카오 로그인/회원가입 (`@react-native-seoul/kakao-login`)
@@ -190,6 +196,10 @@ Welcome (카카오 로그인)
 |---|------|
 | `useNotices` | 공지 목록/상세/CRUD 관리 |
 | `usePickerState` | Picker 로직 공통 훅 |
+| `useNotifications` | 알림 목록/읽음/삭제/페이지네이션 관리 |
+| `useNotificationStream` | SSE 실시간 알림 구독 + 뱃지 업데이트 |
+| `useFcmToken` | 로그인 시 FCM 토큰 자동 등록 (사용자 설정 존중) |
+| `useNotificationNavigation` | 푸시 알림 탭 → 딥링크 화면 이동 |
 
 ### 참조할 웹 파일 위치
 
@@ -229,9 +239,11 @@ eas build --platform ios  # 빌드
 - [x] 고용주 일간 캘린더 화면 (근무 추가/수정 모달)
 - [x] 공지 게시판 (공지 작성/수정/삭제, 카테고리 필터, 상세 바텀시트)
 - [x] BottomSheetModal 스와이프 닫기 + 키보드 회피 버그 수정
+- [x] 고용주 송금관리 화면 (근무지별 급여 조회, 송금 처리)
+- [x] 인앱 알림 (팝업, 상세 화면, SSE 실시간 구독, 숫자 뱃지)
+- [x] 푸시 알림 (FCM 토큰 등록/삭제, 딥링크 네비게이션, 알림 설정)
 
 ### TODO
-- [ ] 고용주 송금관리 화면 구현
 - [ ] 회원탈퇴 API 연동 (백엔드 개발 필요)
 - [ ] 계정 이용/이용동의 상세 UI
 

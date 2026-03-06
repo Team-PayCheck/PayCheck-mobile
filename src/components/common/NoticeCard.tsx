@@ -14,7 +14,7 @@ import type { NoticeCategory } from "../../api/notice/types";
 const CATEGORY_ICON: Record<NoticeCategory, any> = {
 	HANDOVER: require("../../assets/images/notice/handover.png"),
 	URGENT: require("../../assets/images/notice/urgent.png"),
-  	SCHEDULE: require("../../assets/images/notice/schedule.png"),
+  SCHEDULE: require("../../assets/images/notice/schedule.png"),
 	ETC: require("../../assets/images/notice/etc.png"),
 };
 

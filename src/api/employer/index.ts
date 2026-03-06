@@ -13,6 +13,7 @@ import type {
 	CreateContractRequest,
 	UpdateContractRequest,
 	CorrectionRequestListItem,
+	CorrectionRequestPage,
 	CorrectionRequestDetail,
 	CorrectionRequestStatus,
 	CreatePaymentRequest,
@@ -379,15 +380,15 @@ export const getPendingApprovals = async (
 export const getCorrectionRequests = async (
 	workplaceId: number,
 	params?: { status?: CorrectionRequestStatus }
-): Promise<ApiResponse<CorrectionRequestListItem[]>> => {
+): Promise<ApiResponse<CorrectionRequestPage>> => {
 	try {
-		const { data } = await api.get<ApiResponse<CorrectionRequestListItem[]>>(
+		const { data } = await api.get<ApiResponse<CorrectionRequestPage>>(
 			`/api/employer/workplaces/${workplaceId}/correction-requests`,
 			{ params }
 		);
 		return data;
 	} catch (error) {
-		const axiosError = error as AxiosError<ApiResponse<CorrectionRequestListItem[]>>;
+		const axiosError = error as AxiosError<ApiResponse<CorrectionRequestPage>>;
 		const message =
 			axiosError.response?.data?.error?.message ||
 			axiosError.message ||
