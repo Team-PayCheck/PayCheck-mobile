@@ -103,7 +103,7 @@ export function useProfileEdit({ user, onSuccess, onClose }: UseProfileEditParam
       }
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      showError("프로필 수정에 실패했습니다.");
+      showError("수정 실패", "프로필 수정에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }

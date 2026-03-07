@@ -83,7 +83,7 @@ export function useAccountEdit({ worker, onSuccess, onClose }: UseAccountEditPar
       }
     } catch (error) {
       console.error("계좌 정보 수정 실패:", error);
-      showError("계좌 정보 수정에 실패했습니다.");
+      showError("수정 실패", "계좌 정보 수정에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }

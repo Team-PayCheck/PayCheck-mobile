@@ -26,7 +26,7 @@ export const useLogoutHandler = (
             try {
               await unregisterPushToken();
               await logout();
-              showSuccess("로그아웃이 완료되었습니다.");
+              showSuccess("로그아웃 완료", "로그아웃이 완료되었습니다.");
             } catch {
               showError("로그아웃 실패", "로그아웃 처리 중 오류가 발생했습니다.");
             } finally {

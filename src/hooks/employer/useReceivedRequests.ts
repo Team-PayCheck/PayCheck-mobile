@@ -189,7 +189,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 					try {
 						const response = await approveCorrectionRequest(id);
 						if (response.success) {
-							showSuccess("요청이 승인되었습니다.");
+							showSuccess("승인 완료", "요청이 승인되었습니다.");
 							setExpandedId(null);
 							setDetail(null);
 							await fetchRequests();
@@ -197,7 +197,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 							showError("승인 실패", "요청 승인에 실패했습니다.");
 						}
 					} catch {
-						showError("승인 처리에 실패했습니다.");
+						showError("승인 실패", "승인 처리에 실패했습니다.");
 					} finally {
 						setProcessingId(null);
 						setProcessingAction(null);
@@ -220,7 +220,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 					try {
 						const response = await rejectCorrectionRequest(id);
 						if (response.success) {
-							showSuccess("요청이 거절되었습니다.");
+							showSuccess("거절 완료", "요청이 거절되었습니다.");
 							setExpandedId(null);
 							setDetail(null);
 							await fetchRequests();
@@ -228,7 +228,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 							showError("거절 실패", "요청 거절에 실패했습니다.");
 						}
 					} catch {
-						showError("거절 처리에 실패했습니다.");
+						showError("거절 실패", "거절 처리에 실패했습니다.");
 					} finally {
 						setProcessingId(null);
 						setProcessingAction(null);
