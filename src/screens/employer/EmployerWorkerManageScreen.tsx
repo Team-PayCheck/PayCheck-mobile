@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, FlatList, ActivityIndicator, View, Alert } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, View } from "react-native";
 import { Text } from "../../components/common/Text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -24,6 +24,7 @@ import type { ContractUpdateRequest } from "../../types/employer/employer.types"
 import type { WorkplaceDetails } from "../../api/employer/types";
 import { useWorkplaceManagement } from "../../hooks/employer/useWorkplaceManagement";
 import useWorkplaceContracts from "../../hooks/employer/useWorkplaceContracts";
+import { showSuccess, showError } from "../../utils/alert";
 
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
@@ -87,9 +88,9 @@ const EmployerWorkerManageScreen: React.FC = () => {
     try {
       await updateWorker(contractId, data);
       setExpandedContractId(null);
-      Alert.alert("수정 완료", "근무자 정보가 수정되었습니다.");
+      showSuccess("수정 완료", "근무자 정보가 수정되었습니다.");
     } catch {
-      Alert.alert("수정 실패", "근무자 정보 수정 중 오류가 발생했습니다.");
+      showError("수정 실패", "근무자 정보 수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -101,7 +102,7 @@ const EmployerWorkerManageScreen: React.FC = () => {
         setSelectedFilterId("all");
       }
     } catch {
-      Alert.alert("퇴사 처리 실패", "퇴사 처리 중 오류가 발생했습니다.");
+      showError("퇴사 처리 실패", "퇴사 처리 중 오류가 발생했습니다.");
     }
   };
 

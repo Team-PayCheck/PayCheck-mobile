@@ -100,16 +100,16 @@ export function useGetCorrectionRequests(): UseGetCorrectionRequestsReturn {
     try {
       const response = await deleteCorrectionRequest(id);
       if (response.success) {
-        showSuccess("요청이 취소되었습니다.");
+        showSuccess("취소 완료", "요청이 취소되었습니다.");
         setExpandedId(null);
         setDetail(null);
         await fetchRequests();
       } else {
-        showError(response.error?.message ?? "요청 취소에 실패했습니다.");
+        showError("취소 실패", "요청 취소에 실패했습니다.");
       }
     } catch (error) {
       console.warn("정정요청 취소 실패:", error);
-      showError("요청 취소에 실패했습니다.");
+      showError("취소 실패", "요청 취소에 실패했습니다.");
     } finally {
       setIsDeleting(false);
     }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { isAxiosError } from "axios";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { showError } from "../../../utils/alert";
 import { Text } from "../../common/Text";
 import EmployerWorkerCard from "./EmployerWorkerCard";
 import EmployerEditWorkModal from "./EmployerEditWorkModal";
@@ -33,12 +33,9 @@ const EmployerWorkerListSection: React.FC<EmployerWorkerListSectionProps> = ({
     onDeleteItem(id);
     try {
       await deleteWorkRecord(id);
-    } catch (error) {
+    } catch {
       onRefetch();
-      const message = isAxiosError(error)
-        ? (error.response?.data?.error?.message ?? "삭제에 실패했습니다.")
-        : "삭제에 실패했습니다.";
-      Alert.alert("삭제 실패", message);
+      showError("삭제 실패", "삭제에 실패했습니다.");
     }
   };
 

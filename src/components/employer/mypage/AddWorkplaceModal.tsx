@@ -9,6 +9,7 @@ import {
 	ActivityIndicator,
 	Switch,
 } from "react-native";
+import { showSuccess, showError, showWarning } from "../../../utils/alert";
 import BottomSheetModal from "../../common/BottomSheetModal";
 import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
@@ -68,7 +69,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 	const handleSearch = async () => {
 		const query = searchQuery.trim();
 		if (!query) {
-			Alert.alert("검색어 입력", "주소를 입력해주세요.");
+			Alert.alert("입력 확인", "주소를 입력해주세요.");
 			return;
 		}
 
@@ -76,14 +77,14 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 		try {
 			const results = await searchAddress(query);
 			if (results.length === 0) {
-				Alert.alert("검색 결과 없음", "검색 결과가 없습니다. 다른 주소를 입력해주세요.");
+				showWarning("검색 결과 없음", "검색 결과가 없습니다. 다른 주소를 입력해주세요.");
 				setShowResults(false);
 			} else {
 				setSearchResults(results);
 				setShowResults(true);
 			}
 		} catch {
-			Alert.alert("검색 실패", "주소 검색 중 오류가 발생했습니다.");
+			showError("검색 실패", "주소 검색 중 오류가 발생했습니다.");
 		} finally {
 			setIsSearching(false);
 		}
@@ -110,15 +111,15 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 			});
 
 			if (res.success) {
-				Alert.alert("등록 완료", "새로운 근무지가 등록되었습니다.");
+				showSuccess("등록 완료", "새로운 근무지가 등록되었습니다.");
 				resetForm();
 				onClose();
 				onSuccess?.();
 			} else {
-				Alert.alert("등록 실패", res.error?.message || "근무지 등록에 실패했습니다.");
+				showError("등록 실패", "근무지 등록에 실패했습니다.");
 			}
-		} catch (error: any) {
-			Alert.alert("등록 실패", error?.message || "근무지 등록 중 오류가 발생했습니다.");
+		} catch {
+			showError("등록 실패", "근무지 등록 중 오류가 발생했습니다.");
 		} finally {
 			setIsLoading(false);
 		}

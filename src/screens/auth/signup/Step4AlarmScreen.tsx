@@ -70,10 +70,10 @@ const Step4AlarmScreen: React.FC = () => {
 
 			// 400 에러 (이미 가입된 계정 등)
 			if (loginError.status === 400) {
-				showError("회원가입 실패", loginError.message);
+				showError("회원가입 실패", "이미 가입된 계정입니다.");
 			} else {
 				// 그 외 에러
-				showError("회원가입 실패", "회원가입에 실패하였습니다.");
+				showError("회원가입 실패", "회원가입에 실패했습니다.");
 			}
 
 			// SignUp Store 초기화

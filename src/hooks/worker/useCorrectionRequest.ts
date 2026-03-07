@@ -4,8 +4,8 @@
  * 주간캘린더, 월간캘린더 등 여러 스크린에서 재사용 가능.
  */
 import { useState, useCallback } from "react";
-import { Alert } from "react-native";
 import { createCorrectionRequest } from "../../api/worker";
+import { showSuccess, showError } from "../../utils/alert";
 import type { WorkItem } from "../../types/worker.types";
 
 const useCorrectionRequest = () => {
@@ -47,13 +47,9 @@ const useCorrectionRequest = () => {
 					...data,
 				});
 				setCorrectionModalVisible(false);
-				Alert.alert("요청 완료", "근무 기록 정정 요청이 전송되었습니다.");
-			} catch (error) {
-				const message =
-					error instanceof Error
-						? error.message
-						: "요청에 실패했습니다. 다시 시도해주세요.";
-				Alert.alert("요청 실패", message);
+				showSuccess("요청 완료", "근무 기록 정정 요청이 전송되었습니다.");
+			} catch {
+				showError("요청 실패", "요청에 실패했습니다. 다시 시도해주세요.");
 			}
 		},
 		[]
@@ -73,13 +69,9 @@ const useCorrectionRequest = () => {
 					...data,
 				});
 				setAddModalVisible(false);
-				Alert.alert("요청 완료", "근무 추가 요청이 전송되었습니다.");
-			} catch (error) {
-				const message =
-					error instanceof Error
-						? error.message
-						: "요청에 실패했습니다. 다시 시도해주세요.";
-				Alert.alert("요청 실패", message);
+				showSuccess("요청 완료", "근무 추가 요청이 전송되었습니다.");
+			} catch {
+				showError("요청 실패", "요청에 실패했습니다. 다시 시도해주세요.");
 			}
 		},
 		[]

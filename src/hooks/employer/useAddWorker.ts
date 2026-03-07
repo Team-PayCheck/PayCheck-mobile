@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { Alert } from "react-native";
+import { showError } from "../../utils/alert";
 import type { WorkScheduleRow } from "../../types/employer/employer.types";
 import type { SearchedWorker, WorkSchedule } from "../../api/employer/types";
 import { getWorkerByCode } from "../../api/worker";
@@ -34,7 +35,7 @@ const useAddWorker = () => {
   const handleSearch = useCallback(async () => {
     if (isSearching) return;
     if (!workerCode.trim()) {
-      Alert.alert("입력 오류", "근무자 코드를 입력해주세요.");
+      Alert.alert("입력 확인", "근무자 코드를 입력해주세요.");
       return;
     }
     setIsSearching(true);
@@ -44,11 +45,11 @@ const useAddWorker = () => {
       if (workerData && workerData.id) {
         setSearchedWorker(workerData);
       } else {
-        Alert.alert("검색 실패", "해당 근무자 코드를 찾을 수 없습니다.");
+        showError("검색 실패", "해당 근무자 코드를 찾을 수 없습니다.");
         setSearchedWorker(null);
       }
     } catch {
-      Alert.alert("검색 실패", "해당 근무자 코드를 찾을 수 없습니다.");
+      showError("검색 실패", "해당 근무자 코드를 찾을 수 없습니다.");
       setSearchedWorker(null);
     } finally {
       setIsSearching(false);

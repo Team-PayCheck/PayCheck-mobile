@@ -79,16 +79,11 @@ export function useAccountEdit({ worker, onSuccess, onClose }: UseAccountEditPar
         onSuccess();
         onClose();
       } else {
-        const fieldErrors = response.error?.fieldErrors;
-        if (fieldErrors && fieldErrors.length > 0) {
-          showError(fieldErrors[0].message);
-        } else {
-          showError(response.error?.message ?? "계좌 정보 수정에 실패했습니다.");
-        }
+        showError("수정 실패", "계좌 정보 수정에 실패했습니다.");
       }
     } catch (error) {
       console.error("계좌 정보 수정 실패:", error);
-      showError("계좌 정보 수정에 실패했습니다.");
+      showError("수정 실패", "계좌 정보 수정에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }

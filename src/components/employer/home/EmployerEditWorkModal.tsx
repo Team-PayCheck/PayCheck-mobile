@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { isAxiosError } from "axios";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { showSuccess, showError } from "../../../utils/alert";
 import { Feather } from "@expo/vector-icons";
 import PrimaryButton from "../../common/PrimaryButton";
 import { Text } from "../../common/Text";
@@ -49,14 +49,11 @@ const EmployerEditWorkModal: React.FC<EmployerEditWorkModalProps> = ({
     setIsSubmitting(true);
     try {
       await updateWorkRecord(record.id, { startTime, endTime, breakMinutes });
-      Alert.alert("완료", "근무 정보가 수정되었습니다.");
+      showSuccess("수정 완료", "근무 정보가 수정되었습니다.");
       onSuccess();
       onClose();
-    } catch (error) {
-      const message = isAxiosError(error)
-        ? (error.response?.data?.error?.message ?? "근무 수정에 실패했습니다.")
-        : "근무 수정에 실패했습니다.";
-      Alert.alert("수정 실패", message);
+    } catch {
+      showError("수정 실패", "근무 수정에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
