@@ -7,27 +7,29 @@ import {
 	StyleSheet,
 	Linking,
 	Platform,
+	ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 import { Text } from "../../components/common/Text";
 import { registerPushToken, unregisterPushToken } from "../../utils/pushToken";
+import { getNotificationSettings, updateNotificationSettings } from "../../api/settings";
 import { colors } from "../../constants/colors";
-import { PUSH_ENABLED_KEY } from "../../constants/storageKeys";
 
 const NotificationSettingsScreen = () => {
 	const navigation = useNavigation();
 	const [pushEnabled, setPushEnabled] = useState(true);
+	const [isLoading, setIsLoading] = useState(true);
 	const [isToggling, setIsToggling] = useState(false);
 
 	useEffect(() => {
-		AsyncStorage.getItem(PUSH_ENABLED_KEY).then((value) => {
-			if (value !== null) {
-				setPushEnabled(value === "true");
+		getNotificationSettings().then((res) => {
+			if (res.success && res.data) {
+				setPushEnabled(res.data.pushEnabled);
 			}
+			setIsLoading(false);
 		});
 	}, []);
 
@@ -68,8 +70,8 @@ const NotificationSettingsScreen = () => {
 			} else {
 				await unregisterPushToken();
 			}
+			await updateNotificationSettings({ pushEnabled: newValue });
 			setPushEnabled(newValue);
-			await AsyncStorage.setItem(PUSH_ENABLED_KEY, String(newValue));
 		} catch {
 			// silent fail
 		} finally {
@@ -101,44 +103,50 @@ const NotificationSettingsScreen = () => {
 				<View style={{ width: 28 }} />
 			</View>
 
-			<View style={styles.content}>
-				<View style={styles.settingRow}>
-					<View style={styles.settingInfo}>
-						<Text weight="SemiBold" style={styles.settingTitle}>
-							푸시 알림
-						</Text>
-						<Text style={styles.settingDesc}>
-							앱을 사용하지 않을 때도 알림을 받습니다.
-						</Text>
-					</View>
-					<Switch
-						value={pushEnabled}
-						onValueChange={handleToggle}
-						disabled={isToggling}
-						trackColor={{
-							false: colors.disabled,
-							true: colors.primary,
-						}}
-						thumbColor={colors.white}
-					/>
+			{isLoading ? (
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator color={colors.primary} />
 				</View>
+			) : (
+				<View style={styles.content}>
+					<View style={styles.settingRow}>
+						<View style={styles.settingInfo}>
+							<Text weight="SemiBold" style={styles.settingTitle}>
+								푸시 알림
+							</Text>
+							<Text style={styles.settingDesc}>
+								앱을 사용하지 않을 때도 알림을 받습니다.
+							</Text>
+						</View>
+						<Switch
+							value={pushEnabled}
+							onValueChange={handleToggle}
+							disabled={isToggling}
+							trackColor={{
+								false: colors.disabled,
+								true: colors.primary,
+							}}
+							thumbColor={colors.white}
+						/>
+					</View>
 
-				<Pressable style={styles.linkRow} onPress={openDeviceSettings}>
-					<Text weight="Medium" style={styles.linkText}>
-						디바이스 알림 설정 열기
+					<Pressable style={styles.linkRow} onPress={openDeviceSettings}>
+						<Text weight="Medium" style={styles.linkText}>
+							디바이스 알림 설정 열기
+						</Text>
+						<Ionicons
+							name="open-outline"
+							size={18}
+							color={colors.textSecondary}
+						/>
+					</Pressable>
+
+					<Text style={styles.hintText}>
+						디바이스 설정에서 알림 권한을 끄면 푸시 알림이{"\n"}
+						앱 내 설정과 관계없이 수신되지 않습니다.
 					</Text>
-					<Ionicons
-						name="open-outline"
-						size={18}
-						color={colors.textSecondary}
-					/>
-				</Pressable>
-
-				<Text style={styles.hintText}>
-					디바이스 설정에서 알림 권한을 끄면 푸시 알림이{"\n"}
-					앱 내 설정과 관계없이 수신되지 않습니다.
-				</Text>
-			</View>
+				</View>
+			)}
 		</SafeAreaView>
 	);
 };
@@ -160,6 +168,11 @@ const styles = StyleSheet.create({
 	headerTitle: {
 		fontSize: 18,
 		color: colors.textPrimary,
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	content: {
 		paddingHorizontal: 20,
