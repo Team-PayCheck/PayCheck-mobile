@@ -177,7 +177,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 					{/* 검색 결과 목록 */}
 					{showResults && searchResults.length > 0 && (
 						<View style={styles.resultList}>
-							 <ScrollView
+							<ScrollView
 								nestedScrollEnabled
 								keyboardShouldPersistTaps="handled"
 								showsVerticalScrollIndicator={false}
@@ -195,7 +195,7 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 									<Text style={styles.resultZoneNo}>{item.zoneNo}</Text>
 									<Text style={styles.resultAddress}>{item.addressName}</Text>
 								</TouchableOpacity>
-							))}	
+								))}	
 							</ScrollView>
 						</View>
 					)}
