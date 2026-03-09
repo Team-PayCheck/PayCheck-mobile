@@ -177,7 +177,12 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 					{/* 검색 결과 목록 */}
 					{showResults && searchResults.length > 0 && (
 						<View style={styles.resultList}>
-							{searchResults.map((item, index) => (
+							<ScrollView
+								nestedScrollEnabled
+								keyboardShouldPersistTaps="handled"
+								showsVerticalScrollIndicator={false}
+							>
+							    {searchResults.map((item, index) => (
 								<TouchableOpacity
 									key={`${item.zoneNo}-${index}`}
 									style={[
@@ -190,7 +195,8 @@ const AddWorkplaceModal: React.FC<AddWorkplaceModalProps> = ({
 									<Text style={styles.resultZoneNo}>{item.zoneNo}</Text>
 									<Text style={styles.resultAddress}>{item.addressName}</Text>
 								</TouchableOpacity>
-							))}
+								))}	
+							</ScrollView>
 						</View>
 					)}
 
@@ -321,7 +327,7 @@ const styles = StyleSheet.create({
 		maxHeight: 200,
 	},
 	resultItem: {
-		paddingVertical: 12,
+		paddingVertical: 8,
 		paddingHorizontal: 14,
 	},
 	resultItemBorder: {
