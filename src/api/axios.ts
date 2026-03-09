@@ -110,11 +110,21 @@ api.interceptors.response.use(
 			isRefreshing = true;
 
 			try {
+				// React Native는 withCredentials로 쿠키가 자동 전송되지 않아
+				// CookieManager로 쿠키를 직접 읽어 Cookie 헤더에 수동 첨부
+				const cookies = await CookieManager.get(API_BASE_URL);
+				const cookieHeader = Object.entries(cookies)
+					.map(([key, cookie]) => `${key}=${cookie.value}`)
+					.join("; ");
+
 				// Refresh Token(쿠키)으로 새 Access Token 요청
 				const response = await axios.post<ApiResponse<AuthSuccessData>>(
 					`${API_BASE_URL}/api/auth/refresh`,
 					{},
-					{ withCredentials: true }
+					{
+						withCredentials: true,
+						headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
+					}
 				);
 
 				const newAccessToken = response.data.data?.accessToken;

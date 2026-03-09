@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavigationContainer, NavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useOnboardingStatus } from "../hooks/common/useOnboardingStatus";
 import { useNotificationStream } from "../hooks/common/useNotificationStream";
 import { useFcmToken } from "../hooks/common/useFcmToken";
 import { useNotificationNavigation } from "../hooks/common/useNotificationNavigation";
+import { setLogoutCallback } from "../api/axios";
 import OnboardingStack from "./OnboardingStack";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 import SignUpNavigator from "./SignUpNavigator";
@@ -28,6 +29,13 @@ const RootNavigator = () => {
 	useNotificationStream();
 	useFcmToken();
 	useNotificationNavigation(isNavReady ? navigationRef.current : null);
+
+	useEffect(() => {
+		if (!isNavReady) return;
+		setLogoutCallback(() => {
+			navigationRef.current?.reset({ index: 0, routes: [{ name: "Welcome" }] });
+		});
+	}, [isNavReady]);
 
 	if (isLoading) {
 		return null;
