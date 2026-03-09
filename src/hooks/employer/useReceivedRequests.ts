@@ -171,6 +171,7 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 				setDetail(response.data);
 			}
 		} catch {
+			// TODO: 백엔드 CREATE 타입 500 에러 수정 후 이 폴백 로직 제거
 			// 상세 조회 실패 시 목록 아이템 데이터로 대체 (백엔드 버그 임시 대응)
 			const listItem = allRequests.find((r) => r.id === id);
 			if (listItem) {

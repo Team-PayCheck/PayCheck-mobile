@@ -16,6 +16,7 @@ import * as Notifications from "expo-notifications";
 import { Text } from "../../components/common/Text";
 import { registerPushToken, unregisterPushToken } from "../../utils/pushToken";
 import { getNotificationSettings, updateNotificationSettings } from "../../api/settings";
+import { showError } from "../../utils/alert";
 import { colors } from "../../constants/colors";
 
 const NotificationSettingsScreen = () => {
@@ -70,7 +71,14 @@ const NotificationSettingsScreen = () => {
 			} else {
 				await unregisterPushToken();
 			}
-			await updateNotificationSettings({ pushEnabled: newValue });
+			const res = await updateNotificationSettings({ pushEnabled: newValue });
+			if (!res.success) {
+				// 서버 설정 업데이트 실패 시 FCM 토큰 롤백
+				if (newValue) await unregisterPushToken();
+				else await registerPushToken();
+				showError("오류", "알림 설정 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
+				return;
+			}
 			setPushEnabled(newValue);
 		} catch {
 			// silent fail

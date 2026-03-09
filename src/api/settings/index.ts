@@ -17,7 +17,7 @@ export const getNotificationSettings = async (): Promise<ApiResponse<Notificatio
   } catch (error) {
     const axiosError = error as AxiosError<ApiResponse<NotificationSettings>>;
     const message = axiosError.response?.data?.error?.message ?? "알림 설정 조회에 실패했습니다.";
-    return { success: false, data: null as any, error: { code: "ERROR", message, fieldErrors: [] } };
+    return { success: false, error: { code: "ERROR", message, fieldErrors: [] } };
   }
 };
 
@@ -34,6 +34,6 @@ export const updateNotificationSettings = async (
   } catch (error) {
     const axiosError = error as AxiosError<ApiResponse<NotificationSettings>>;
     const message = axiosError.response?.data?.error?.message ?? "알림 설정 수정에 실패했습니다.";
-    return { success: false, data: null as any, error: { code: "ERROR", message, fieldErrors: [] } };
+    return { success: false, error: { code: "ERROR", message, fieldErrors: [] } };
   }
 };
