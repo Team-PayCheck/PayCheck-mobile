@@ -171,11 +171,33 @@ export function useReceivedRequests(): UseReceivedRequestsReturn {
 				setDetail(response.data);
 			}
 		} catch {
-			console.warn("정정요청 상세 조회 실패");
+			// TODO: 백엔드 CREATE 타입 500 에러 수정 후 이 폴백 로직 제거
+			// 상세 조회 실패 시 목록 아이템 데이터로 대체 (백엔드 버그 임시 대응)
+			const listItem = allRequests.find((r) => r.id === id);
+			if (listItem) {
+				setDetail({
+					id: listItem.id,
+					type: listItem.type,
+					workRecordId: listItem.workRecordId,
+					contractId: 0,
+					originalWorkDate: null,
+					originalStartTime: listItem.originalStartTime,
+					originalEndTime: listItem.originalEndTime,
+					requestedWorkDate: listItem.workDate,
+					requestedStartTime: listItem.requestedStartTime,
+					requestedEndTime: listItem.requestedEndTime,
+					requestedBreakMinutes: 0,
+					requestedMemo: "",
+					status: listItem.status,
+					requester: listItem.requester,
+					reviewedAt: null,
+					createdAt: listItem.createdAt,
+				});
+			}
 		} finally {
 			setIsDetailLoading(false);
 		}
-	}, [expandedId]);
+	}, [expandedId, allRequests]);
 
 	// 승인
 	const handleApprove = useCallback((id: number) => {

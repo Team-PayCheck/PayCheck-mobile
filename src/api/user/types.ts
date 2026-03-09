@@ -25,7 +25,7 @@ export interface UserUpdateRequest {
 
 // ============ 근로자 정보 관련 타입 ============
 
-/** [GET] /api/workers/user/{userId}, [PUT] /api/users/me/account 응답 데이터 */
+/** [GET] /api/users/me, [PUT] /api/users/me/account 응답 데이터 */
 export interface WorkerResponse {
   id: number;
   userId: number;
