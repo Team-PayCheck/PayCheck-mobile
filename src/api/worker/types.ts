@@ -6,14 +6,17 @@ export type PayrollDeductionType = 'FREELANCER' | 'PART_TIME_NONE' | 'PART_TIME_
 // 계약 목록 아이템 (GET /api/worker/contracts)
 export interface ContractListItem {
 	id: number;
+	workplaceId: number;
+	workplaceName: string;
 	workerName: string;
 	workerCode: string;
 	workerPhone: string;
 	hourlyWage: number;
 	contractStartDate: string;
 	contractEndDate: string | null;
+	paymentDay: number;
+	payrollDeductionType: PayrollDeductionType;
 	isActive: boolean;
-	workplaceName?: string;
 }
 
 // 계약 상세 (GET /api/worker/contracts/{id})
@@ -170,8 +173,13 @@ export interface SalaryDetailResponse {
 	overtimePay: number;
 	nightPay: number;
 	holidayPay: number;
+	weeklyPaidLeaveAmount: number;
 	totalGrossPay: number;
 	fourMajorInsurance: number;
+	nationalPension: number;
+	healthInsurance: number;
+	longTermCare: number;
+	employmentInsurance: number;
 	incomeTax: number;
 	localIncomeTax: number;
 	totalDeduction: number;
