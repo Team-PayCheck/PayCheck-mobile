@@ -32,7 +32,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ salary }) => {
 				label="휴일근로수당"
 				value={salary?.holidayPay ?? null}
 			/>
-			<SalaryItemRow label="가족수당" value={null} />
 			<View style={styles.divider} />
 			<View style={styles.subtotalRow}>
 				<Text style={styles.subtotalText} weight="SemiBold">

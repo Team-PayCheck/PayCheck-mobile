@@ -28,8 +28,6 @@ const DeductionSection: React.FC<DeductionSectionProps> = ({ salary }) => {
 			<SalaryItemRow label="고용보험" value={salary?.employmentInsurance ?? null} />
 			<SalaryItemRow label="건강보험" value={salary?.healthInsurance ?? null} />
 			<SalaryItemRow label="장기요양보험" value={salary?.longTermCare ?? null} />
-			{/* 노동조합비: 백엔드에서 필드 추가 전까지 ? 표시 */}
-			<SalaryItemRow label="노동조합비" value={null} />
 			<View style={styles.divider} />
 			<View style={styles.subtotalRow}>
 				<Text style={styles.subtotalText} weight="SemiBold">
