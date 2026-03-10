@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ActivityIndicator, ScrollView } from "react-native";
+import { StyleSheet, ActivityIndicator, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -16,7 +16,7 @@ import EmployerNavigationBar, {
 import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
 import AddWorkplaceButton from "../../../components/employer/mypage/AddWorkplaceButton";
 import AddWorkplaceModal from "../../../components/employer/mypage/AddWorkplaceModal";
-import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
+import { getWorkplaces, getWorkplaceDetail, deleteWorkplace } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
@@ -73,6 +73,24 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		}
 	};
 
+	const handleDeleteWorkplace = (id: number, name: string) => {
+		Alert.alert("근무지 삭제", `${name}을(를) 삭제하시겠습니까?`, [
+			{ text: "취소", style: "cancel" },
+			{
+				text: "삭제",
+				style: "destructive",
+				onPress: async () => {
+					try {
+						await deleteWorkplace(id);
+						fetchWorkplaces();
+					} catch {
+						Alert.alert("삭제 실패", "근무지 삭제 중 오류가 발생했습니다.");
+					}
+				},
+			},
+		]);
+	};
+
 	useEffect(() => {
 		fetchWorkplaces();
 	}, []);
@@ -109,6 +127,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 									colorCode={w.colorCode}
 									businessNumber={detail?.businessNumber}
 									address={detail?.address}
+									onDelete={() => handleDeleteWorkplace(w.id, w.name)}
 								/>
 							);
 						})}
