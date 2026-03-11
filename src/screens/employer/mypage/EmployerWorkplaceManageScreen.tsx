@@ -20,6 +20,7 @@ import { getWorkplaces, getWorkplaceDetail, deleteWorkplace } from "../../../api
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
+import { showError } from "../../../utils/alert";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",
@@ -37,6 +38,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [deletingId, setDeletingId] = useState<number | null>(null);
 
 	const handleTabPress = (tab: EmployerTabName) => {
 		navigation.replace(TAB_SCREEN_MAP[tab]);
@@ -74,17 +76,21 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 	};
 
 	const handleDeleteWorkplace = (id: number, name: string) => {
+		if (deletingId !== null) return;
 		Alert.alert("근무지 삭제", `${name}을(를) 삭제하시겠습니까?`, [
 			{ text: "취소", style: "cancel" },
 			{
 				text: "삭제",
 				style: "destructive",
 				onPress: async () => {
+					setDeletingId(id);
 					try {
 						await deleteWorkplace(id);
 						fetchWorkplaces();
 					} catch {
-						Alert.alert("삭제 실패", "근무지 삭제 중 오류가 발생했습니다.");
+						showError("삭제 실패", "근무지 삭제 중 오류가 발생했습니다.");
+					} finally {
+						setDeletingId(null);
 					}
 				},
 			},
@@ -127,7 +133,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 									colorCode={w.colorCode}
 									businessNumber={detail?.businessNumber}
 									address={detail?.address}
-									onDelete={() => handleDeleteWorkplace(w.id, w.name)}
+									onDelete={deletingId === null ? () => handleDeleteWorkplace(w.id, w.name) : undefined}
 								/>
 							);
 						})}
