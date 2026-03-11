@@ -102,7 +102,7 @@ export const devLogin = async (
  */
 export const deleteMyAccount = async () => {
 	try {
-		const { data } = await api.delete("/api/users/me");
+		const { data } = await api.delete("/api/auth/withdraw");
 		return data;
 	} catch (error) {
 		const axiosError = error as AxiosError;
