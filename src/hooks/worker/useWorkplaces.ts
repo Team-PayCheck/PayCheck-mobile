@@ -1,10 +1,10 @@
 /**
  * 근로자의 활성 근무지 목록을 조회하는 커스텀 훅
- * - 계약 목록 → 상세 조회를 통해 근무지명, 시급 정보를 가공
+ * - 계약 목록 응답에서 근무지명, 시급 정보를 직접 사용
  * - WheelPicker용 items 변환까지 포함
  */
 import { useState, useMemo, useCallback } from "react";
-import { getContracts, getContractDetail } from "../../api/worker";
+import { getContracts } from "../../api/worker";
 import type { WheelPickerItem } from "../../components/common/WheelPicker";
 
 export interface WorkplaceOption {
@@ -25,18 +25,12 @@ const useWorkplaces = () => {
 			const activeContracts =
 				contractsRes.data?.filter((c) => c.isActive) ?? [];
 
-			const details = await Promise.all(
-				activeContracts.map(async (contract) => {
-					const detailRes = await getContractDetail(contract.id);
-					return {
-						contractId: contract.id,
-						workplaceId: detailRes.data?.workplaceId ?? 0,
-						workplaceName:
-							detailRes.data?.workplaceName ?? "알 수 없음",
-						hourlyWage: detailRes.data?.hourlyWage ?? 0,
-					};
-				})
-			);
+			const details = activeContracts.map((contract) => ({
+				contractId: contract.id,
+				workplaceId: contract.workplaceId,
+				workplaceName: contract.workplaceName,
+				hourlyWage: contract.hourlyWage,
+			}));
 
 			setWorkplaces(details);
 		} catch {
