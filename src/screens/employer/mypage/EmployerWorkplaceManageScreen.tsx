@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ActivityIndicator, ScrollView } from "react-native";
+import { StyleSheet, ActivityIndicator, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -16,10 +16,11 @@ import EmployerNavigationBar, {
 import EmployerWorkplaceCard from "../../../components/employer/mypage/EmployerWorkplaceCard";
 import AddWorkplaceButton from "../../../components/employer/mypage/AddWorkplaceButton";
 import AddWorkplaceModal from "../../../components/employer/mypage/AddWorkplaceModal";
-import { getWorkplaces, getWorkplaceDetail } from "../../../api/employer";
+import { getWorkplaces, getWorkplaceDetail, deleteWorkplace } from "../../../api/employer";
 import type { WorkplaceListItem, WorkplaceDetail } from "../../../api/employer/types";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import { useEmployerDrawer } from "../../../hooks/employer/useEmployerDrawer";
+import { showError } from "../../../utils/alert";
 
 const TAB_SCREEN_MAP: Record<EmployerTabName, keyof EmployerStackParamList> = {
 	home: "EmployerHomeMain",
@@ -37,6 +38,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 	const [detailMap, setDetailMap] = useState<Record<number, WorkplaceDetail>>({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [deletingId, setDeletingId] = useState<number | null>(null);
 
 	const handleTabPress = (tab: EmployerTabName) => {
 		navigation.replace(TAB_SCREEN_MAP[tab]);
@@ -71,6 +73,28 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleDeleteWorkplace = (id: number, name: string) => {
+		if (deletingId !== null) return;
+		Alert.alert("근무지 삭제", `${name}을(를) 삭제하시겠습니까?`, [
+			{ text: "취소", style: "cancel" },
+			{
+				text: "삭제",
+				style: "destructive",
+				onPress: async () => {
+					setDeletingId(id);
+					try {
+						await deleteWorkplace(id);
+						fetchWorkplaces();
+					} catch {
+						showError("삭제 실패", "근무지 삭제 중 오류가 발생했습니다.");
+					} finally {
+						setDeletingId(null);
+					}
+				},
+			},
+		]);
 	};
 
 	useEffect(() => {
@@ -109,6 +133,7 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 									colorCode={w.colorCode}
 									businessNumber={detail?.businessNumber}
 									address={detail?.address}
+									onDelete={deletingId === null ? () => handleDeleteWorkplace(w.id, w.name) : undefined}
 								/>
 							);
 						})}

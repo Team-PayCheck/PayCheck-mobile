@@ -1,5 +1,6 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Text } from "../../common/Text";
 import { colors } from "../../../constants/colors";
 
@@ -9,6 +10,7 @@ export interface EmployerWorkplaceCardProps {
 	colorCode?: string;
 	businessNumber?: string;
 	address?: string;
+	onDelete?: () => void;
 }
 
 const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
@@ -17,16 +19,24 @@ const EmployerWorkplaceCard: React.FC<EmployerWorkplaceCardProps> = ({
 	colorCode,
 	businessNumber,
 	address,
+	onDelete,
 }) => {
 	return (
 		<View style={styles.card}>
 			<View style={styles.header}>
-				{colorCode && (
-					<View style={[styles.colorDot, { backgroundColor: colorCode }]} />
+				<View style={styles.nameRow}>
+					{colorCode && (
+						<View style={[styles.colorDot, { backgroundColor: colorCode }]} />
+					)}
+					<Text weight="Bold" style={styles.name}>
+						{name}
+					</Text>
+				</View>
+				{onDelete && (
+					<TouchableOpacity onPress={onDelete} hitSlop={8}>
+						<Ionicons name="trash-outline" size={20} color={colors.deleteRed} />
+					</TouchableOpacity>
 				)}
-				<Text weight="Bold" style={styles.name}>
-					{name}
-				</Text>
 			</View>
 			<Text style={styles.info}>직원 수: {workerCount}명</Text>
 			<Text style={styles.info}>사업자번호: {businessNumber ?? "?"}</Text>
@@ -51,7 +61,12 @@ const styles = StyleSheet.create({
 	header: {
 		flexDirection: "row",
 		alignItems: "center",
+		justifyContent: "space-between",
 		marginBottom: 10,
+	},
+	nameRow: {
+		flexDirection: "row",
+		alignItems: "center",
 	},
 	colorDot: {
 		width: 12,
