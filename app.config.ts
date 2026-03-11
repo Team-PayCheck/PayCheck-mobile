@@ -54,7 +54,7 @@ const config: ExpoConfig = {
       "@react-native-seoul/kakao-login",
       {
         kakaoAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY,
-        kotlinVersion: "1.9.0",
+        kotlinVersion: "2.0.21",
       },
     ],
     "expo-dev-client",
@@ -66,7 +66,7 @@ const config: ExpoConfig = {
 
         },
         android: {
-          kotlinVersion: "1.9.0",
+          kotlinVersion: "2.0.21",
           enableProguardInReleaseBuilds: true,
         },
       },
