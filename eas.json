@@ -7,18 +7,37 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
+      "channel": "development",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_API_URL": "https://paycheck.duckdns.org",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY": "664c635b87b1c370d812bfdef853b66d"
+      }
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview"
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_API_URL": "https://paycheck.duckdns.org",
+        "EXPO_PUBLIC_APP_ENV": "staging",
+        "EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY": "664c635b87b1c370d812bfdef853b66d"
+      }
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_API_URL": "https://paycheck.duckdns.org",
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY": "664c635b87b1c370d812bfdef853b66d"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6760436915"
+      }
+    }
   }
 }
