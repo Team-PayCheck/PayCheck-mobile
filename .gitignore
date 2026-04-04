@@ -45,5 +45,5 @@ yarn-error.*
 /android
 
 # claude
-.claude
+.claude/settings.local.json
 PLAN.md
