@@ -36,7 +36,38 @@ gh issue view {번호} --json title,body,labels,assignees,comments
 
 판단이 애매하면 `paycheck-feature`로 라우팅.
 
-### Phase 3: exec-plan 생성
+### Phase 3: 브랜치 생성
+
+이슈 레이블과 제목을 기반으로 작업 브랜치를 생성하고 체크아웃한다.
+
+**브랜치 접두사 규칙:**
+
+| 레이블 | 접두사 |
+|--------|--------|
+| `bug` | `bug/` |
+| `feature` | `feat/` |
+| `enhancement` | `enhance/` |
+| 기타 | `chore/` |
+
+**브랜치명 형식:** `{접두사}{제목-슬러그}#{이슈번호}`
+
+- 제목 슬러그: 소문자, 공백→하이픈, 특수문자 제거, 최대 30자
+- 예시: `bug/workplace-name-display#50`, `feat/worker-detail-screen#42`
+
+```bash
+# 현재 브랜치 확인
+git branch --show-current
+
+# 브랜치 생성 및 체크아웃 (develop 기준)
+git checkout develop
+git pull origin develop
+git checkout -b {브랜치명}
+```
+
+- 이미 같은 이름의 브랜치가 존재하면 `git checkout {브랜치명}`으로 전환만 함
+- 브랜치 생성 후 사용자에게 브랜치명 알림
+
+### Phase 4: exec-plan 생성
 
 `docs/exec-plans/active/YYYY-MM-DD-issue-{번호}-{제목}.md` 파일 생성:
 
@@ -77,7 +108,7 @@ https://github.com/Team-PayCheck/PayCheck-mobile/issues/{번호}
 {이슈 코멘트 중 구현에 영향을 주는 내용}
 ```
 
-### Phase 4: 구현 실행
+### Phase 5: 구현 실행
 
 exec-plan 생성 후 판단한 스킬로 작업 진행:
 
@@ -86,7 +117,7 @@ exec-plan 생성 후 판단한 스킬로 작업 진행:
 - `paycheck-hook` → paycheck-logic 단독 실행
 - 직접 수정 → 파일 읽고 수정 후 paycheck-review 실행
 
-### Phase 5: 완료 처리
+### Phase 6: 완료 처리
 
 구현 완료 후:
 1. exec-plan의 체크리스트 항목을 `[x]`로 업데이트
@@ -105,3 +136,5 @@ exec-plan 생성 후 판단한 스킬로 작업 진행:
 | 이슈 내용이 불충분 | 파악 가능한 범위에서 계획 수립 후 사용자에게 확인 |
 | 이슈가 백엔드 작업 | "프론트엔드 작업이 없는 이슈입니다" 안내 |
 | 이미 active/ 에 같은 이슈 계획 존재 | 기존 계획 이어서 진행 |
+| 같은 이름의 브랜치가 이미 존재 | `git checkout {브랜치명}`으로 전환만 함 |
+| develop 브랜치에 pull 실패 | 사용자에게 알리고 현재 브랜치에서 진행 |

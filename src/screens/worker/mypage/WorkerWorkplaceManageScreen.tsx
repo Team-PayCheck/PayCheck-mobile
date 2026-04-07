@@ -71,7 +71,7 @@ const EmployerWorkplaceManageScreen: React.FC<Props> = ({ navigation }) => {
 		return workplaces.map((w, idx) => (
 			<WorkplaceCard
 				key={w.id || idx}
-				name={w.workerName || '-'}
+				name={w.workplaceName || '-'}
 				joinedAt={w.contractStartDate ? formatDate(w.contractStartDate) : '-'}
 				wage={w.hourlyWage ? `${formatCurrency(w.hourlyWage)}원` : '-'}
 			/>

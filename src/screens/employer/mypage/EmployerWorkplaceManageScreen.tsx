@@ -128,12 +128,12 @@ const EmployerWorkplaceManageScreen: React.FC = () => {
 							return (
 								<EmployerWorkplaceCard
 									key={w.id}
-									name={w.name}
+									name={detail?.name || w.name}
 									workerCount={w.workerCount ?? 0}
 									colorCode={w.colorCode}
 									businessNumber={detail?.businessNumber}
 									address={detail?.address}
-									onDelete={deletingId === null ? () => handleDeleteWorkplace(w.id, w.name) : undefined}
+									onDelete={deletingId === null ? () => handleDeleteWorkplace(w.id, detail?.name || w.name) : undefined}
 								/>
 							);
 						})}
