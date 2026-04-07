@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Alert, StyleSheet, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { deleteMyAccount } from "../../../api/auth";
 import { useAuthStore } from "../../../stores/authStore";
-import CookieManager from "@react-native-cookies/cookies";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import HomeBackButton from "../../../components/common/HomeBackButton";
@@ -47,7 +46,6 @@ const WithdrawScreen: React.FC<Props> = ({ navigation }) => {
 					text: "확인",
 					onPress: async () => {
 						useAuthStore.getState().logout();
-						await CookieManager.clearAll();
 						navigation.getParent()?.reset({ index: 0, routes: [{ name: "Welcome" }] });
 					},
 				},
