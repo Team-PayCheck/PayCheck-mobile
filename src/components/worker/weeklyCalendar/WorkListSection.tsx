@@ -5,6 +5,29 @@ import WorkCard from "./WorkCard";
 import { colors } from "../../../constants/colors";
 import type { WorkItem } from "../../../types/worker.types";
 
+/** StatusBadge와 동일한 로직으로 상태 우선순위 반환: 근무중(0) → 근무예정(1) → 근무완료(2) */
+const getStatusPriority = (work: WorkItem): number => {
+	const now = new Date();
+	const [startH, startM] = work.startTime.split(":").map(Number);
+	const [endH, endM] = work.endTime.split(":").map(Number);
+
+	const start = new Date(`${work.workDate}T00:00:00`);
+	start.setHours(startH, startM, 0, 0);
+
+	const end = new Date(`${work.workDate}T00:00:00`);
+	end.setHours(endH, endM, 0, 0);
+
+	if (end <= start) end.setDate(end.getDate() + 1);
+
+	const beforeStart = now < start;
+	const working = !beforeStart && now <= end && work.status === "SCHEDULED";
+	const isScheduled = beforeStart || (work.status === "SCHEDULED" && !working);
+
+	if (working) return 0;
+	if (isScheduled) return 1;
+	return 2;
+};
+
 interface WorkListSectionProps {
 	works: WorkItem[];
 	onPressAdd?: () => void;
@@ -18,7 +41,12 @@ const WorkListSection: React.FC<WorkListSectionProps> = ({
 }) => {
 	const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
-	const sortedWorks = [...works].sort((a, b) => b.startTime.localeCompare(a.startTime));
+	const sortedWorks = [...works].sort((a, b) => {
+		const priorityA = getStatusPriority(a);
+		const priorityB = getStatusPriority(b);
+		if (priorityA !== priorityB) return priorityA - priorityB;
+		return a.startTime.localeCompare(b.startTime);
+	});
 
 	const handleToggle = (work: WorkItem) => {
 		setExpandedCardId((prev) => (prev === work.id ? null : work.id));
