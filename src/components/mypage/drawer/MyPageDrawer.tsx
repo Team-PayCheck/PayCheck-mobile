@@ -92,7 +92,8 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 						/>
 						<MenuButton
 							title="알림 설정"
-							iconName="notifications-outline"
+							iconSource={require("../../../assets/images/mypage/bell.png")}
+							iconImageSize={115}
 							onPress={onPressNotificationSettings}
 						/>
 						<MenuButton
