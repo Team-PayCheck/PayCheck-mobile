@@ -8,17 +8,18 @@ interface MenuButtonProps {
 	title: string;
 	iconSource?: ImageSourcePropType;
 	iconName?: keyof typeof Ionicons.glyphMap;
+	iconImageSize?: number;
 	onPress?: () => void;
 }
 
-const MenuButton: React.FC<MenuButtonProps> = ({ title, iconSource, iconName, onPress }) => {
+const MenuButton: React.FC<MenuButtonProps> = ({ title, iconSource, iconName, iconImageSize, onPress }) => {
 	return (
 		<TouchableOpacity style={styles.container} activeOpacity={0.8} onPress={onPress}>
 			<View style={styles.iconCircle}>
 				{iconSource ? (
 					<Image
 						source={iconSource}
-						style={styles.iconImage}
+						style={[styles.iconImage, iconImageSize != null && { width: iconImageSize, height: iconImageSize }]}
 						resizeMode="contain"
 					/>
 				) : iconName ? (
