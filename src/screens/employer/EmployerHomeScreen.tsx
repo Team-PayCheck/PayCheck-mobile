@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   StyleSheet,
   ScrollView,
@@ -50,12 +50,11 @@ const EmployerHomeScreen: React.FC = () => {
 
   const { openDrawer, drawerProps, accountSheetProps } = useEmployerDrawer(navigation);
 
-  const today = useMemo(() => new Date(), []);
-  const [selectedDate, setSelectedDate] = useState<Date>(today);
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [isCalendarModalVisible, setIsCalendarModalVisible] = useState(false);
   const [isAddWorkModalVisible, setIsAddWorkModalVisible] = useState(false);
-  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
-  const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
 
   const {
     workplaces,
@@ -212,7 +211,10 @@ const EmployerHomeScreen: React.FC = () => {
               </View>
             ) : (
               <>
-                <EmployerTimeline workRecords={workRecords} />
+                <EmployerTimeline
+                  workRecords={workRecords}
+                  selectedDate={dateStr}
+                />
                 <EmployerWorkerListSection
                   workRecords={workRecords}
                   onPressAdd={() => setIsAddWorkModalVisible(true)}
