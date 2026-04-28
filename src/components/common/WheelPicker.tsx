@@ -36,6 +36,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 }) => {
 	const scrollY = useRef(new Animated.Value(0)).current;
 	const flatListRef = useRef<Animated.FlatList>(null);
+	const momentumStartedRef = useRef(false);
+	const dragSnapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const containerHeight = itemHeight * visibleCount;
 	const paddingVertical = itemHeight * Math.floor(visibleCount / 2);
 
@@ -57,14 +59,54 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 		}
 	}, [selectedValue]);
 
-	const handleMomentumScrollEnd = useCallback(
-		(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-			const offsetY = e.nativeEvent.contentOffset.y;
+	const snapToOffset = useCallback(
+		(offsetY: number) => {
 			const index = Math.round(offsetY / itemHeight);
 			const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
 			onValueChange(items[clampedIndex].value);
 		},
 		[items, itemHeight, onValueChange]
+	);
+
+	const clearDragSnapTimer = useCallback(() => {
+		if (dragSnapTimerRef.current !== null) {
+			clearTimeout(dragSnapTimerRef.current);
+			dragSnapTimerRef.current = null;
+		}
+	}, []);
+
+	useEffect(() => clearDragSnapTimer, [clearDragSnapTimer]);
+
+	const handleScrollBeginDrag = useCallback(() => {
+		momentumStartedRef.current = false;
+		clearDragSnapTimer();
+	}, [clearDragSnapTimer]);
+
+	// 짧은 드래그로 momentum scroll이 발생하지 않을 때를 대비해 직접 스냅 처리
+	const handleScrollEndDrag = useCallback(
+		(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+			const offsetY = e.nativeEvent.contentOffset.y;
+			clearDragSnapTimer();
+			dragSnapTimerRef.current = setTimeout(() => {
+				dragSnapTimerRef.current = null;
+				if (!momentumStartedRef.current) {
+					snapToOffset(offsetY);
+				}
+			}, 80);
+		},
+		[snapToOffset, clearDragSnapTimer]
+	);
+
+	const handleMomentumScrollBegin = useCallback(() => {
+		momentumStartedRef.current = true;
+		clearDragSnapTimer();
+	}, [clearDragSnapTimer]);
+
+	const handleMomentumScrollEnd = useCallback(
+		(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+			snapToOffset(e.nativeEvent.contentOffset.y);
+		},
+		[snapToOffset]
 	);
 
 	const renderItem = useCallback(
@@ -136,6 +178,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 					[{ nativeEvent: { contentOffset: { y: scrollY } } }],
 					{ useNativeDriver: true }
 				)}
+				onScrollBeginDrag={handleScrollBeginDrag}
+				onScrollEndDrag={handleScrollEndDrag}
+				onMomentumScrollBegin={handleMomentumScrollBegin}
 				onMomentumScrollEnd={handleMomentumScrollEnd}
 				contentContainerStyle={{
 					paddingVertical,
