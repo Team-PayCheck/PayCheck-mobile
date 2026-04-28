@@ -23,9 +23,13 @@ const minutesToX = (minutes: number): number =>
 
 interface EmployerTimelineProps {
   workRecords: WorkRecord[];
+  selectedDate: string;
 }
 
-const EmployerTimeline: React.FC<EmployerTimelineProps> = ({ workRecords }) => {
+const EmployerTimeline: React.FC<EmployerTimelineProps> = ({
+  workRecords,
+  selectedDate,
+}) => {
   const scrollRef = useRef<ScrollView>(null);
 
   const now = new Date();
@@ -103,10 +107,26 @@ const EmployerTimeline: React.FC<EmployerTimelineProps> = ({ workRecords }) => {
             {/* 근무자 바 */}
             {workRecords.map((record, index) => {
               const startMin = timeToMinutes(record.startTime);
-              let endMin = timeToMinutes(record.endTime);
-              if (endMin <= startMin) endMin += 24 * 60; // 자정 넘는 근무
-              const barLeft = minutesToX(startMin);
-              const barWidth = Math.max(minutesToX(endMin - startMin), 48);
+              const endMin = timeToMinutes(record.endTime);
+              const isPrevDay = record.workDate !== selectedDate;
+              const overnight = endMin <= startMin;
+
+              // 자정을 넘는 근무는 시작 날짜와 종료 날짜 양쪽에서 분할 표시한다.
+              // - 전날 시작: 0:00 ~ endTime
+              // - 당일 시작 + 자정 넘김: startTime ~ 24:00
+              // - 그 외: startTime ~ endTime
+              const displayStart = isPrevDay ? 0 : startMin;
+              const displayEnd = isPrevDay
+                ? endMin
+                : overnight
+                  ? 24 * 60
+                  : endMin;
+
+              const barLeft = minutesToX(displayStart);
+              const barWidth = Math.max(
+                minutesToX(displayEnd - displayStart),
+                48
+              );
               const barTop = ROW_GAP + index * (BAR_HEIGHT + ROW_GAP);
               const barColor = WORK_STATUS_COLOR[getWorkStatus(record)];
 
