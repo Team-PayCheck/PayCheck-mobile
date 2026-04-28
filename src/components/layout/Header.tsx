@@ -18,6 +18,7 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
   const [popupVisible, setPopupVisible] = useState(false);
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const decrementUnreadCount = useNotificationStore((s) => s.decrementUnreadCount);
 
   const handleBellPress = useCallback(async () => {
@@ -29,12 +30,15 @@ const Header: React.FC<HeaderProps> = ({ onPressLeft }) => {
       const res = await getNotifications({ size: 5 });
       if (res.success && res.data) {
         setNotifications(res.data.notifications ?? []);
+        if (res.data.unreadCount !== undefined) {
+          setUnreadCount(res.data.unreadCount);
+        }
       }
     } catch {
       // silent fail
     }
     setPopupVisible(true);
-  }, [popupVisible]);
+  }, [popupVisible, setUnreadCount]);
 
   const handlePressItem = useCallback(
     async (notification: NotificationResponse) => {
