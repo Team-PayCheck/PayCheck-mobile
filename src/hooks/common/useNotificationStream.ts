@@ -5,6 +5,7 @@
  * 로그아웃 또는 언마운트 시 자동 해제.
  */
 import { useEffect, useRef } from "react";
+import { AppState, type AppStateStatus } from "react-native";
 import Constants from "expo-constants";
 import { useAuthStore } from "../../stores/authStore";
 import { useNotificationStore } from "../../stores/notificationStore";
@@ -33,14 +34,18 @@ export function useNotificationStream() {
 			return;
 		}
 
+		const refreshUnreadCount = () => {
+			getUnreadCount()
+				.then((res) => {
+					if (res.success && res.data) {
+						setUnreadCount(res.data.count);
+					}
+				})
+				.catch(() => {});
+		};
+
 		// 초기 읽지 않은 알림 수 조회
-		getUnreadCount()
-			.then((res) => {
-				if (res.success && res.data) {
-					setUnreadCount(res.data.count);
-				}
-			})
-			.catch(() => {});
+		refreshUnreadCount();
 
 		// SSE 연결
 		sseRef.current = new ReactNativeEventSource(
@@ -64,9 +69,21 @@ export function useNotificationStream() {
 			}
 		);
 
+		// 앱이 포그라운드로 복귀할 때 unreadCount 재조회 (SSE 끊김 대비 안전장치)
+		const handleAppStateChange = (nextState: AppStateStatus) => {
+			if (nextState === "active") {
+				refreshUnreadCount();
+			}
+		};
+		const subscription = AppState.addEventListener(
+			"change",
+			handleAppStateChange
+		);
+
 		return () => {
 			sseRef.current?.close();
 			sseRef.current = null;
+			subscription.remove();
 		};
 	}, [isLoggedIn, accessToken, setUnreadCount, incrementUnreadCount, signalNewNotification]);
 }
