@@ -46,12 +46,13 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 
 	// 근로자 근무지 조회 (공지 게시판용 workplaceId 확보)
 	const { workplaces: workerWorkplaces, fetchWorkplaces } = useWorkplaces();
+	const [selectedWorkplaceIndex, setSelectedWorkplaceIndex] = useState(0);
 
 	useEffect(() => {
 		fetchWorkplaces();
 	}, []);
 
-	const workerWorkplaceId = workerWorkplaces[0]?.workplaceId ?? null;
+	const workerWorkplaceId = workerWorkplaces[selectedWorkplaceIndex]?.workplaceId ?? null;
 
 	// 공지 게시판
 	const {
@@ -151,10 +152,13 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 				/>
 
 				<NoticeBoard
-				notices={notices}
-				onPressAdd={() => setIsNoticeCreateVisible(true)}
-				onPressNotice={handlePressNotice}
-			/>
+					notices={notices}
+					onPressAdd={() => setIsNoticeCreateVisible(true)}
+					onPressNotice={handlePressNotice}
+					workplaceNames={workerWorkplaces.map((wp) => wp.workplaceName)}
+					selectedWorkplaceIndex={selectedWorkplaceIndex}
+					onWorkplaceSelect={setSelectedWorkplaceIndex}
+				/>
 
 				{isLoading ? (
 					<ActivityIndicator

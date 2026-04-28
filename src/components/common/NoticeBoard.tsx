@@ -5,6 +5,7 @@ import React from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { Text } from "./Text";
 import NoticeCard from "./NoticeCard";
+import WorkplaceTabSelector from "../worker/salary/WorkplaceTabSelector";
 import { colors } from "../../constants/colors";
 import type { NoticeCardItem } from "../../types/common/notice.types";
 
@@ -12,13 +13,21 @@ interface NoticeBoardProps {
 	notices: NoticeCardItem[];
 	onPressAdd?: () => void;
 	onPressNotice?: (notice: NoticeCardItem) => void;
+	workplaceNames?: string[];
+	selectedWorkplaceIndex?: number;
+	onWorkplaceSelect?: (index: number) => void;
 }
 
 const NoticeBoard: React.FC<NoticeBoardProps> = ({
 	notices,
 	onPressAdd,
 	onPressNotice,
+	workplaceNames,
+	selectedWorkplaceIndex = 0,
+	onWorkplaceSelect,
 }) => {
+	const hasMultipleWorkplaces = workplaceNames && workplaceNames.length > 1;
+
 	return (
 		<View style={styles.container}>
 			{/* 헤더 */}
@@ -36,6 +45,15 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({
 					</Text>
 				</TouchableOpacity>
 			</View>
+
+			{/* 근무지 탭 (근무지가 2개 이상일 때만 표시) */}
+			{hasMultipleWorkplaces && (
+				<WorkplaceTabSelector
+					workplaceNames={workplaceNames}
+					selectedIndex={selectedWorkplaceIndex}
+					onSelect={onWorkplaceSelect ?? (() => {})}
+				/>
+			)}
 
 			{/* 카드 가로 스크롤 */}
 			<ScrollView
