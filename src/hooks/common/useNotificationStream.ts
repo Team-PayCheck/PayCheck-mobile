@@ -9,7 +9,7 @@ import { AppState, type AppStateStatus } from "react-native";
 import Constants from "expo-constants";
 import { useAuthStore } from "../../stores/authStore";
 import { useNotificationStore } from "../../stores/notificationStore";
-import { getUnreadCount } from "../../api/notification";
+import { getNotifications } from "../../api/notification";
 import { ReactNativeEventSource } from "../../utils/sse";
 
 const env = Constants.expoConfig?.extra || {};
@@ -35,10 +35,11 @@ export function useNotificationStream() {
 		}
 
 		const refreshUnreadCount = () => {
-			getUnreadCount()
+			// size:1 — 개수만 필요하므로 페이로드 최소화
+			getNotifications({ size: 1 })
 				.then((res) => {
-					if (res.success && res.data) {
-						setUnreadCount(res.data.count);
+					if (res.success && res.data && res.data.unreadCount !== undefined) {
+						setUnreadCount(res.data.unreadCount);
 					}
 				})
 				.catch(() => {});
