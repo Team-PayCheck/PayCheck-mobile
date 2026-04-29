@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
 	View,
 	Switch,
@@ -8,6 +8,7 @@ import {
 	Linking,
 	Platform,
 	ActivityIndicator,
+	AppState,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,84 +17,74 @@ import * as Notifications from "expo-notifications";
 import { Text } from "../../components/common/Text";
 import { registerPushToken, unregisterPushToken } from "../../utils/pushToken";
 import { getNotificationSettings, updateNotificationSettings } from "../../api/settings";
-import { showError } from "../../utils/alert";
 import { colors } from "../../constants/colors";
 
 const NotificationSettingsScreen = () => {
 	const navigation = useNavigation();
-	const [pushEnabled, setPushEnabled] = useState(true);
+	const [pushEnabled, setPushEnabled] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
-	const [isToggling, setIsToggling] = useState(false);
+	const lastGrantedRef = useRef<boolean | null>(null);
 
-	useEffect(() => {
-		getNotificationSettings().then((res) => {
-			if (res.success && res.data) {
-				setPushEnabled(res.data.pushEnabled);
-			}
-			setIsLoading(false);
-		});
-	}, []);
-
-	const handleToggle = useCallback(async (newValue: boolean) => {
-		if (newValue) {
-			// ON으로 바꿀 때: 디바이스 알림 권한 확인
-			const { status } = await Notifications.getPermissionsAsync();
-			if (status !== "granted") {
-				Alert.alert(
-					"알림 권한 필요",
-					"디바이스 설정에서 알림을 허용해주세요.",
-					[
-						{ text: "취소", style: "cancel" },
-						{
-							text: "설정으로 이동",
-							onPress: () => {
-								if (Platform.OS === "ios") {
-									Linking.openURL("app-settings:");
-								} else {
-									Linking.openSettings();
-								}
-							},
-						},
-					]
-				);
-				return;
-			}
-		}
-
-		setIsToggling(true);
-		try {
-			if (newValue) {
-				const success = await registerPushToken();
-				if (!success) {
-					Alert.alert("오류", "푸시 알림 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
-					return;
-				}
-			} else {
-				await unregisterPushToken();
-			}
-			const res = await updateNotificationSettings({ pushEnabled: newValue });
-			if (!res.success) {
-				// 서버 설정 업데이트 실패 시 FCM 토큰 롤백
-				if (newValue) await unregisterPushToken();
-				else await registerPushToken();
-				showError("오류", "알림 설정 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
-				return;
-			}
-			setPushEnabled(newValue);
-		} catch {
-			// silent fail
-		} finally {
-			setIsToggling(false);
-		}
-	}, []);
-
-	const openDeviceSettings = () => {
+	const openDeviceSettings = useCallback(() => {
 		if (Platform.OS === "ios") {
 			Linking.openURL("app-settings:");
 		} else {
 			Linking.openSettings();
 		}
-	};
+	}, []);
+
+	// 디바이스 권한 상태를 단일 진실 공급원으로 사용한다.
+	// 표시 상태를 OS 권한에 맞추고, 서버 설정과 다르면 토큰 등록/해제와 함께 동기화한다.
+	const syncWithDevicePermission = useCallback(async () => {
+		const { status } = await Notifications.getPermissionsAsync();
+		const granted = status === "granted";
+		setPushEnabled(granted);
+
+		const isFirstSync = lastGrantedRef.current === null;
+		const deviceChanged = !isFirstSync && lastGrantedRef.current !== granted;
+		lastGrantedRef.current = granted;
+
+		if (isFirstSync || deviceChanged) {
+			const res = await getNotificationSettings();
+			const serverEnabled = res.success && res.data ? res.data.pushEnabled : false;
+			if (serverEnabled !== granted) {
+				try {
+					if (granted) {
+						await registerPushToken();
+					} else {
+						await unregisterPushToken();
+					}
+					await updateNotificationSettings({ pushEnabled: granted });
+				} catch {
+					// 실패 시 다음 포그라운드 진입에서 재동기화되도록 직전 값을 롤백한다.
+					lastGrantedRef.current = !granted;
+				}
+			}
+		}
+
+		setIsLoading(false);
+	}, []);
+
+	useEffect(() => {
+		syncWithDevicePermission();
+		const subscription = AppState.addEventListener("change", (state) => {
+			if (state === "active") {
+				syncWithDevicePermission();
+			}
+		});
+		return () => subscription.remove();
+	}, [syncWithDevicePermission]);
+
+	const handleToggleAttempt = useCallback(() => {
+		Alert.alert(
+			"알림 설정 변경",
+			"푸시 알림은 디바이스 설정에서만 변경할 수 있습니다.",
+			[
+				{ text: "취소", style: "cancel" },
+				{ text: "설정으로 이동", onPress: openDeviceSettings },
+			]
+		);
+	}, [openDeviceSettings]);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -117,7 +108,7 @@ const NotificationSettingsScreen = () => {
 				</View>
 			) : (
 				<View style={styles.content}>
-					<View style={styles.settingRow}>
+					<Pressable style={styles.settingRow} onPress={handleToggleAttempt}>
 						<View style={styles.settingInfo}>
 							<Text weight="SemiBold" style={styles.settingTitle}>
 								푸시 알림
@@ -128,15 +119,14 @@ const NotificationSettingsScreen = () => {
 						</View>
 						<Switch
 							value={pushEnabled}
-							onValueChange={handleToggle}
-							disabled={isToggling}
+							onValueChange={handleToggleAttempt}
 							trackColor={{
 								false: colors.disabled,
 								true: colors.primary,
 							}}
 							thumbColor={colors.white}
 						/>
-					</View>
+					</Pressable>
 
 					<Pressable style={styles.linkRow} onPress={openDeviceSettings}>
 						<Text weight="Medium" style={styles.linkText}>
@@ -150,8 +140,8 @@ const NotificationSettingsScreen = () => {
 					</Pressable>
 
 					<Text style={styles.hintText}>
-						디바이스 설정에서 알림 권한을 끄면 푸시 알림이{"\n"}
-						앱 내 설정과 관계없이 수신되지 않습니다.
+						푸시 알림 상태는 디바이스 설정과 항상 동기화됩니다.{"\n"}
+						변경하려면 디바이스 설정에서 알림 권한을 조정해주세요.
 					</Text>
 				</View>
 			)}
