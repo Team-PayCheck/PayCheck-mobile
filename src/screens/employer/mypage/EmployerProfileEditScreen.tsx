@@ -14,7 +14,6 @@ import Header from "../../../components/layout/Header";
 import EmployerMyPageDrawer from "../../../components/employer/mypage/EmployerMyPageDrawer";
 import BottomSheetModal from "../../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
-import { ProfileImagePicker } from "../../../components/signup";
 import ProfileEditModal from "../../../components/mypage/ProfileEditModal";
 import type { EmployerStackParamList } from "../../../navigation/EmployerStack";
 import { colors } from "../../../constants/colors";
@@ -48,8 +47,6 @@ const EmployerProfileEditScreen: React.FC<Props> = ({ navigation }) => {
     fetchUser();
   }, [fetchUser]);
 
-  const profileImageUri = user?.profileImageUrl ?? null;
-
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={openDrawer} />
@@ -64,9 +61,6 @@ const EmployerProfileEditScreen: React.FC<Props> = ({ navigation }) => {
         ) : (
           <View style={styles.sectionsArea}>
             <View style={styles.card}>
-              <View style={styles.profileSection}>
-                <ProfileImagePicker imageUri={profileImageUri} onPress={() => {}} showCameraIcon={false} />
-              </View>
               <View style={styles.fieldGroup}>
                 <InfoRow label="이름" value={user?.name ?? "-"} />
                 <InfoRow label="전화번호" value={user?.phone || "-"} />
@@ -133,10 +127,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
     elevation: 2,
-  },
-  profileSection: {
-    alignItems: "center",
-    marginBottom: 20,
   },
   fieldGroup: {
     gap: 12,

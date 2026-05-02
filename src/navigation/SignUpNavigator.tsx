@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
 	Step1UserTypeScreen,
-	Step2ProfileScreen,
 	Step3BasicInfoScreen,
 	Step4AlarmScreen,
 	Step5CompleteScreen,
@@ -11,7 +10,6 @@ import { useSignUpStore } from "../stores";
 
 export type SignUpStackParamList = {
 	Step1UserType: undefined;
-	Step2Profile: undefined;
 	Step3BasicInfo: undefined;
 	Step4Alarm: undefined;
 	Step5Complete: undefined;
@@ -46,7 +44,6 @@ const SignUpNavigator: React.FC<SignUpNavigatorProps> = ({ kakaoAccessToken }) =
 			}}
 		>
 			<Stack.Screen name="Step1UserType" component={Step1UserTypeScreen} />
-			<Stack.Screen name="Step2Profile" component={Step2ProfileScreen} />
 			<Stack.Screen name="Step3BasicInfo" component={Step3BasicInfoScreen} />
 			<Stack.Screen name="Step4Alarm" component={Step4AlarmScreen} />
 			<Stack.Screen name="Step5Complete" component={Step5CompleteScreen} />

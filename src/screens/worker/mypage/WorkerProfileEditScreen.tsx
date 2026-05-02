@@ -16,7 +16,6 @@ import MyPageDrawer from "../../../components/mypage/drawer/MyPageDrawer";
 import BottomSheetModal from "../../../components/common/BottomSheetModal";
 import AccountTermsContent from "../../../components/mypage/AccountTermsContent";
 import { WorkerStackParamList } from "../../../navigation/WorkerStack";
-import { ProfileImagePicker } from "../../../components/signup";
 import { colors } from "../../../constants/colors";
 import { useWorkerData } from "../../../hooks/worker/useUserData";
 import ProfileEditModal from "../../../components/mypage/ProfileEditModal";
@@ -39,8 +38,6 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
   };
   const handleLogout = useLogoutHandler(closeDrawer, navigation);
 
-  const profileImageUri = user?.profileImageUrl ?? null;
-
   return (
     <SafeAreaView style={styles.container}>
       <Header onPressLeft={() => setIsDrawerVisible(true)} />
@@ -57,9 +54,6 @@ const ProfileEditScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.sectionsArea}>
             {/* 섹션 1: 프로필 정보 (API 1 - /api/users/me) */}
             <View style={styles.card}>
-              <View style={styles.profileSection}>
-                <ProfileImagePicker imageUri={profileImageUri} onPress={() => {}} showCameraIcon={false} />
-              </View>
               <View style={styles.fieldGroup}>
                 <InfoRow label="이름" value={user?.name ?? "-"} />
                 <InfoRow label="전화번호" value={user?.phone ?? "-"} />
@@ -210,12 +204,6 @@ const styles = StyleSheet.create({
   readOnlyLabel: {
     fontSize: 13,
     color: colors.textMuted,
-  },
-
-  // 프로필 사진 섹션
-  profileSection: {
-    alignItems: "center",
-    marginBottom: 20,
   },
 
   // 필드 그룹

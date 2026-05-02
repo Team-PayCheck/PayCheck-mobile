@@ -88,7 +88,6 @@ const EmployerMyPageDrawer: React.FC<EmployerMyPageDrawerProps> = ({
 					) : user ? (
 						<ProfileCard
 							name={user.name}
-							imageUri={user.profileImageUrl ?? undefined}
 						/>
 					) : (
 						<ProfileCard name="정보 없음" />

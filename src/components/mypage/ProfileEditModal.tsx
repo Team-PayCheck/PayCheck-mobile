@@ -6,7 +6,6 @@ import {
 } from "react-native";
 import BottomSheetModal from "../common/BottomSheetModal";
 import PrimaryButton from "../common/PrimaryButton";
-import { ProfileImagePicker } from "../signup";
 import { FormInput, PhoneInput } from "../signup";
 import { Text } from "../common/Text";
 import { colors } from "../../constants/colors";
@@ -29,11 +28,9 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   const {
     name,
     phone,
-    imageUri,
     isSubmitting,
     setName,
     setPhone,
-    handleImagePress,
     handleSubmit,
     resetForm,
     isSubmitEnabled,
@@ -57,14 +54,6 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         <Text weight="ExtraBold" style={styles.title}>
           내 프로필 수정
         </Text>
-
-        {/* 프로필 이미지 */}
-        <View style={styles.imageSection}>
-          <ProfileImagePicker
-            imageUri={imageUri}
-            onPress={handleImagePress}
-          />
-        </View>
 
         {/* 이름 */}
         <FormInput
@@ -99,9 +88,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.textPrimary,
     textAlign: "center",
-  },
-  imageSection: {
-    alignItems: "center",
   },
   buttonSection: {
     alignItems: "center",
