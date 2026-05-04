@@ -6,14 +6,16 @@ import type { UserInfo } from "../api/auth/types";
 interface AuthState {
 	// 상태
 	accessToken: string | null;
+	refreshToken: string | null;
 	userInfo: UserInfo | null;
 	isLoggedIn: boolean;
 	isHydrated: boolean;
 
 	// 액션
 	setAccessToken: (token: string) => void;
+	setRefreshToken: (token: string) => void;
 	setUserInfo: (info: UserInfo) => void;
-	login: (token: string, userInfo: UserInfo) => void;
+	login: (token: string, userInfo: UserInfo, refreshToken?: string) => void;
 	logout: () => void;
 	setHydrated: (hydrated: boolean) => void;
 }
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
 		(set) => ({
 			// 초기 상태
 			accessToken: null,
+			refreshToken: null,
 			userInfo: null,
 			isLoggedIn: false,
 			isHydrated: false,
@@ -31,11 +34,15 @@ export const useAuthStore = create<AuthState>()(
 			setAccessToken: (token) =>
 				set({ accessToken: token, isLoggedIn: true }),
 
+			setRefreshToken: (token) =>
+				set({ refreshToken: token }),
+
 			setUserInfo: (info) => set({ userInfo: info }),
 
-			login: (token, userInfo) =>
+			login: (token, userInfo, refreshToken) =>
 				set({
 					accessToken: token,
+					refreshToken: refreshToken ?? null,
 					userInfo,
 					isLoggedIn: true,
 				}),
@@ -43,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
 			logout: () =>
 				set({
 					accessToken: null,
+					refreshToken: null,
 					userInfo: null,
 					isLoggedIn: false,
 				}),
@@ -55,6 +63,7 @@ export const useAuthStore = create<AuthState>()(
 			// isHydrated는 persist하지 않음
 			partialize: (state) => ({
 				accessToken: state.accessToken,
+				refreshToken: state.refreshToken,
 				userInfo: state.userInfo,
 				isLoggedIn: state.isLoggedIn,
 			}),

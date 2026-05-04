@@ -3,7 +3,6 @@ import axios, {
 	AxiosError,
 	InternalAxiosRequestConfig,
 } from "axios";
-import CookieManager from "@react-native-cookies/cookies";
 import Constants from "expo-constants";
 import { getAuthState } from "../stores/authStore";
 import type {
@@ -24,7 +23,6 @@ export const api = axios.create({
 		"Content-Type": "application/json",
 		Accept: "application/json",
 	},
-	withCredentials: true, // 쿠키 전송 활성화
 });
 
 // 로그아웃 콜백 (네비게이션 처리용)
@@ -34,10 +32,9 @@ export const setLogoutCallback = (callback: () => void) => {
 	logoutCallback = callback;
 };
 
-// 인증 실패 시 처리 (Zustand + 쿠키 삭제)
-const handleAuthFailure = async () => {
+// 인증 실패 시 처리 (Zustand 초기화)
+const handleAuthFailure = () => {
 	getAuthState().logout();
-	await CookieManager.clearAll();
 	logoutCallback?.();
 };
 
@@ -110,35 +107,38 @@ api.interceptors.response.use(
 			isRefreshing = true;
 
 			try {
-				// React Native는 withCredentials로 쿠키가 자동 전송되지 않아
-				// CookieManager로 쿠키를 직접 읽어 Cookie 헤더에 수동 첨부
-				const cookies = await CookieManager.get(API_BASE_URL);
-				const cookieHeader = Object.entries(cookies)
-					.map(([key, cookie]) => `${key}=${cookie.value}`)
-					.join("; ");
+				const { refreshToken } = getAuthState();
 
-				// Refresh Token(쿠키)으로 새 Access Token 요청
+				if (!refreshToken) {
+					const noTokenError = new Error("리프레시 토큰이 없습니다");
+					onRefreshFailed(noTokenError);
+					handleAuthFailure();
+					return Promise.reject(noTokenError);
+				}
+
+				// Refresh Token을 body로 전송하여 새 Access Token 요청
 				const response = await axios.post<ApiResponse<AuthSuccessData>>(
 					`${API_BASE_URL}/api/auth/refresh`,
-					{},
-					{
-						withCredentials: true,
-						headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
-					}
+					{ refreshToken }
 				);
 
 				const newAccessToken = response.data.data?.accessToken;
+				const newRefreshToken = response.data.data?.refreshToken;
+
 				if (!newAccessToken) {
 					const noTokenError = new Error(
 						"토큰 갱신 응답에 accessToken이 없습니다"
 					);
 					onRefreshFailed(noTokenError);
-					await handleAuthFailure();
+					handleAuthFailure();
 					return Promise.reject(noTokenError);
 				}
 
-				// 새 토큰 저장 (Zustand → 자동으로 AsyncStorage에도 persist)
+				// 새 토큰 저장
 				getAuthState().setAccessToken(newAccessToken);
+				if (newRefreshToken) {
+					getAuthState().setRefreshToken(newRefreshToken);
+				}
 
 				// 대기 중인 요청들에 새 토큰 전달
 				onRefreshed(newAccessToken);
@@ -151,7 +151,7 @@ api.interceptors.response.use(
 			} catch (refreshError) {
 				// 갱신 실패 → 대기 요청 모두 reject 후 로그아웃
 				onRefreshFailed(refreshError);
-				await handleAuthFailure();
+				handleAuthFailure();
 				return Promise.reject(refreshError);
 			} finally {
 				isRefreshing = false;
