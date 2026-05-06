@@ -6,23 +6,22 @@ export interface WorkSummary {
 }
 
 /**
- * 근무 목록에서 요약(총 근무시간, 예상 근무비) 계산.
+ * 근무 목록에서 요약(총 근무시간, 예상 근무비) 계산. DELETED 근무는 두 값 모두 제외.
  * - 총 근무시간: COMPLETED 근무의 totalWorkMinutes 합산
- * - 예상 근무비: COMPLETED는 totalSalary, SCHEDULED는 hourlyWage × 시간으로 추정 (DELETED 제외)
- *   세금/보험은 고려하지 않는 단순 추정치.
+ * - 예상 근무비: COMPLETED + SCHEDULED의 totalSalary 합산
+ *   (백엔드가 SCHEDULED도 totalSalary를 계산해 반환 — PayCheck-backend#177)
  */
 export const calculateWorkSummary = (works: WorkItem[]): WorkSummary => {
 	let completedMinutes = 0;
 	let estimatedPay = 0;
 
 	for (const work of works) {
+		if (work.status === "DELETED") continue;
+
 		if (work.status === "COMPLETED") {
 			completedMinutes += work.totalWorkMinutes;
-			estimatedPay += work.totalSalary ?? 0;
-		} else if (work.status === "SCHEDULED") {
-			const hourlyWage = work.hourlyWage ?? 0;
-			estimatedPay += Math.round((hourlyWage * work.totalWorkMinutes) / 60);
 		}
+		estimatedPay += work.totalSalary ?? 0;
 	}
 
 	const totalHours = Math.round((completedMinutes / 60) * 10) / 10;
