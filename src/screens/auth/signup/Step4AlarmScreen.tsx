@@ -58,7 +58,7 @@ const Step4AlarmScreen: React.FC = () => {
 					userId: response.data.userId,
 					name: response.data.name,
 					userType: response.data.userType as "EMPLOYER" | "WORKER",
-				});
+				}, response.data.refreshToken);
 
 				return true;
 			}

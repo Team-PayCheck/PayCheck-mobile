@@ -49,7 +49,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 					userType: loginResult.data.userType,
 					userId: loginResult.data.userId,
 					name: loginResult.data.name,
-				});
+				}, loginResult.data.refreshToken);
 
 				// userType에 따라 콜백 호출
 				onLoginSuccess?.(loginResult.data.userType);

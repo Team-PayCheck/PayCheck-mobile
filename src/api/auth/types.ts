@@ -1,6 +1,7 @@
 // 인증 성공 데이터 (백엔드 API 응답 형태)
 export interface AuthSuccessData {
 	accessToken: string;
+	refreshToken?: string;
 	userType: "EMPLOYER" | "WORKER";
 	userId: number;
 	name: string;

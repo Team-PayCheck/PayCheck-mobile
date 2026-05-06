@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import CookieManager from "@react-native-cookies/cookies";
 import api from "../axios";
 import { getAuthState } from "../../stores/authStore";
 import type {
@@ -69,7 +68,6 @@ export const logout = async (): Promise<void> => {
 		await api.post("/api/auth/logout", {});
 	} finally {
 		getAuthState().logout();
-		await CookieManager.clearAll();
 	}
 };
 
