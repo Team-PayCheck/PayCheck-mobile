@@ -108,7 +108,7 @@ const Step4AlarmScreen: React.FC = () => {
 
 	return (
 		<SignUpScreenLayout
-			currentStep={4}
+			currentStep={3}
 			stepTitle="알람 설정"
 			backButtonDisabled={isLoading}
 			contentStyle={styles.content}

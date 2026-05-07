@@ -68,7 +68,7 @@ const MyPageDrawer: React.FC<MyPageDrawerProps> = ({
 							<ProfileCard
 								name={worker.name}
 								code={worker.workerCode ? `@${worker.workerCode}` : "-"}
-									/>
+							/>
 						) : (
 							<ProfileCard name="정보 없음" code="-" />
 						)}
