@@ -20,6 +20,7 @@ import useCorrectionRequest from "../../hooks/worker/useCorrectionRequest";
 import { useLogoutHandler } from "../../hooks/common/useLogoutHandler";
 import { WorkerStackParamList } from "../../navigation/WorkerStack";
 import { colors } from "../../constants/colors";
+import { calculateWorkSummary } from "../../utils/workSummary";
 
 const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -114,9 +115,10 @@ const WorkerMonthlyCalendarScreen: React.FC = ({ navigation }: any) => {
 
   // 월간 요약 계산 (근무 총 시간/급여)
   const monthLabel = `${month + 1}월`;
-  const totalMinutes = works.reduce((sum, w) => sum + w.totalWorkMinutes, 0);
-  const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
-  const estimatedPay = works.reduce((sum, w) => sum + (w.totalSalary ?? 0), 0);
+  const { totalHours, estimatedPay } = useMemo(
+    () => calculateWorkSummary(works),
+    [works]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
