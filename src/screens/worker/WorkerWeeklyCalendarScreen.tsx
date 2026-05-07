@@ -31,6 +31,7 @@ import {
 	getWeekLabel,
 	getWeekRange,
 } from "../../utils/date";
+import { calculateWorkSummary } from "../../utils/workSummary";
 
 type Props = NativeStackScreenProps<WorkerStackParamList, "WorkerHomeMain">;
 
@@ -128,14 +129,9 @@ const WorkerWeeklyCalendarScreen: React.FC<Props> = ({ navigation }) => {
 	} = useCorrectionRequest();
 
 	// 주간 요약 계산
-	const totalMinutes = works.reduce(
-		(sum, w) => sum + w.totalWorkMinutes,
-		0
-	);
-	const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
-	const estimatedPay = works.reduce(
-		(sum, w) => sum + (w.totalSalary ?? 0),
-		0
+	const { totalHours, estimatedPay } = useMemo(
+		() => calculateWorkSummary(works),
+		[works]
 	);
 
 	return (
