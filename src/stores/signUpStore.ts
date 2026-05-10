@@ -7,8 +7,6 @@ interface SignUpState {
 
 	// 회원가입 폼 데이터
 	userType: UserType | null;
-	profileImageUri: string | null;
-	profileImageBase64: string | null;
 	name: string;
 	phone: string;
 	bankName: string;
@@ -17,7 +15,6 @@ interface SignUpState {
 	// 액션
 	setKakaoAccessToken: (token: string) => void;
 	setUserType: (type: UserType) => void;
-	setProfileImage: (uri: string | null, base64: string | null) => void;
 	setName: (name: string) => void;
 	setPhone: (phone: string) => void;
 	setBankName: (bankName: string) => void;
@@ -30,8 +27,6 @@ interface SignUpState {
 const initialState = {
 	kakaoAccessToken: null,
 	userType: null,
-	profileImageUri: null,
-	profileImageBase64: null,
 	name: "",
 	phone: "--",
 	bankName: "",
@@ -43,8 +38,6 @@ export const useSignUpStore = create<SignUpState>((set) => ({
 
 	setKakaoAccessToken: (token) => set({ kakaoAccessToken: token }),
 	setUserType: (type) => set({ userType: type }),
-	setProfileImage: (uri, base64) =>
-		set({ profileImageUri: uri, profileImageBase64: base64 }),
 	setName: (name) => set({ name }),
 	setPhone: (phone) => set({ phone }),
 	setBankName: (bankName) => set({ bankName }),

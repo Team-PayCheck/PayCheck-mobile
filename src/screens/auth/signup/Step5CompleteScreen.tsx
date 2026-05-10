@@ -50,7 +50,7 @@ const Step5CompleteScreen: React.FC = () => {
 
 	return (
 		<SignUpScreenLayout
-			currentStep={5}
+			currentStep={4}
 			stepTitle="가입완료"
 			showBackButton={false}
 			contentStyle={styles.content}

@@ -26,7 +26,7 @@ import type { BankName } from "../../../constants/bank";
 
 type NavigationProp = NativeStackNavigationProp<SignUpStackParamList, "Step3BasicInfo">;
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 const Step3BasicInfoScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp>();
@@ -110,7 +110,7 @@ const Step3BasicInfoScreen: React.FC = () => {
 						<Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
 					</TouchableOpacity>
 					<View style={styles.progressBarContainer}>
-						<ProgressBar currentStep={3} totalSteps={TOTAL_STEPS} />
+						<ProgressBar currentStep={2} totalSteps={TOTAL_STEPS} />
 					</View>
 				</View>
 
@@ -120,7 +120,7 @@ const Step3BasicInfoScreen: React.FC = () => {
 					contentContainerStyle={styles.scrollContent}
 					showsVerticalScrollIndicator={false}
 				>
-					<StepHeader step={3} totalSteps={TOTAL_STEPS} title="기본정보" />
+					<StepHeader step={2} totalSteps={TOTAL_STEPS} title="기본정보" />
 
 					<View style={styles.formContainer}>
 						<FormInput

@@ -20,7 +20,6 @@ export interface UserResponse {
 export interface UserUpdateRequest {
   name?: string;
   phone?: string;
-  profileImageUrl?: string;
 }
 
 // ============ 근로자 정보 관련 타입 ============

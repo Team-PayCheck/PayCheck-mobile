@@ -22,7 +22,6 @@ export interface KakaoRegisterParams {
 	phone: string;
 	bankName: string;
 	accountNumber: string;
-	profileImageUrl: string;
 }
 
 // 로그인 에러 타입

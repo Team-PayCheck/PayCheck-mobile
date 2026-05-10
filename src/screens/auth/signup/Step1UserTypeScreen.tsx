@@ -18,7 +18,7 @@ const Step1UserTypeScreen: React.FC = () => {
 		setUserType(type);
 		// 선택 후 잠시 대기 후 다음 화면으로 이동
 		setTimeout(() => {
-			navigation.navigate("Step2Profile");
+			navigation.navigate("Step3BasicInfo");
 		}, 300);
 	};
 

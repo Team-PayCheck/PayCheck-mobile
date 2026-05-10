@@ -24,7 +24,7 @@ interface SignUpScreenLayoutProps {
 	contentStyle?: ViewStyle;
 }
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 const SignUpScreenLayout: React.FC<SignUpScreenLayoutProps> = ({
 	currentStep,
