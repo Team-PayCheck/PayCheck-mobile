@@ -27,13 +27,13 @@ interface SignUpNavigatorProps {
 
 const SignUpNavigator: React.FC<SignUpNavigatorProps> = ({ kakaoAccessToken }) => {
 	const setKakaoAccessToken = useSignUpStore((state) => state.setKakaoAccessToken);
-	const reset = useSignUpStore((state) => state.reset);
+	const resetForm = useSignUpStore((state) => state.resetForm);
 
 	useEffect(() => {
-		// 회원가입 플로우 시작 시 store 초기화 후 토큰 저장
-		reset();
+		// 폼 필드만 초기화하고 mode는 호출자(WelcomeScreen)가 설정한 값 유지
+		resetForm();
 		setKakaoAccessToken(kakaoAccessToken);
-	}, [kakaoAccessToken, reset, setKakaoAccessToken]);
+	}, [kakaoAccessToken, resetForm, setKakaoAccessToken]);
 
 	return (
 		<Stack.Navigator

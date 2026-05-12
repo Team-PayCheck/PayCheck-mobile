@@ -30,3 +30,26 @@ export interface LoginError {
 	message: string;
 	code?: string;
 }
+
+// 탈퇴 보류 계정 정보 (카카오 로그인 시 WITHDRAWN_PENDING 응답)
+export interface WithdrawnAccountInfo {
+	name: string;
+	userType: "EMPLOYER" | "WORKER";
+	withdrawnAt: string;
+	profileImageUrl: string;
+}
+
+// 카카오 로그인 응답 (status 분기 union)
+export type KakaoLoginResult =
+	| {
+			status: "LOGGED_IN";
+			accessToken: string;
+			refreshToken?: string;
+			userType: "EMPLOYER" | "WORKER";
+			userId: number;
+			name: string;
+	  }
+	| {
+			status: "WITHDRAWN_PENDING";
+			withdrawnAccount: WithdrawnAccountInfo;
+	  };

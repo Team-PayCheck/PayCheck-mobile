@@ -7,7 +7,10 @@ import PrimaryButton from "../../../components/common/PrimaryButton";
 import { Text } from "../../../components/common/Text";
 import { colors } from "../../../constants/colors";
 import { requestNotificationPermission } from "../../../utils/notification";
-import { kakaoRegisterWithToken } from "../../../api/auth";
+import {
+	kakaoRegisterWithToken,
+	kakaoPurgeAndRegisterWithToken,
+} from "../../../api/auth";
 import { useSignUpStore, useAuthStore } from "../../../stores";
 import { showError } from "../../../utils/alert";
 import type { SignUpStackParamList } from "../../../navigation/SignUpNavigator";
@@ -26,6 +29,7 @@ const Step4AlarmScreen: React.FC = () => {
 	const phone = useSignUpStore((state) => state.phone);
 	const bankName = useSignUpStore((state) => state.bankName);
 	const accountNumber = useSignUpStore((state) => state.accountNumber);
+	const mode = useSignUpStore((state) => state.mode);
 	const resetSignUp = useSignUpStore((state) => state.reset);
 
 	// Auth Store
@@ -43,7 +47,12 @@ const Step4AlarmScreen: React.FC = () => {
 		setIsLoading(true);
 
 		try {
-			const response = await kakaoRegisterWithToken({
+			const submit =
+				mode === "purge-and-register"
+					? kakaoPurgeAndRegisterWithToken
+					: kakaoRegisterWithToken;
+
+			const response = await submit({
 				kakaoAccessToken,
 				name,
 				userType,
