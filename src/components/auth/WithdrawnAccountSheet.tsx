@@ -4,7 +4,7 @@
  * 사용자에게 "기존 계정 복구" / "새 계정으로 가입" 두 가지 선택지를 제공한다.
  */
 import React from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import BottomSheetModal from "../common/BottomSheetModal";
 import PrimaryButton from "../common/PrimaryButton";
 import { Text } from "../common/Text";
@@ -39,28 +39,18 @@ const WithdrawnAccountSheet: React.FC<WithdrawnAccountSheetProps> = ({
 	onRestore,
 	onPurgeAndRegister,
 }) => {
-	const { name, userType, withdrawnAt, profileImageUrl } = withdrawnAccount;
+	const { name, userType, withdrawnAt } = withdrawnAccount;
 
 	return (
 		<BottomSheetModal visible={visible} onClose={onClose} maxHeight="80%">
 			<View style={styles.container}>
-				<View style={styles.profileSection}>
-					{profileImageUrl ? (
-						<Image
-							source={{ uri: profileImageUrl }}
-							style={styles.profileImage}
-						/>
-					) : (
-						<View style={[styles.profileImage, styles.profilePlaceholder]} />
-					)}
-					<View style={styles.profileTextGroup}>
-						<Text weight="Bold" style={styles.profileName}>
-							{name}
-						</Text>
-						<Text weight="Medium" style={styles.profileType}>
-							{USER_TYPE_LABEL[userType]}
-						</Text>
-					</View>
+				<View style={styles.headerSection}>
+					<Text weight="Bold" style={styles.profileName}>
+						{name}
+					</Text>
+					<Text weight="Medium" style={styles.profileType}>
+						{USER_TYPE_LABEL[userType]}
+					</Text>
 				</View>
 
 				<View style={styles.infoBox}>
@@ -107,23 +97,8 @@ const styles = StyleSheet.create({
 		gap: 24,
 		paddingTop: 4,
 	},
-	profileSection: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 16,
-	},
-	profileImage: {
-		width: 56,
-		height: 56,
-		borderRadius: 28,
-		backgroundColor: colors.backgroundGrey,
-	},
-	profilePlaceholder: {
-		backgroundColor: colors.backgroundGrey,
-	},
-	profileTextGroup: {
-		flex: 1,
-		gap: 4,
+	headerSection: {
+		gap: 6,
 	},
 	profileName: {
 		fontSize: 18,

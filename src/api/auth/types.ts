@@ -36,7 +36,6 @@ export interface WithdrawnAccountInfo {
 	name: string;
 	userType: "EMPLOYER" | "WORKER";
 	withdrawnAt: string;
-	profileImageUrl: string;
 }
 
 // 카카오 로그인 응답 (status 분기 union)
