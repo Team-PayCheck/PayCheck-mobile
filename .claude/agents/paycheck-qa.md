@@ -55,7 +55,15 @@ description: "PayCheck-mobile 프로젝트의 코드 품질 검토 전문가. Re
 - `any` 타입 사용이 불가피한 경우 주석으로 이유 명시 여부
 - 옵셔널 체이닝(`?.`) vs 단언(`!`) 사용의 적절성
 
-### 5. 코딩 컨벤션
+### 5. Zustand 스토어 잔여/덮어쓰기 검토
+
+신규로 추가된 store 필드(예: mode, flag, 단계 상태 등)가 있을 때 반드시 다음을 검토한다:
+
+- **호출 순서 트랩**: 호출자가 `setX("A")` 후 어떤 화면/네비게이터가 `reset()`을 호출하면 `initialState`로 덮어써져 값이 유실된다. grep으로 `state.reset` / `useXxxStore.*reset` / `resetXxx` 호출 지점을 **모두** 찾아 각 지점이 신규 필드를 의도적으로 초기화하는지 확인할 것.
+- **진입점이 여러 개인 store**: SignUp/Auth 등 여러 진입점에서 사용되는 store는 진입점마다 의도하는 초기 상태가 다를 수 있다. "폼 필드만 초기화"와 "전체 초기화"를 구분하는 액션(`resetForm` vs `reset`)이 필요한지 점검.
+- **useEffect의 reset**: 네비게이터/스크린 마운트 시 useEffect에서 호출되는 reset은 호출자가 사전 설정한 상태를 덮어쓰기 쉬운 함정. 의존성 배열과 호출 순서를 함께 본다.
+
+### 6. 코딩 컨벤션
 
 - 컴포넌트: PascalCase 파일명
 - 훅: `use` 접두사, camelCase

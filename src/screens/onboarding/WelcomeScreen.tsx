@@ -10,9 +10,18 @@ import { Text } from "../../components/common/Text";
 import { showError } from "../../utils/alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "@react-native-seoul/kakao-login";
-import { kakaoLoginWithToken, devLogin } from "../../api/auth";
+import {
+	kakaoLoginWithToken,
+	kakaoRestoreWithToken,
+	devLogin,
+} from "../../api/auth";
 import { useAuthStore } from "../../stores/authStore";
-import type { LoginError } from "../../api/auth/types";
+import { useSignUpStore } from "../../stores";
+import WithdrawnAccountSheet from "../../components/auth/WithdrawnAccountSheet";
+import type {
+	LoginError,
+	WithdrawnAccountInfo,
+} from "../../api/auth/types";
 import { colors } from "../../constants/colors";
 
 interface WelcomeScreenProps {
@@ -25,9 +34,19 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 	onSignUpNeeded,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const [withdrawnSheetVisible, setWithdrawnSheetVisible] = useState(false);
+	const [withdrawnAccount, setWithdrawnAccount] =
+		useState<WithdrawnAccountInfo | null>(null);
+	const [pendingKakaoToken, setPendingKakaoToken] = useState<string | null>(
+		null
+	);
+
 	const authLogin = useAuthStore((state) => state.login);
+	const setStoreKakaoToken = useSignUpStore((state) => state.setKakaoAccessToken);
+	const setSignUpMode = useSignUpStore((state) => state.setMode);
 
 	const handleKakaoLogin = async () => {
+		if (withdrawnSheetVisible) return;
 		setIsLoading(true);
 		let kakaoAccessToken: string | undefined;
 
@@ -42,41 +61,112 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 			const loginResult = await kakaoLoginWithToken(kakaoAccessToken);
 
-			// 기존 회원인 경우 (success: true)
-			if (loginResult.success && loginResult.data?.accessToken) {
-				// Zustand에 토큰 + 사용자 정보 저장 (자동으로 AsyncStorage에도 persist)
-				authLogin(loginResult.data.accessToken, {
-					userType: loginResult.data.userType,
-					userId: loginResult.data.userId,
-					name: loginResult.data.name,
-				}, loginResult.data.refreshToken);
+			if (loginResult.success && loginResult.data) {
+				const data = loginResult.data;
 
-				// userType에 따라 콜백 호출
-				onLoginSuccess?.(loginResult.data.userType);
-				return;
+				if (data.status === "LOGGED_IN") {
+					authLogin(
+						data.accessToken,
+						{
+							userType: data.userType,
+							userId: data.userId,
+							name: data.name,
+						},
+						data.refreshToken
+					);
+					onLoginSuccess?.(data.userType);
+					return;
+				}
+
+				if (data.status === "WITHDRAWN_PENDING") {
+					setWithdrawnAccount(data.withdrawnAccount);
+					setPendingKakaoToken(kakaoAccessToken);
+					setWithdrawnSheetVisible(true);
+					return;
+				}
 			}
 
-			// 그 외 에러 (success: false인 경우)
 			throw new Error(loginResult.error?.message || "로그인에 실패했습니다.");
 		} catch (error) {
 			const loginError = error as LoginError;
 
-			// 404 (USER_NOT_FOUND) → 회원가입으로 이동
+			// 404 (USER_NOT_FOUND) → 신규 카카오 사용자, 회원가입 진입
 			if (
 				loginError.status === 404 &&
 				loginError.code === "USER_NOT_FOUND"
 			) {
 				if (kakaoAccessToken) {
+					// 이전 세션에서 남은 mode 잔여 방지
+					setSignUpMode("register");
+					setStoreKakaoToken(kakaoAccessToken);
 					onSignUpNeeded?.(kakaoAccessToken);
 					return;
 				}
 			}
 
-			// 그 외 에러
 			showError("로그인 실패", "로그인에 실패했습니다. 다시 시도해주세요.");
 		} finally {
 			setIsLoading(false);
 		}
+	};
+
+	const handleRestore = async () => {
+		if (!pendingKakaoToken) {
+			setWithdrawnSheetVisible(false);
+			return;
+		}
+
+		setIsLoading(true);
+		try {
+			const result = await kakaoRestoreWithToken(pendingKakaoToken);
+
+			if (result.success && result.data?.accessToken) {
+				authLogin(
+					result.data.accessToken,
+					{
+						userType: result.data.userType,
+						userId: result.data.userId,
+						name: result.data.name,
+					},
+					result.data.refreshToken
+				);
+				setWithdrawnSheetVisible(false);
+				setWithdrawnAccount(null);
+				setPendingKakaoToken(null);
+				onLoginSuccess?.(result.data.userType);
+				return;
+			}
+
+			throw new Error(result.error?.message || "계정 복구에 실패했습니다.");
+		} catch {
+			showError("복구 실패", "계정 복구에 실패했습니다. 잠시 후 다시 시도해주세요.");
+			setWithdrawnSheetVisible(false);
+			setWithdrawnAccount(null);
+			setPendingKakaoToken(null);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handlePurgeAndRegister = () => {
+		if (!pendingKakaoToken) {
+			setWithdrawnSheetVisible(false);
+			return;
+		}
+
+		const tokenForSignUp = pendingKakaoToken;
+		setStoreKakaoToken(tokenForSignUp);
+		setSignUpMode("purge-and-register");
+		setWithdrawnSheetVisible(false);
+		setWithdrawnAccount(null);
+		setPendingKakaoToken(null);
+		onSignUpNeeded?.(tokenForSignUp);
+	};
+
+	const handleCloseSheet = () => {
+		setWithdrawnSheetVisible(false);
+		setWithdrawnAccount(null);
+		setPendingKakaoToken(null);
 	};
 
 	const handleDevLogin = async () => {
@@ -129,6 +219,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 							style={styles.kakaoButton}
 							onPress={handleKakaoLogin}
 							activeOpacity={0.8}
+							disabled={withdrawnSheetVisible}
 						>
 							<Image
 								source={require("../../assets/images/kakao_login_medium_wide.png")}
@@ -150,6 +241,16 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 					</>
 				)}
 			</View>
+
+			{withdrawnAccount && (
+				<WithdrawnAccountSheet
+					visible={withdrawnSheetVisible}
+					onClose={handleCloseSheet}
+					withdrawnAccount={withdrawnAccount}
+					onRestore={handleRestore}
+					onPurgeAndRegister={handlePurgeAndRegister}
+				/>
+			)}
 		</SafeAreaView>
 	);
 };
