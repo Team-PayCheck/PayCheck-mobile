@@ -185,6 +185,8 @@ export interface SalaryDetailResponse {
 	totalDeduction: number;
 	netPay: number;
 	paymentDueDate: string;
+	paymentId?: number;
+	paymentStatus?: PaymentStatus | null;
 }
 
 /** 급여 자동 계산 응답 (POST /api/worker/salaries/contracts/{contractId}/calculate) */

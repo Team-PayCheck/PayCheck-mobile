@@ -31,12 +31,11 @@ const SalaryStatementSheet: React.FC<SalaryStatementSheetProps> = ({
 		fetchStatements,
 	} = useSalaryStatement(year, month);
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (visible) {
 			fetchStatements();
 		}
-	}, [visible]);
+	}, [visible, fetchStatements]);
 
 	const currentStatement = statements[selectedIndex];
 	const workplaceNames = statements.map((s) => s.workplaceName);
@@ -87,9 +86,7 @@ const SalaryStatementSheet: React.FC<SalaryStatementSheetProps> = ({
 					<View style={styles.netPayContainer}>
 						<Text style={styles.netPayText} weight="Bold">
 							실 수령액 :{" "}
-							{currentStatement.salary?.netPay != null
-								? `${formatCurrency(currentStatement.salary.netPay)}원`
-								: "?"}
+							{`${formatCurrency(currentStatement.salary.netPay)}원`}
 						</Text>
 					</View>
 				</ScrollView>
@@ -111,7 +108,7 @@ const styles = StyleSheet.create({
 		color: colors.textSecondary,
 	},
 	scrollContent: {
-		paddingBottom: 20,
+		paddingBottom: 40,
 	},
 	header: {
 		flexDirection: "row",

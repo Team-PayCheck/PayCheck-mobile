@@ -19,12 +19,18 @@ const WorkplaceSalarySummary: React.FC<WorkplaceSalarySummaryProps> = ({ workpla
   return (
     <View style={styles.container}>
       <View style={styles.innerBox}>
-        {workplaces.map((w, idx) => (
-          <React.Fragment key={w.workplaceName}>
-            {idx > 0 && <View style={styles.dashedLine} />}
-            <WorkplaceSalaryCard {...w} />
-          </React.Fragment>
-        ))}
+        {workplaces.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText} weight="Medium">이번 달 급여 정보가 없습니다</Text>
+          </View>
+        ) : (
+          workplaces.map((w, idx) => (
+            <React.Fragment key={w.workplaceName}>
+              {idx > 0 && <View style={styles.dashedLine} />}
+              <WorkplaceSalaryCard {...w} />
+            </React.Fragment>
+          ))
+        )}
         <TouchableOpacity style={styles.detailBtn} onPress={onPressDetail}>
           <Text style={styles.detailText} weight="SemiBold">급여명세서 자세히보기</Text>
         </TouchableOpacity>
@@ -60,6 +66,14 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 12,
     color: colors.blue,
+  },
+  emptyContainer: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 14,
+    color: colors.textSecondary,
   },
 });
 
