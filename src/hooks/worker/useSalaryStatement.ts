@@ -14,7 +14,7 @@ export interface SalaryStatementData {
 	contractId: number;
 	workplaceName: string;
 	payrollDeductionType: PayrollDeductionType;
-	salary: SalaryCalculateResponse | null;
+	salary: SalaryCalculateResponse;
 }
 
 const useSalaryStatement = (year: number, month: number) => {
@@ -31,28 +31,30 @@ const useSalaryStatement = (year: number, month: number) => {
 
 			const results = await Promise.all(
 				activeContracts.map(async (contract) => {
-					let salary: SalaryCalculateResponse | null = null;
 					try {
 						const salaryRes = await calculateSalary(
 							contract.id,
 							year,
 							month
 						);
-						salary = salaryRes.data ?? null;
+						const salary = salaryRes.data ?? null;
+						if (!salary) return null;
+						return {
+							contractId: contract.id,
+							workplaceName: contract.workplaceName,
+							payrollDeductionType: contract.payrollDeductionType,
+							salary,
+						};
 					} catch {
-						// 급여 계산 실패 시 null
+						// 해당 기간 근무 기록 없음 등 — 이 계약은 결과에서 제외
+						return null;
 					}
-
-					return {
-						contractId: contract.id,
-						workplaceName: contract.workplaceName,
-						payrollDeductionType: contract.payrollDeductionType,
-						salary,
-					};
 				})
 			);
 
-			setStatements(results);
+			setStatements(
+				results.filter((r): r is SalaryStatementData => r !== null)
+			);
 			setSelectedIndex(0);
 		} catch {
 			setStatements([]);

@@ -1,11 +1,11 @@
 /**
- * 송금 내역 + 급여 상세 조회 훅.
- * getPayments()로 전체 송금 내역을 가져온 뒤,
- * year/month로 필터링하고 각 salaryId로 급여 상세를 조회하여
- * 근무지별 급여 + 송금 상태 데이터를 반환.
+ * 근무지별 월간 급여 요약 훅.
+ * 활성 계약 목록을 가져온 뒤 각 계약에 대해 calculateSalary를 호출하여
+ * WorkplaceSalarySummary에서 사용할 데이터를 반환한다.
+ * paymentStatus가 응답에 포함된 경우 한글 라벨로 변환하여 표시한다.
  */
 import { useState, useEffect, useCallback } from "react";
-import { getPayments, getSalaryDetail } from "../../api/worker";
+import { getContracts, calculateSalary } from "../../api/worker";
 import type { PaymentStatus } from "../../api/worker/types";
 
 const STATUS_LABEL: Record<PaymentStatus, string> = {
@@ -29,27 +29,33 @@ const usePayments = (year: number, month: number) => {
 	const fetchPayments = useCallback(async () => {
 		try {
 			setIsLoading(true);
-			const paymentsRes = await getPayments();
-			const allPayments = paymentsRes.data ?? [];
+			const contractsRes = await getContracts();
+			const activeContracts =
+				contractsRes.data?.filter((c) => c.isActive) ?? [];
 
-			// 해당 월 필터링
-			const filtered = allPayments.filter(
-				(p) => p.year === year && p.month === month
-			);
-
-			// 각 payment의 salaryId로 급여 상세 조회
 			const results = await Promise.all(
-				filtered.map(async (payment) => {
+				activeContracts.map(async (contract) => {
 					try {
-						const salaryRes = await getSalaryDetail(payment.salaryId);
+						const salaryRes = await calculateSalary(
+							contract.id,
+							year,
+							month
+						);
 						const salary = salaryRes.data;
 						if (!salary) return null;
+
+						const statusKey = salary.paymentStatus as PaymentStatus | undefined;
+						const statusLabel =
+							statusKey && statusKey in STATUS_LABEL
+								? STATUS_LABEL[statusKey]
+								: "송금 대기중";
+
 						return {
-							workplaceName: salary.workplaceName,
+							workplaceName: contract.workplaceName,
 							baseSalary: salary.totalGrossPay,
 							deduction: salary.totalDeduction,
 							maxSalary: salary.netPay,
-							status: STATUS_LABEL[payment.status],
+							status: statusLabel,
 						};
 					} catch {
 						return null;
@@ -57,7 +63,9 @@ const usePayments = (year: number, month: number) => {
 				})
 			);
 
-			setWorkplaces(results.filter((r): r is WorkplaceSalaryItem => r !== null));
+			setWorkplaces(
+				results.filter((r): r is WorkplaceSalaryItem => r !== null)
+			);
 		} catch {
 			setWorkplaces([]);
 		} finally {

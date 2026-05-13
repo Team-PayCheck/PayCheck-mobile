@@ -31,12 +31,11 @@ const SalaryStatementSheet: React.FC<SalaryStatementSheetProps> = ({
 		fetchStatements,
 	} = useSalaryStatement(year, month);
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		if (visible) {
 			fetchStatements();
 		}
-	}, [visible]);
+	}, [visible, fetchStatements]);
 
 	const currentStatement = statements[selectedIndex];
 	const workplaceNames = statements.map((s) => s.workplaceName);
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
 		color: colors.textSecondary,
 	},
 	scrollContent: {
-		paddingBottom: 20,
+		paddingBottom: 40,
 	},
 	header: {
 		flexDirection: "row",
