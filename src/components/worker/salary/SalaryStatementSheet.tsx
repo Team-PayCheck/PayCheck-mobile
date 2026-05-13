@@ -86,9 +86,7 @@ const SalaryStatementSheet: React.FC<SalaryStatementSheetProps> = ({
 					<View style={styles.netPayContainer}>
 						<Text style={styles.netPayText} weight="Bold">
 							실 수령액 :{" "}
-							{currentStatement.salary?.netPay != null
-								? `${formatCurrency(currentStatement.salary.netPay)}원`
-								: "?"}
+							{`${formatCurrency(currentStatement.salary.netPay)}원`}
 						</Text>
 					</View>
 				</ScrollView>
