@@ -165,19 +165,15 @@ const BaseRequestCard: React.FC<BaseRequestCardProps> = ({
 											</View>
 											<View style={styles.detailHourRow}>
 												<View style={styles.detailHourBox}>
-													<Text style={styles.detailValueText}>{parseTime(detail.originalStartTime).hour}</Text>
-												</View>
-												<Text>:</Text>
-												<View style={styles.detailHourBox}>
-													<Text style={styles.detailValueText}>{parseTime(detail.originalStartTime).min}</Text>
+													<Text style={styles.detailValueText}>
+														{parseTime(detail.originalStartTime).hour}:{parseTime(detail.originalStartTime).min}
+													</Text>
 												</View>
 												<Text style={styles.detailTilde}>~</Text>
 												<View style={styles.detailHourBox}>
-													<Text style={styles.detailValueText}>{parseTime(detail.originalEndTime!).hour}</Text>
-												</View>
-												<Text>:</Text>
-												<View style={styles.detailHourBox}>
-													<Text style={styles.detailValueText}>{parseTime(detail.originalEndTime!).min}</Text>
+													<Text style={styles.detailValueText}>
+														{parseTime(detail.originalEndTime!).hour}:{parseTime(detail.originalEndTime!).min}
+													</Text>
 												</View>
 											</View>
 										</View>
@@ -193,19 +189,15 @@ const BaseRequestCard: React.FC<BaseRequestCardProps> = ({
 										</View>
 										<View style={styles.detailHourRow}>
 											<View style={styles.detailHourBox}>
-												<Text style={styles.detailValueText}>{parseTime(detail.requestedStartTime).hour}</Text>
-											</View>
-											<Text>:</Text>
-											<View style={styles.detailHourBox}>
-												<Text style={styles.detailValueText}>{parseTime(detail.requestedStartTime).min}</Text>
+												<Text style={styles.detailValueText}>
+													{parseTime(detail.requestedStartTime).hour}:{parseTime(detail.requestedStartTime).min}
+												</Text>
 											</View>
 											<Text style={styles.detailTilde}>~</Text>
 											<View style={styles.detailHourBox}>
-												<Text style={styles.detailValueText}>{parseTime(detail.requestedEndTime).hour}</Text>
-											</View>
-											<Text>:</Text>
-											<View style={styles.detailHourBox}>
-												<Text style={styles.detailValueText}>{parseTime(detail.requestedEndTime).min}</Text>
+												<Text style={styles.detailValueText}>
+													{parseTime(detail.requestedEndTime).hour}:{parseTime(detail.requestedEndTime).min}
+												</Text>
 											</View>
 										</View>
 									</View>
@@ -380,20 +372,22 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		gap: 4,
+		gap: 8,
 	},
 	detailHourBox: {
+		flex: 1,
 		backgroundColor: colors.backgroundGrey,
 		borderRadius: 8,
 		paddingVertical: 10,
-		paddingHorizontal: 12,
+		paddingHorizontal: 8,
 		borderWidth: 1,
 		borderColor: colors.borderLight,
-		minWidth: 40,
 		alignItems: "center",
 	},
 	detailTilde: {
-		marginHorizontal: 6,
+		marginHorizontal: 2,
+		color: colors.textPrimary,
+		fontSize: 15,
 	},
 });
 
